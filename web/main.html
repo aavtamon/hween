@@ -1,0 +1,71 @@
+<head>
+  <meta charset="utf-8">
+  <title>Get It</title>
+  
+  <script src="../../shared_tools/web/lib/jquery-1.11.2.min.js"></script>
+  <link rel="stylesheet" href="../../shared_tools/web/lib/jquery-ui-1.11.4/jquery-ui.min.css">
+  <script src="../../shared_tools/web/lib/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+  
+  
+  <script src="../../shared_tools/web/utils/utils.js"></script>
+  <script src="../../shared_tools/web/utils/backend.js"></script>
+  
+  <link rel="stylesheet" href="../../shared_tools/web/ui/uiutils.css">
+  <script src="../../shared_tools/web/ui/uiutils.js"></script>
+
+  <script src="../../shared_tools/web/utils/i18n.js"></script>
+  <script src="i18n/Locale-eng.js"></script>
+
+  
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/application.css">
+  <script src="js/application.js"></script>
+  <script src="js/backend-ext.js"></script>
+  
+
+  
+  <script src="../../shared_tools/web/pagemanagement/pm.js"></script>
+  <script src="../../shared_tools/web/pagemanagement/abstract_page.js"></script>
+  <script src="../../shared_tools/web/pagemanagement/abstract_container_page.js"></script>
+  <script src="../../shared_tools/web/pagemanagement/pagenotfound_page.js"></script>
+  <link rel="stylesheet" href="../../shared_tools/web/pagemanagement/css/pagenotfound_page.css">
+
+  
+  <link rel="stylesheet" href="pages/login_page.css">
+  <script src="pages/login_page.js"></script>
+
+  <link rel="stylesheet" href="pages/register_page.css">
+  <script src="pages/register_page.js"></script>
+  
+  <link rel="stylesheet" href="pages/restore_password_page.css">
+  <script src="pages/restore_password_page.js"></script>
+  
+  <script>
+    $(document).ready(function() {
+      Application.start();
+    }); 
+  </script>
+</head>
+
+<body>
+  <div id="Title">
+    <img id="Title-Logo" src="imgs/Logo.png"></img>
+    <div id="HeaderContainer"></div>
+    <div id="Title-Options">
+      <div id="Title-Options-Language">
+        <button id="Title-Options-Language-Button" class="link-button"></button>
+      </div>
+      <label id="Title-Options-Separator">|</label>
+      <div id="Title-Options-User">
+        <button id="Title-Options-User-Button" class="link-button"></button>
+      </div>
+    </div>
+    <div id="Title-Caption"></div>
+  </div>
+  <div id="RootContainer"></div>
+  <div id="Footer">
+    <label id="Footer-Label">PiZ Technologies / PiZtec, &nbsp;2015. &nbsp;All rights reserved.</label>
+    <button id="Footer-ContactUs" class="link-button"></button>
+  </div>
+</body>
+</html>
