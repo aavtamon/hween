@@ -67,6 +67,8 @@ var Locale_eng = {
       "AccessCodeExplanationText": "Access Code is printed on the box that you received your Helloween Toy in. If you cannot locate it, please contact our customer service and we will recover it for you",
       
       "AcceptTermsProvider": function(linkId) { return "I acknowledge that have read and agree to the <a id='" + linkId + "'>Terms And Conditions</a>"; },
+      
+      "LoginButton": "Login",
 
       "ProvideEmailMessage": "The email is not provided or does not look like a valid email address",
       "ProvideNameMessage": "You must provide a valid name. Do not use special characters",
@@ -90,6 +92,11 @@ var Locale_eng = {
     "PageNotFoundPage": {
       "NotFoundLabel": "Page Not Found",
       "CreateRequestDialogTitle": "I Need..."
+    },
+    "DeviceSelectionPage": {
+      "DeviceSelectionLabel": "Select the device that you want to work with:",
+      "NoDevicesAvailableLabel": "You have no devices yet activated. Click <b>Add Device</b> button",
+      "UpdatingDevicesLabel": "Retriving your devices, please wait..."
     }
   }
 }

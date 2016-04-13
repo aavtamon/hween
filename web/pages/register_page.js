@@ -50,6 +50,11 @@ RegisterPage.prototype.definePageContent = function(root) {
   }.bind(this));
 
   var buttonsPanel = UIUtils.appendBlock(signUpPanel, "ButtonsPanel");
+  var loginButton = UIUtils.appendLink(buttonsPanel, "LoginButton", this.getLocale().LoginButton);
+  UIUtils.setClickListener(loginButton, function() {
+    Application.showPage(LoginPage.name);
+  });
+  
   var signUpButton = UIUtils.appendButton(buttonsPanel, "SignUpButton", "");
   UIUtils.setClickListener(signUpButton, function() {
     this._signUp();
@@ -131,7 +136,8 @@ RegisterPage.prototype._signUp = function() {
       this._retypePasswordElement.setValue("");
 
       Application.setupUserMenuChooser();
-      Application.showPage(WelcomePage.name);
+      //Application.showPage(WelcomePage.name);
+      Application.showPage(DeviceSelectionPage.name);
     }.bind(this),
     failure: function() {
       backendCallback._onCompletion();

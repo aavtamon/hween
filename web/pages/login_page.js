@@ -156,7 +156,7 @@ LoginPage.prototype._signIn = function() {
     success: function() {
       this._onCompletion();
       Application.setupUserMenuChooser();
-      Application.showPage(HomePage.name);
+      Application.showPage(DeviceSelectionPage.name);
     },
     failure: function() {
       this._onCompletion();
