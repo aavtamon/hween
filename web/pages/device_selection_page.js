@@ -1,24 +1,28 @@
 DeviceSelectionPage = ClassUtils.defineClass(AbstractPage, function DeviceSelectionPage() {
   AbstractPage.call(this, DeviceSelectionPage.name);
   
-  this._deviceSelecionLabel;
   this._noDevicesAvailableLabel;
   this._updatingDevicesLabel;
+  this._deviceSelectionPanel;
   this._deviceSelector;
 });
 
 DeviceSelectionPage.prototype.definePageContent = function(root) {
-  var deviceSelecionPanel = UIUtils.appendBlock(root, "DeviceSelectionPanel");
+  var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
   
-  this._deviceSelecionLabel = UIUtils.appendLabel(deviceSelecionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
-  UIUtils.setVisible(this._deviceSelecionLabel, false);
-  
-  this._noDevicesAvailableLabel = UIUtils.appendLabel(deviceSelecionPanel, "NoDevicesAvailableLabel", this.getLocale().NoDevicesAvailableLabel);
+  this._noDevicesAvailableLabel = UIUtils.appendLabel(contentPanel, "NoDevicesAvailableLabel", this.getLocale().NoDevicesAvailableLabel);
   UIUtils.setVisible(this._noDevicesAvailableLabel, false);
   
-  this._updatingDevicesLabel = UIUtils.appendLabel(deviceSelecionPanel, "UpdatingDevicesLabel", this.getLocale().UpdatingDevicesLabel);
+  this._updatingDevicesLabel = UIUtils.appendLabel(contentPanel, "UpdatingDevicesLabel", this.getLocale().UpdatingDevicesLabel);
   
-  this._deviceSelector = UIUtils.appendGallery(deviceSelecionPanel, "DeviceSelector");
+  this._deviceSelectionPanel = UIUtils.appendBlock(contentPanel, "DeviceSelectionPanel");
+  UIUtils.appendLabel(this._deviceSelectionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
+  this._deviceSelector = UIUtils.appendGallery(this._deviceSelectionPanel, "DeviceSelector");
+  
+  UIUtils.setVisible(this._deviceSelectionPanel, false);
+  
+  var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
+  var addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
 }
 
 DeviceSelectionPage.prototype.onShow = function() {
@@ -31,12 +35,12 @@ DeviceSelectionPage.prototype.onShow = function() {
         return;
       }
       
-      UIUtils.setVisible(this._deviceSelecionLabel, true);
+      UIUtils.setVisible(this._deviceSelectionPanel, true);
       
       for (var i = 0; i < ids.length; i++) {
         Backend.getDeviceInfo(ids[i], function(status, info) {
           if (status == Backend.OperationResult.SUCCESS) {
-            this._deviceSelector.addItem({id: info.id, label: info.label, icon: info.icon, function(id) {
+            this._deviceSelector.addItem({id: info.id, label: info.name, icon: info.icon, clickListener: function(id) {
               console.debug("Selected device " + id);
             }});
           }

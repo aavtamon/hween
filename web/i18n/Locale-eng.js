@@ -96,7 +96,8 @@ var Locale_eng = {
     "DeviceSelectionPage": {
       "DeviceSelectionLabel": "Select the device that you want to work with:",
       "NoDevicesAvailableLabel": "You have no devices yet activated. Click <b>Add Device</b> button",
-      "UpdatingDevicesLabel": "Retriving your devices, please wait..."
+      "UpdatingDevicesLabel": "Retriving your devices, please wait...",
+      "AddButton": "Add Device"
     }
   }
 }

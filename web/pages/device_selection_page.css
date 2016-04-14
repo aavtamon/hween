@@ -1,90 +1,42 @@
-#RegisterPage {
+#DeviceSelectionPage {
   text-align: center;
   min-width: 950px;
 }
 
-#RegisterPage-SignUpPanel {
+
+#DeviceSelectionPage-ContentPanel {
+  display: inline-block;
   width: 500px;
-  display: inline-block;
-  margin-top: 10px;
-  position: relative;
-  
-  font-family: Verdana;
-  font-size: 13px;
-  
-  text-align: left;
+  margin-top: 50px;
 }
 
-#RegisterPage-SignUpPanel-SignUpLabel {
+#DeviceSelectionPage-ContentPanel-NoDevicesAvailableLabel, #DeviceSelectionPage-ContentPanel-UpdatingDevicesLabel {
   display: block;
+  
   font-size: 20px;
-  text-align: left;
-  
-  color: rgb(0, 133, 63);
-  
-  margin-bottom: 30px;
 }
 
-#RegisterPage-SignUpPanel-EmailPanel, #RegisterPage-SignUpPanel-NamePanel, #RegisterPage-SignUpPanel-AccessCodePanel, #RegisterPage-SignUpPanel-PasswordPanel, #RegisterPage-SignUpPanel-RetypePasswordPanel {
+
+#DeviceSelectionPage-ContentPanel-DeviceSelectionPanel {
+}
+
+#DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-DeviceSelectionLabel {
+  display: block;
+  
+  font-size: 20px;
+}
+
+#DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-DeviceSelector {
   margin-top: 10px;
-  margin-left: 20px;
 }
-#RegisterPage-SignUpPanel-PasswordPanel {
+
+#DeviceSelectionPage-ContentPanel-ButtonsPanel {
   margin-top: 30px;
-}
-#RegisterPage-SignUpPanel-EmailPanel-EmailLabel, #RegisterPage-SignUpPanel-NamePanel-NameLabel, #RegisterPage-SignUpPanel-AccessCodePanel-AccessCodeLabel, #RegisterPage-SignUpPanel-PasswordPanel-PasswordLabel, #RegisterPage-SignUpPanel-RetypePasswordPanel-RetypePasswordLabel {
-  display: inline-block;
-  width: 150px;
-  text-align: left;
+  text-align: right;
 }
 
-#RegisterPage-SignUpPanel-EmailPanel-Email, #RegisterPage-SignUpPanel-NamePanel-Name, #RegisterPage-SignUpPanel-AccessCodePanel-AccessCcode, #RegisterPage-SignUpPanel-PasswordPanel-Password, #RegisterPage-SignUpPanel-RetypePasswordPanel-RetypePassword {
-  display: inline-block;
-  width: 330px;
-}
-#RegisterPage-SignUpPanel-AccessCodePanel-AccessCode {
-  width: 100px;
-}
-#RegisterPage-SignUpPanel-AccessCodePanel {
-  position: relative;
-}
-#RegisterPage-SignUpPanel-AccessCodePanel-AccessCodeExplanation {
-  position: absolute;
-  display: inline-block;
-  width: 300px;
-  left: -350px;
-  top: -10px;
-}
-
-#RegisterPage-SignUpPanel-TermsAndCondsCheckbox {
-  margin-top: 20px;
-}
-#RegisterPage-SignUpPanel-TermsAndCondsLink {
-}
-
-#RegisterPage-SignUpPanel-ButtonsPanel {
-  margin-top: 30px;
-  text-align: center;
-}
-
-#RegisterPage-SignUpPanel-ButtonsPanel-LoginButton {
-  margin-right: 100px;
-  vertical-align: bottom;
-  font-size: 15px;
-}
-
-#RegisterPage-SignUpPanel-ButtonsPanel-SignUpButton {
-  width: 85px;
-  height: 35px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-color: transparent;
-  
-  border-width: 0px;
-  
-  background-image: url(../../../shared_tools/web/imgs/SignUp.png);
-}
-#RegisterPage-SignUpPanel-ButtonsPanel-SignUpButton:active {
+#DeviceSelectionPage-ContentPanel-ButtonsPanel-AddButton {
+  padding: 5px 20px 5px 20px;
 }
 
 
