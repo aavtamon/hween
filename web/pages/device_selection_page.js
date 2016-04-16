@@ -28,47 +28,38 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
 }
 
 DeviceSelectionPage.prototype.onShow = function() {
-  Controller.startDiscovery(function(deviceId, status) {
-    var deviceItem = this._devices[deviceId];
-    if (deviceItem != null) {
-      if (status == Controller.ConnectionStatus.UNKNOWN) {
-        UIUtils.removeClass(deviceItem._indicator, "device-connected");
-        UIUtils.removeClass(deviceItem._indicator, "device-offline");
-        UIUtils.addClass(deviceItem._indicator, "device-inactive");
-      } else if (status == Controller.ConnectionStatus.CONNECTED) {
-        UIUtils.removeClass(deviceItem._indicator, "device-inactive");
-        UIUtils.removeClass(deviceItem._indicator, "device-offline");
-        UIUtils.addClass(deviceItem._indicator, "device-connected");
-      } else if (status == Controller.ConnectionStatus.OFFLINE) {
-        UIUtils.removeClass(deviceItem._indicator, "device-inactive");
-        UIUtils.removeClass(deviceItem._indicator, "device-connected");
-        UIUtils.addClass(deviceItem._indicator, "device-offline");
-      }
-    }
-  }.bind(this));
-  
   Backend.getDeviceIds(function(status, ids) {
-    if (status == Backend.OperationResult.SUCCESS) {
-      UIUtils.setVisible(this._updatingDevicesLabel, false);
-      
-      if (ids.length == 0) {
-        UIUtils.setVisible(this._noDevicesAvailableLabel, true);
-        return;
-      }
-      
-      UIUtils.setVisible(this._deviceSelectionPanel, true);
-      
-      for (var i = 0; i < ids.length; i++) {
-        Backend.getDeviceInfo(ids[i], function(status, info) {
-          if (status == Backend.OperationResult.SUCCESS) {
-            this._addDevice(info);
+    if (status != Backend.OperationResult.SUCCESS) {
+      return;
+    }
+    
+    UIUtils.setVisible(this._updatingDevicesLabel, false);
+
+    if (ids.length == 0) {
+      UIUtils.setVisible(this._noDevicesAvailableLabel, true);
+      return;
+    }
+
+    UIUtils.setVisible(this._deviceSelectionPanel, true);
+
+    for (var i = 0; i < ids.length; i++) {
+      Backend.getDeviceInfo(ids[i], function(result, info) {
+        if (result == Backend.OperationResult.SUCCESS) {
+          this._addDevice(info);
+
+          if (info.status == Backend.Status.OFFLINE) {
+            this._setDeviceConnectionStatus(info, Backend.Status.OFFLINE);
+          } else {
+            this._setDeviceConnectionStatus(info, Backend.Status.UNKNOWN);
+
+            Controller.isAvailable(info, function(isAvailable) {
+              this._setDeviceConnectionStatus(info, isAvailable ? Backend.Status.CONNECTED : Backend.Status.OFFLINE);
+            }.bind(this));
           }
-        }.bind(this)); 
-      }
+        }
+      }.bind(this)); 
     }
   }.bind(this));
-  
-  
 }
 
 DeviceSelectionPage.prototype.onHide = function() {
@@ -102,4 +93,22 @@ DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {
   UIUtils.setClickListener(deviceItem, function() {
     console.debug("Clicked element " + deviceInfo.id);
   });
+}
+
+DeviceSelectionPage.prototype._setDeviceConnectionStatus = function(deviceInfo, status) {
+  var deviceItem = this._devices[deviceInfo.id];
+  
+  if (status == Backend.Status.UNKNOWN) {
+    UIUtils.removeClass(deviceItem._indicator, "device-connected");
+    UIUtils.removeClass(deviceItem._indicator, "device-offline");
+    UIUtils.addClass(deviceItem._indicator, "device-inactive");
+  } else if (status == Backend.Status.CONNECTED) {
+    UIUtils.removeClass(deviceItem._indicator, "device-inactive");
+    UIUtils.removeClass(deviceItem._indicator, "device-offline");
+    UIUtils.addClass(deviceItem._indicator, "device-connected");
+  } else if (status == Backend.Status.OFFLINE) {
+    UIUtils.removeClass(deviceItem._indicator, "device-inactive");
+    UIUtils.removeClass(deviceItem._indicator, "device-connected");
+    UIUtils.addClass(deviceItem._indicator, "device-offline");
+  }
 }

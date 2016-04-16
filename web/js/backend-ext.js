@@ -10,6 +10,13 @@ Backend.CacheChangeEvent.TYPE_DEVICE_INFO = "device_info";
 Backend.DeviceType = {};
 Backend.DeviceType.STUMP_GHOST = "stump_ghost";
 
+Backend.Status = {};
+Backend.Status.UNKNOWN = "unknown";
+Backend.Status.CONNECTED = "connected";
+Backend.Status.OFFLINE = "offline";
+
+
+
 
 // Device Management
 
@@ -52,6 +59,8 @@ Backend.getDeviceInfo = function(deviceId, operationCallback) {
         operations: ["up", "down", "rotate-clockwise", "rotate-couterclockwise", "eyes_on", "eyes_off"],
         name: "Ghost",
         icon: null,
+        status: Backend.Status.CONNECTED,
+        ip_address: "192.168.0.1"
       }
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_INFO, deviceId, deviceInfo);
 

@@ -1,35 +1,18 @@
 Controller = {
-  _discoveredDevices: {}
 }
 
-Controller.ConnectionStatus = {};
-Controller.ConnectionStatus.UNKNOWN = "unknown";
-Controller.ConnectionStatus.ERROR = "error";
-Controller.ConnectionStatus.CONNECTED = "connected";
-Controller.ConnectionStatus.OFFLINE = "offline";
+Controller.Command = {}
+Controller.Command.CONNECT_TO_BACKEND = "connect_to_backend";
 
-
-Controller.startDiscovery = function(observer) {
-  setTimeout(function() {
-    var deviceIds = Backend.getDeviceIds();
-    
-    if (deviceIds == null) {
-    } else {
-      for (var i = 0; i < deviceIds.length; i++) {
-        this._discoveredDevices[deviceIds[i]] = Controller.ConnectionStatus.CONNECTED;
-        
-        if (observer) {
-          observer(deviceIds[i], this._discoveredDevices[deviceIds[i]]);
-        }
-      }
-    }
-  }.bind(this), 5000);
+Controller.isAvailable = function(deviceInfo, observer) {
+  setTimeout(observer.bind(this, true), 2000);
 }
 
-Controller.stopDiscovery = function() {
+// command: {id: Controller.Command, arg: <any data>}
+Controller.sendCommand = function(deviceInfo, command, observer) {
+  //  setTimeout(observer.bind(this, true), 2000);
 }
 
-Controller.getStatus = function(deviceId, observer) {
-  var status = this._discoveredDevices[deviceId];
-  return status != null ? status : Controller.ConnectionStatus.UNKNOWN;
+Controller.sendProgram = function(deviceInfo, commands, observer) {
+  //  setTimeout(observer.bind(this, true), 2000);
 }
