@@ -1,36 +1,30 @@
-DeviceSelectionPage = ClassUtils.defineClass(AbstractDataPage, function DeviceSelectionPage() {
-  AbstractDataPage.call(this, DeviceSelectionPage.name);
+AddDevicePage = ClassUtils.defineClass(AbstractPage, function AddDevicePage() {
+  AbstractPage.call(this, AddDevicePage.name);
   
-  this._noDevicesAvailableLabel;
-  this._updatingDevicesLabel;
-  this._deviceSelectionPanel;
-  this._deviceSelector;
-  
+  this._progressIndicator;
   this._devices = {};
 });
 
-DeviceSelectionPage.prototype.definePageContent = function(root) {
-  AbstractDataPage.prototype.definePageContent.call(this, root);
-
+AddDevicePage.prototype.definePageContent = function(root) {
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
   
-  this._noDevicesAvailableLabel = UIUtils.appendLabel(contentPanel, "NoDevicesAvailableLabel", this.getLocale().NoDevicesAvailableLabel);
-  UIUtils.setVisible(this._noDevicesAvailableLabel, false);
+  var devicesPanel = UIUtils(contentPanel, "DevicesPanel");
   
-  this._updatingDevicesLabel = UIUtils.appendLabel(contentPanel, "UpdatingDevicesLabel", this.getLocale().UpdatingDevicesLabel);
+  UIUtils.appendLabel(devicesPanel, "FoundDevicesLabel", this.getLocale().NoDevicesAvailableLabel);
   
-  this._deviceSelectionPanel = UIUtils.appendBlock(contentPanel, "DeviceSelectionPanel");
-  UIUtils.appendLabel(this._deviceSelectionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
-  this._deviceSelector = UIUtils.appendGallery(this._deviceSelectionPanel, "DeviceSelector");
+  UIUtils.appendList(devicesPanel, "DevicesList");
   
-  UIUtils.setVisible(this._deviceSelectionPanel, false);
+  var buttonsPanel = UIUtils.appendBlock(devicesPanel, "ButtonsPanel");
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
+  var addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);
   
-  var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  var addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
+  var progressPanel = UIUtils(contentPanel, "ProgressPanel");
+  this._progressIndicator = UIUtils.appendBlock(progressPanel, "DiscoveryInProgress");
+  UIUtils.setVisible(this._progressIndicator, false);
 }
 
-DeviceSelectionPage.prototype.onShow = function() {
-  AbstractDataPage.prototype.onShow.call(this);
+AddDevicePage.prototype.onShow = function() {
+  UIUtils.setVisible(this._progressIndicator, false);
   
   Backend.getDeviceIds(function(status, ids) {
     if (status != Backend.OperationResult.SUCCESS) {
@@ -49,14 +43,6 @@ DeviceSelectionPage.prototype.onShow = function() {
     for (var i = 0; i < ids.length; i++) {
       Backend.getDeviceInfo(ids[i], function(result, info) {
         if (result == Backend.OperationResult.SUCCESS) {
-          if (info.status == Backend.Status.DISCOVERED) {
-            idsStatus[info.id] = true;
-            
-            // On this screen we only show devices added on the account
-            return;
-          }
-
-          
           this._addDevice(info);
 
           if (info.status == Backend.Status.OFFLINE) {
@@ -75,11 +61,8 @@ DeviceSelectionPage.prototype.onShow = function() {
 }
 
 DeviceSelectionPage.prototype.onHide = function() {
-  AbstractDataPage.prototype.onHide.call(this);
-  
   Controller.stopDiscovery();
 }
-
 
 
 DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {

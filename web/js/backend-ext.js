@@ -14,6 +14,7 @@ Backend.Status = {};
 Backend.Status.UNKNOWN = "unknown";
 Backend.Status.CONNECTED = "connected";
 Backend.Status.OFFLINE = "offline";
+Backend.Status.DISCOVERED = "discovered";
 
 
 
@@ -34,7 +35,7 @@ Backend.getDeviceIds = function(operationCallback) {
       if (operationCallback) {
         operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
       }
-    }, 2000);
+    }, 5000);
   } else {
     if (operationCallback) {
       operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
