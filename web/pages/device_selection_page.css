@@ -41,7 +41,7 @@
 
 .device {
 }
-.device-icon {
+.device .device-icon {
   position: relative;
   display: inline-block;
   width: 70px;
@@ -53,14 +53,14 @@
   background-position: center;
   background-size: contain;
 }
-.device-label {
+.device .device-name {
   display: inline-block;
   width: 100%;
   height: 20px;
   margin-top: 5px;
   text-align: center;
 }
-.device-indicator {
+.device .device-indicator {
   position: absolute;
   display: inline-block;
   width: 10px;
@@ -75,13 +75,13 @@
   
   background-color: white;
 }
-.device-indicator.device-inactive {
+.device .device-indicator.device-inactive {
   background-color: yellow;
 }
-.device-indicator.device-connected {
+.device .device-indicator.device-connected {
   background-color: green;
 }
-.device-indicator.device-offline {
+.device .device-indicator.device-offline {
   background-color: red;
 }
 

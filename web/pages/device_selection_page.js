@@ -27,6 +27,9 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
   var addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
+  addButton.setClickListener(function() {
+    Application.showPage(AddDevicePage.name);
+  });
 }
 
 DeviceSelectionPage.prototype.onShow = function() {
@@ -76,8 +79,6 @@ DeviceSelectionPage.prototype.onShow = function() {
 
 DeviceSelectionPage.prototype.onHide = function() {
   AbstractDataPage.prototype.onHide.call(this);
-  
-  Controller.stopDiscovery();
 }
 
 
@@ -103,7 +104,7 @@ DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {
   deviceItem._indicator = activityIndicator;
 
   var itemLabel = UIUtils.appendLabel(deviceItem, "Label", deviceInfo.name);
-  UIUtils.addClass(itemLabel, "device-");
+  UIUtils.addClass(itemLabel, "device-name");
 
   UIUtils.setClickListener(deviceItem, function() {
     console.debug("Clicked element " + deviceInfo.id);
