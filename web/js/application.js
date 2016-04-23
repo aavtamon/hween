@@ -43,7 +43,7 @@ Application.start = function() {
   
   var showDefaultPage = function() {
     if (Backend.isLogged()) {
-      Application.showPage(HomePage.name);
+      Application.showPage(DeviceSelectionPage.name);
     } else {
       Application.showPage(LoginPage.name);
     }

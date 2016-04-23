@@ -21,9 +21,9 @@ Backend.Status.DISCOVERED = "discovered";
 
 // Device Management
 
-Backend.getDeviceIds = function(operationCallback) {
+Backend.getRegisteredDeviceIds = function(operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
-  
+
   if (deviceIds == null) {
     Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
     
@@ -43,6 +43,17 @@ Backend.getDeviceIds = function(operationCallback) {
   }
   
   return deviceIds;
+}
+
+Backend.getNewDeviceIds = function(operationCallback) {
+  //TODO
+  setTimeout(function() {
+    var deviceIds = [1004, 1005, 1006];
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
+    }
+  }, 5000);
 }
 
 Backend.getDeviceInfo = function(deviceId, operationCallback) {
@@ -76,6 +87,23 @@ Backend.getDeviceInfo = function(deviceId, operationCallback) {
   }
   
   return deviceInfo;
+}
+
+
+Backend.registerDevices = function(ids, operationCallback) {
+  var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
+  
+  setTimeout(function() {
+    for (var i in ids) {
+      deviceIds.push(ids[i]);
+    }
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 5000);
 }
 
 

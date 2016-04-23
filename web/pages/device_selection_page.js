@@ -35,7 +35,9 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
 DeviceSelectionPage.prototype.onShow = function() {
   AbstractDataPage.prototype.onShow.call(this);
   
-  Backend.getDeviceIds(function(status, ids) {
+  this._deviceSelector.clear();
+  
+  Backend.getRegisteredDeviceIds(function(status, ids) {
     if (status != Backend.OperationResult.SUCCESS) {
       return;
     }
@@ -52,14 +54,6 @@ DeviceSelectionPage.prototype.onShow = function() {
     for (var i = 0; i < ids.length; i++) {
       Backend.getDeviceInfo(ids[i], function(result, info) {
         if (result == Backend.OperationResult.SUCCESS) {
-          if (info.status == Backend.Status.DISCOVERED) {
-            idsStatus[info.id] = true;
-            
-            // On this screen we only show devices added on the account
-            return;
-          }
-
-          
           this._addDevice(info);
 
           if (info.status == Backend.Status.OFFLINE) {
@@ -80,7 +74,6 @@ DeviceSelectionPage.prototype.onShow = function() {
 DeviceSelectionPage.prototype.onHide = function() {
   AbstractDataPage.prototype.onHide.call(this);
 }
-
 
 
 DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {

@@ -100,8 +100,12 @@ var Locale_eng = {
       "AddButton": "Add Device"
     },
     "AddDevicePage": {
-      "FoundDevicesLabel": "Found New Devices:",
-      "AddDevicesButton": "Add selected",
+      "SearchingDevicesLabel": "Searching new devices on your network...",
+      "FoundNewDevicesLabel": "Found new devices:",
+      "NoNewDevicesFoundLabel": "No new devices were found",
+      "ServerErrorLabel": "Cannot communicate with the server. It could be a problem with your internet connection",
+      "AddDevicesButton": "Add Selected Devices",
+      "ScanButton": "Rescan"
     }
   }
 }

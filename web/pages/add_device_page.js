@@ -1,7 +1,11 @@
 AddDevicePage = ClassUtils.defineClass(AbstractDataPage, function AddDevicePage() {
   AbstractPage.call(this, AddDevicePage.name);
   
+  this._statusLabel;
   this._progressIndicator;
+  this._addButton;
+  this._rescanButton;
+  this._deviceList;
   this._devices = {};
 });
 
@@ -12,13 +16,24 @@ AddDevicePage.prototype.definePageContent = function(root) {
   
   var devicesPanel = UIUtils.appendBlock(contentPanel, "DevicesPanel");
   
-  UIUtils.appendLabel(devicesPanel, "FoundDevicesLabel", this.getLocale().NoDevicesAvailableLabel);
+  var scanStatusPanel = UIUtils.appendBlock(devicesPanel, "ScanStatusPanel");
+  this._statusLabel = UIUtils.appendLabel(scanStatusPanel, "SearchStatusLabel");
+  this._rescanButton = UIUtils.appendButton(scanStatusPanel, "ScanButton", this.getLocale().ScanButton);
+  this._rescanButton.setClickListener(this._scanNewDevices.bind(this));
   
-  UIUtils.appendList(devicesPanel, "DevicesList");
+  this._deviceList = UIUtils.appendBlock(devicesPanel, "DevicesList");
   
   var buttonsPanel = UIUtils.appendBlock(devicesPanel, "ButtonsPanel");
   var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
-  var addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);
+  cancelButton.setClickListener(Application.goBack.bind(Application));
+  
+  this._addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);
+  this._addButton.setClickListener(function() {
+    Backend.registerDevices(this._getSelectedDeviceIds(), function() {
+      Application.goBack();
+    });
+  }.bind(this));
+  UIUtils.setEnabled(this._addButton, false);
   
   var progressPanel = UIUtils.appendBlock(contentPanel, "ProgressPanel");
   this._progressIndicator = UIUtils.appendBlock(progressPanel, "DiscoveryInProgress");
@@ -27,17 +42,32 @@ AddDevicePage.prototype.definePageContent = function(root) {
 
 AddDevicePage.prototype.onShow = function() {
   AbstractDataPage.prototype.onShow.call(this);
-  
+ 
+  this._scanNewDevices();
+}
+
+AddDevicePage.prototype.onHide = function() {
+  AbstractDataPage.prototype.onHide.call(this);
+}
+
+
+AddDevicePage.prototype._scanNewDevices = function() {
   UIUtils.setVisible(this._progressIndicator, true);
+  this._statusLabel.innerHTML = this.getLocale().SearchingDevicesLabel;
+  UIUtils.setEnabled(this._rescanButton, false);
   
+  this._devices = {};
+  UIUtils.emptyContainer(this._deviceList);
   
-  Backend.getDeviceIds(function(status, ids) {
+  Backend.getNewDeviceIds(function(status, ids) {
     if (status != Backend.OperationResult.SUCCESS) {
+      this._statusLabel.innerHTML = this.getLocale().ServerErrorLabel;
       return;
     }
     
     if (ids.length == 0) {
       UIUtils.setVisible(this._progressIndicator, false);
+      this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
       return;
     }
 
@@ -49,17 +79,18 @@ AddDevicePage.prototype.onShow = function() {
           if (info.status == Backend.Status.DISCOVERED) {
             Controller.isAvailable(info, function(isAvailable) {
               if (isAvailable) {
-                this._devices[ids[i]] = info;
-                this._addDeviceElement(ids[i]);
+                this._devices[info.id] = info;
+                
+                this._addDeviceElement(info.id);
                 this._stopProgressIndicationIfDiscoveryCompleted();
               }
             }.bind(this));
           } else {
-            this._devices[ids[i]] = {};
+            delete this._devices[info.id];
             this._stopProgressIndicationIfDiscoveryCompleted();
           }
         } else {
-          this._devices[ids[i]] = {};
+          delete this._devices[info.id];
           this._stopProgressIndicationIfDiscoveryCompleted();
         }
       }.bind(this)); 
@@ -67,9 +98,6 @@ AddDevicePage.prototype.onShow = function() {
   }.bind(this));
 }
 
-AddDevicePage.prototype.onHide = function() {
-  AbstractDataPage.prototype.onHide.call(this);
-}
 
 AddDevicePage.prototype._stopProgressIndicationIfDiscoveryCompleted = function() {
   for (var id in this._devices) {
@@ -79,26 +107,47 @@ AddDevicePage.prototype._stopProgressIndicationIfDiscoveryCompleted = function()
   }
   
   UIUtils.setVisible(this._progressIndicator, false);
+  
+  if (Object.keys(this._devices).length == 0) {
+    this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
+  } else {
+    this._statusLabel.innerHTML = this.getLocale().FoundNewDevicesLabel;
+  }
+  
+  UIUtils.setEnabled(this._rescanButton, true);
 }
 
 AddDevicePage.prototype._addDeviceElement = function(id) {
-  var deviceItem = document.createElement("div");
-  UIUtils.addClass(deviceItem, "discovered-device");
-  
   var info = this._devices[id];
-  this._devices[id] = {element: deviceItem, dislay: info.name, info: info};
+  var deviceItem = UIUtils.appendBlock(this._deviceList, info.id);
+  deviceItem._info = info;
+  this._devices[id] = deviceItem;
+  
+  UIUtils.addClass(deviceItem, "discovered-device");
 
   var selectionBox = UIUtils.appendCheckbox(deviceItem, "Selection");
-  UIUtils.addClass(itemIcon, "device-selection");
+  UIUtils.addClass(selectionBox, "device-selection");
+  deviceItem._selectionBox = selectionBox;
+  selectionBox.setChangeListener(function() {
+    UIUtils.setEnabled(this._addButton, this._getSelectedDeviceIds().length > 0);
+  }.bind(this));
                        
   var itemIcon = UIUtils.appendBlock(deviceItem, "Icon");
   UIUtils.addClass(itemIcon, "device-icon");
   itemIcon.style.backgroundImage = info.icon;
 
-  var itemLabel = UIUtils.appendLabel(deviceItem, "Label", deviceInfo.name);
+  var itemLabel = UIUtils.appendLabel(deviceItem, "Label", info.name);
   UIUtils.addClass(itemLabel, "device-name");
+}
 
-  UIUtils.setClickListener(deviceItem, function() {
-    console.debug("Clicked element " + info.id);
-  });
+AddDevicePage.prototype._getSelectedDeviceIds = function() {
+  var selectedIds = [];
+
+  for (var id in this._devices) {
+    if (this._devices[id]._selectionBox.isChecked()) {
+      selectedIds.push(id);
+    }
+  }
+  
+  return selectedIds;
 }
