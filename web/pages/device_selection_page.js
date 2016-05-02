@@ -5,6 +5,7 @@ DeviceSelectionPage = ClassUtils.defineClass(AbstractDataPage, function DeviceSe
   this._updatingDevicesLabel;
   this._deviceSelectionPanel;
   this._deviceSelector;
+  this._addButton;
   
   this._devices = {};
 });
@@ -26,18 +27,26 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
   UIUtils.setVisible(this._deviceSelectionPanel, false);
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  var addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
-  addButton.setClickListener(function() {
-    Application.showPage(AddDevicePage.name);
-  });
+  this._addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
+  this._addButton.setClickListener(function() {
+    if (this._devices.length == 0) {
+      Dialogs.showAddDeviceByIdDialog();
+    } else {
+      Application.showPage(AddDevicePage.name);
+    }
+  }.bind(this));
 }
 
 DeviceSelectionPage.prototype.onShow = function() {
   AbstractDataPage.prototype.onShow.call(this);
   
   this._deviceSelector.clear();
+  this._devices = {};
+  UIUtils.setEnabled(this._addButton, false);
   
   Backend.getRegisteredDeviceIds(function(status, ids) {
+    UIUtils.setEnabled(this._addButton, true);
+    
     if (status != Backend.OperationResult.SUCCESS) {
       return;
     }

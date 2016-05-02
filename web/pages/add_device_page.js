@@ -3,6 +3,7 @@ AddDevicePage = ClassUtils.defineClass(AbstractDataPage, function AddDevicePage(
   
   this._statusLabel;
   this._progressIndicator;
+  this._addByIdPanel;
   this._addButton;
   this._rescanButton;
   this._deviceList;
@@ -35,9 +36,22 @@ AddDevicePage.prototype.definePageContent = function(root) {
   }.bind(this));
   UIUtils.setEnabled(this._addButton, false);
   
-  var progressPanel = UIUtils.appendBlock(contentPanel, "ProgressPanel");
-  this._progressIndicator = UIUtils.appendBlock(progressPanel, "DiscoveryInProgress");
-  UIUtils.setVisible(this._progressIndicator, false);
+  
+  var rightPanel = UIUtils.appendBlock(contentPanel, "RightPanel");
+  
+  this._progressIndicator = UIUtils.appendBlock(rightPanel, "DiscoveryInProgressIndicator");
+  this._progressIndicator.start = function() {
+    this._progressIndicator.style.backgroundImage = "url(../../shared_tools/web/imgs/ajax-loader.gif)";
+  }.bind(this);
+  this._progressIndicator.stop = function() {
+    this._progressIndicator.style.backgroundImage = "url(../../shared_tools/web/imgs/close.png)";
+  }.bind(this);
+  
+  
+  this._addByIdPanel = UIUtils.appendBlock(rightPanel, "AddByIdPanel");
+  UIUtils.appendLabel(this._addByIdPanel, "AddByIdLabel", this.getLocale().AddByIdLabel);
+  var addByIdButton = UIUtils.appendButton(this._addByIdPanel, "AddByIdButton", this.getLocale().AddByIdButton);
+  addByIdButton.setClickListener(Dialogs.showAddDeviceByIdDialog);
 }
 
 AddDevicePage.prototype.onShow = function() {
@@ -52,9 +66,10 @@ AddDevicePage.prototype.onHide = function() {
 
 
 AddDevicePage.prototype._scanNewDevices = function() {
-  UIUtils.setVisible(this._progressIndicator, true);
+  this._progressIndicator.start();
   this._statusLabel.innerHTML = this.getLocale().SearchingDevicesLabel;
   UIUtils.setEnabled(this._rescanButton, false);
+  UIUtils.setVisible(this._addByIdPanel, false);
   
   this._devices = {};
   UIUtils.emptyContainer(this._deviceList);
@@ -66,7 +81,8 @@ AddDevicePage.prototype._scanNewDevices = function() {
     }
     
     if (ids.length == 0) {
-      UIUtils.setVisible(this._progressIndicator, false);
+      this._progressIndicator.stop();
+      UIUtils.setVisible(this._addByIdPanel, true);
       this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
       return;
     }
@@ -106,7 +122,8 @@ AddDevicePage.prototype._stopProgressIndicationIfDiscoveryCompleted = function()
     }
   }
   
-  UIUtils.setVisible(this._progressIndicator, false);
+  this._progressIndicator.stop();
+  UIUtils.setVisible(this._addByIdPanel, true);
   
   if (Object.keys(this._devices).length == 0) {
     this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;

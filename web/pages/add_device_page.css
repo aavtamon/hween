@@ -33,7 +33,6 @@
   border-style: solid;
 }
 
-
 #AddDevicePage-ContentPanel-DevicesPanel-ButtonsPanel {
   margin-top: 30px;
 }
@@ -48,22 +47,38 @@
 }
 
 
-#AddDevicePage-ContentPanel-ProgressPanel {
+#AddDevicePage-ContentPanel-RightPanel {
   display: inline-block;
-  margin-left: 200px;
   margin-top: 50px;
   vertical-align: top;
+  width: calc(100% - 600px);
+  
+  text-align: center;
 }
 
-#AddDevicePage-ContentPanel-ProgressPanel-DiscoveryInProgress {
-  width: 200px;
-  height: 200px;
+#AddDevicePage-ContentPanel-RightPanel-DiscoveryInProgressIndicator {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
   
-  background-image: url(../../../shared_tools/web/imgs/ajax-loader.gif);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
 }
+
+#AddDevicePage-ContentPanel-RightPanel-AddByIdPanel {
+  margin-top: 50px;
+}
+#AddDevicePage-ContentPanel-RightPanel-AddByIdPanel-AddByIdLabel {
+  display: block;
+  
+  font-size: 20px;
+}
+#AddDevicePage-ContentPanel-RightPanel-AddByIdPanel-AddByIdButton {
+  margin-top: 10px;
+  padding: 5px 20px 5px 20px;
+}
+
 
 
 

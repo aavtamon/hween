@@ -105,7 +105,19 @@ var Locale_eng = {
       "NoNewDevicesFoundLabel": "No new devices were found",
       "ServerErrorLabel": "Cannot communicate with the server. It could be a problem with your internet connection",
       "AddDevicesButton": "Add Selected Devices",
-      "ScanButton": "Rescan"
+      "ScanButton": "Rescan",
+      "AddByIdLabel": "Don't see your device in the list?",
+      "AddByIdButton": "Add By ID"
+    }
+  },
+  
+  "dialogs": {
+    "AddDeviceByIdDialog": {
+      "Title": "Adding Device...",
+      "DescriptionLabel": "Please enter your Halloween Toy id. You can find it printed on the box or on the label",
+      "AddButton": "Add",
+      
+      "IncorrectDeviceIdMessage": "Incorrect Device Id.<br>Valid id should be a 10-digit number"
     }
   }
 }
