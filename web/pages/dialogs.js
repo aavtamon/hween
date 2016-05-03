@@ -26,8 +26,14 @@ Dialogs.showAddDeviceByIdDialog = function() {
         }
         
         Dialogs._processing = true;
-        dialog.close();
-        Application.showPage(DeviceSelectionPage.name);
+        Backend.registerDevices([deviceIdInput.getValue()], function(status) {
+          if (status == Backend.OperationResult.SUCCESS) {
+            dialog.close();
+            Application.showPage(DeviceSelectionPage.name);
+          } else {
+            UIUtils.showMessage(this.getLocale().UnrecognizedDeviceIdMessage);
+          }
+        });
       }
     },
     cancel: {

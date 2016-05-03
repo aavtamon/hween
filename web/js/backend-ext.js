@@ -29,7 +29,7 @@ Backend.getRegisteredDeviceIds = function(operationCallback) {
     
     //TODO
     setTimeout(function() {
-      var deviceIds = [1001, 1002, 1003];
+      var deviceIds = [1001, 1002, 1003, 1004];
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
 
       if (operationCallback) {

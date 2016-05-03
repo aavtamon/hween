@@ -30,9 +30,13 @@ AddDevicePage.prototype.definePageContent = function(root) {
   
   this._addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);
   this._addButton.setClickListener(function() {
-    Backend.registerDevices(this._getSelectedDeviceIds(), function() {
-      Application.goBack();
-    });
+    Backend.registerDevices(this._getSelectedDeviceIds(), function(status) {
+      if (status == Backend.OperationResult.SUCCESS) {
+        Application.goBack();
+      } else {
+        UIUtuls.showMessage(this.getLocale().UnrecognizedDeviceIdMessage);
+      }
+    }.bind(this));
   }.bind(this));
   UIUtils.setEnabled(this._addButton, false);
   

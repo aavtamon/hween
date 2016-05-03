@@ -107,17 +107,19 @@ var Locale_eng = {
       "AddDevicesButton": "Add Selected Devices",
       "ScanButton": "Rescan",
       "AddByIdLabel": "Don't see your device in the list?",
-      "AddByIdButton": "Add By ID"
+      "AddByIdButton": "Add By ID",
+      "UnrecognizedDeviceIdMessage": "The Device Id is not recognized. Please make sure the device is online"
     }
   },
   
   "dialogs": {
     "AddDeviceByIdDialog": {
       "Title": "Adding Device...",
-      "DescriptionLabel": "Please enter your Halloween Toy id. You can find it printed on the box or on the label",
+      "DescriptionLabel": "Please enter your Halloween Toy id. You can find it printed on the box or on the label:",
       "AddButton": "Add",
       
-      "IncorrectDeviceIdMessage": "Incorrect Device Id.<br>Valid id should be a 10-digit number"
+      "IncorrectDeviceIdMessage": "Incorrect Device Id.<br>Valid id should be a 10-digit number",
+      "UnrecognizedDeviceIdMessage": "The Device Id is not recognized. Please make sure the device is online"
     }
   }
 }
