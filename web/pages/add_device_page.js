@@ -25,7 +25,7 @@ AddDevicePage.prototype.definePageContent = function(root) {
   this._deviceList = UIUtils.appendBlock(devicesPanel, "DevicesList");
   
   var buttonsPanel = UIUtils.appendBlock(devicesPanel, "ButtonsPanel");
-  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().GoBackButton);
   cancelButton.setClickListener(Application.goBack.bind(Application));
   
   this._addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);

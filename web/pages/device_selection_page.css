@@ -6,15 +6,25 @@
 
 #DeviceSelectionPage-ContentPanel {
   display: inline-block;
-  width: 500px;
+  width: 90%;
   margin-top: 50px;
 }
 
-#DeviceSelectionPage-ContentPanel-NoDevicesAvailableLabel, #DeviceSelectionPage-ContentPanel-UpdatingDevicesLabel {
+#DeviceSelectionPage-ContentPanel-InitialUpdatePanel {
+  display: inline-block;
+  width: 500px;
+}
+#DeviceSelectionPage-ContentPanel-InitialUpdatePanel-StatusLabel {
   display: block;
-  
   font-size: 20px;
 }
+#DeviceSelectionPage-ContentPanel-InitialUpdatePanel-ButtonsPanel {
+  margin-top: 30px;
+  text-align: right;
+}
+#DeviceSelectionPage-ContentPanel-InitialUpdatePanel-ButtonsPanel-AddButton {
+}
+
 
 
 #DeviceSelectionPage-ContentPanel-DeviceSelectionPanel {
@@ -22,33 +32,39 @@
 
 #DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-DeviceSelectionLabel {
   display: block;
-  
   font-size: 20px;
 }
 
 #DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-DeviceSelector {
   margin-top: 10px;
+  height: 200px;
 }
 
-#DeviceSelectionPage-ContentPanel-ButtonsPanel {
+#DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-ButtonsPanel {
   margin-top: 30px;
-  text-align: right;
+  text-align: left;
 }
 
-#DeviceSelectionPage-ContentPanel-ButtonsPanel-AddButton {
-  padding: 5px 20px 5px 20px;
+#DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-ButtonsPanel-RefreshButton {
+}
+
+#DeviceSelectionPage-ContentPanel-DeviceSelectionPanel-ButtonsPanel-AddButton {
+  float: right;
 }
 
 .device {
+  width: 166px;
+  height: 166px;
 }
 .device .device-icon {
-  position: relative;
   display: inline-block;
-  width: 70px;
-  height: 70px;
+  width: 100px;
+  height: 100px;
+  margin-top: 20px;
   
   background-color: lightgray;
 
+  background-image: url(../../../shared_tools/web/imgs/close.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -57,16 +73,13 @@
   display: inline-block;
   width: 100%;
   height: 20px;
-  margin-top: 5px;
+  margin-top: 20px;
   text-align: center;
 }
 .device .device-indicator {
-  position: absolute;
-  display: inline-block;
-  width: 10px;
   height: 10px;
-  top: 5px;
-  right: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
   
   border-radius: 5px;
   border-width: 1px;

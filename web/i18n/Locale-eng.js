@@ -97,14 +97,16 @@ var Locale_eng = {
       "DeviceSelectionLabel": "Select the device that you want to work with:",
       "NoDevicesAvailableLabel": "You have no devices yet activated. Click <b>Add Device</b> button",
       "UpdatingDevicesLabel": "Retriving your devices, please wait...",
-      "AddButton": "Add Device"
+      "AddButton": "Add Device",
+      "RefreshButton": "Refresh"
     },
     "AddDevicePage": {
+      "GoBackButton": "Go back",
       "SearchingDevicesLabel": "Searching new devices on your network...",
       "FoundNewDevicesLabel": "Found new devices:",
       "NoNewDevicesFoundLabel": "No new devices were found",
       "ServerErrorLabel": "Cannot communicate with the server. It could be a problem with your internet connection",
-      "AddDevicesButton": "Add Selected Devices",
+      "AddDevicesButton": "Add selected devices",
       "ScanButton": "Rescan",
       "AddByIdLabel": "Don't see your device in the list?",
       "AddByIdButton": "Add By ID",

@@ -21,28 +21,31 @@ Backend.Status.DISCOVERED = "discovered";
 
 // Device Management
 
-Backend.getRegisteredDeviceIds = function(operationCallback) {
+Backend.getRegisteredDeviceIds = function(operationCallback, forceUpdate) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
 
   if (deviceIds == null) {
     Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
     
-    //TODO
-    setTimeout(function() {
-      var deviceIds = [1001, 1002, 1003, 1004];
-      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
-
-      if (operationCallback) {
-        operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
-      }
-    }, 5000);
-  } else {
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
-    }
+    this._pullRegisteredDeviceIds(operationCallback);
+  } else if (forceUpdate) {
+    this._pullRegisteredDeviceIds(operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
   }
   
   return deviceIds;
+}
+Backend._pullRegisteredDeviceIds = function(operationCallback) {
+  //TODO
+  setTimeout(function() {
+    var deviceIds = [1001, 1002, 1003, 1004];
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS, deviceIds);
+    }
+  }, 5000);
 }
 
 Backend.getNewDeviceIds = function(operationCallback) {
@@ -56,37 +59,40 @@ Backend.getNewDeviceIds = function(operationCallback) {
   }, 5000);
 }
 
-Backend.getDeviceInfo = function(deviceId, operationCallback) {
+Backend.getDeviceInfo = function(deviceId, operationCallback, forceUpdate) {
   var deviceInfo = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_INFO, deviceId);
   
   if (deviceInfo == null) {
     Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_INFO, deviceId);
     
-    //TODO
-    setTimeout(function() {
-      var deviceInfo = {
-        id: deviceId,
-        type: Backend.DeviceType.STUMP_GHOST,
-        version: 1,
-        operations: ["up", "down", "rotate-clockwise", "rotate-couterclockwise", "eyes_on", "eyes_off"],
-        name: "Ghost",
-        icon: null,
-        status: Backend.Status.CONNECTED,
-        ip_address: "192.168.0.1"
-      }
-      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_INFO, deviceId, deviceInfo);
-
-      if (operationCallback) {
-        operationCallback(Backend.OperationResult.SUCCESS, deviceInfo);
-      }
-    }, 1000);
-  } else {
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS, deviceInfo);
-    }
+    this._pullDeviceInfo(deviceId, operationCallback);
+  } else if (forceUpdate) {
+    this._pullDeviceInfo(deviceId, operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, deviceInfo);
   }
   
   return deviceInfo;
+}
+Backend._pullDeviceInfo = function(deviceId, operationCallback) {
+  //TODO
+  setTimeout(function() {
+    var deviceInfo = {
+      id: deviceId,
+      type: Backend.DeviceType.STUMP_GHOST,
+      version: 1,
+      operations: ["up", "down", "rotate-clockwise", "rotate-couterclockwise", "eyes_on", "eyes_off"],
+      name: "Ghost",
+      icon: null,
+      status: Backend.Status.CONNECTED,
+      ip_address: "192.168.0.1"
+    }
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_INFO, deviceId, deviceInfo);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS, deviceInfo);
+    }
+  }, 1000);
 }
 
 

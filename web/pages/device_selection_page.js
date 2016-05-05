@@ -1,13 +1,23 @@
 DeviceSelectionPage = ClassUtils.defineClass(AbstractDataPage, function DeviceSelectionPage() {
   AbstractDataPage.call(this, DeviceSelectionPage.name);
   
-  this._noDevicesAvailableLabel;
-  this._updatingDevicesLabel;
+  this._initialUpdatePanel;
+  this._addByIdButton;
+  this._deviceSelectionLabel;
   this._deviceSelectionPanel;
   this._deviceSelector;
   this._addButton;
+  this._refreshButton;
   
   this._devices = {};
+  
+  this._cacheChangeListener = function(event) {
+    if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_IDS) {
+      this._updateDeviceSelector();
+    } else if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_INFO) {
+      this._updateDevice(event.objectId);
+    }
+  }.bind(this);
 });
 
 DeviceSelectionPage.prototype.definePageContent = function(root) {
@@ -15,75 +25,102 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
 
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
   
-  this._noDevicesAvailableLabel = UIUtils.appendLabel(contentPanel, "NoDevicesAvailableLabel", this.getLocale().NoDevicesAvailableLabel);
-  UIUtils.setVisible(this._noDevicesAvailableLabel, false);
+  this._initialUpdatePanel = UIUtils.appendBlock(contentPanel, "InitialUpdatePanel");
+  this._initialStatusLabel = UIUtils.appendLabel(this._initialUpdatePanel, "StatusLabel");
+  var buttonsPanel = UIUtils.appendBlock(this._initialUpdatePanel, "ButtonsPanel");
+  this._addByIdButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
+  this._addByIdButton.setClickListener(Dialogs.showAddDeviceByIdDialog.bind(Dialogs));
   
-  this._updatingDevicesLabel = UIUtils.appendLabel(contentPanel, "UpdatingDevicesLabel", this.getLocale().UpdatingDevicesLabel);
-  
+
   this._deviceSelectionPanel = UIUtils.appendBlock(contentPanel, "DeviceSelectionPanel");
-  UIUtils.appendLabel(this._deviceSelectionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
+  this._statusLabel = UIUtils.appendLabel(this._deviceSelectionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
   this._deviceSelector = UIUtils.appendGallery(this._deviceSelectionPanel, "DeviceSelector");
+  this._deviceSelector.setClickListener(function(item) {
+    console.debug(item._info);
+  });
+
   
-  UIUtils.setVisible(this._deviceSelectionPanel, false);
-  
-  var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  this._addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
-  this._addButton.setClickListener(function() {
-    if (this._devices.length == 0) {
-      Dialogs.showAddDeviceByIdDialog();
-    } else {
-      Application.showPage(AddDevicePage.name);
-    }
+  var buttonsPanel = UIUtils.appendBlock(this._deviceSelectionPanel, "ButtonsPanel");
+  this._refreshButton = UIUtils.appendButton(buttonsPanel, "RefreshButton", this.getLocale().RefreshButton);
+  this._refreshButton.setClickListener(function() {
+    this._refreshDevices();
   }.bind(this));
+
+  this._addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
+  this._addButton.setClickListener(Application.showPage.bind(Application, AddDevicePage.name));
 }
 
 DeviceSelectionPage.prototype.onShow = function() {
   AbstractDataPage.prototype.onShow.call(this);
   
-  this._deviceSelector.clear();
-  this._devices = {};
-  UIUtils.setEnabled(this._addButton, false);
+  UIUtils.setVisible(this._initialUpdatePanel, true);
+  UIUtils.setEnabled(this._addByIdButton, false);
+  this._initialStatusLabel.innerHTML = this.getLocale().UpdatingDevicesLabel;
+  
+  UIUtils.setVisible(this._deviceSelectionPanel, false);
   
   Backend.getRegisteredDeviceIds(function(status, ids) {
-    UIUtils.setEnabled(this._addButton, true);
-    
-    if (status != Backend.OperationResult.SUCCESS) {
-      return;
-    }
-    
-    UIUtils.setVisible(this._updatingDevicesLabel, false);
-
     if (ids.length == 0) {
-      UIUtils.setVisible(this._noDevicesAvailableLabel, true);
+      this._initialStatusLabel.innerHTML = this.getLocale().NoDevicesAvailableLabel;
+      UIUtils.setEnabled(this._addByIdButton, true);
       return;
+    } else {
+      UIUtils.setVisible(this._initialUpdatePanel, false);
+      UIUtils.setVisible(this._deviceSelectionPanel, true);
+      this._updateDeviceSelector();
     }
 
-    UIUtils.setVisible(this._deviceSelectionPanel, true);
-
-    for (var i = 0; i < ids.length; i++) {
-      Backend.getDeviceInfo(ids[i], function(result, info) {
-        if (result == Backend.OperationResult.SUCCESS) {
-          this._addDevice(info);
-
-          if (info.status == Backend.Status.OFFLINE) {
-            this._setDeviceConnectionStatus(info, Backend.Status.OFFLINE);
-          } else {
-            this._setDeviceConnectionStatus(info, Backend.Status.UNKNOWN);
-
-            Controller.isAvailable(info, function(isAvailable) {
-              this._setDeviceConnectionStatus(info, isAvailable ? Backend.Status.CONNECTED : Backend.Status.OFFLINE);
-            }.bind(this));
-          }
-        }
-      }.bind(this)); 
-    }
-  }.bind(this));
+    Backend.addCacheChangeListener(this._cacheChangeListener);
+  }.bind(this), true);
 }
 
 DeviceSelectionPage.prototype.onHide = function() {
   AbstractDataPage.prototype.onHide.call(this);
+  
+  Backend.removeCacheChangeListener(this._cacheChangeListener);
 }
 
+
+DeviceSelectionPage.prototype._refreshDevices = function() {
+  Backend.removeCacheChangeListener(this._cacheChangeListener);
+  
+  UIUtils.setEnabled(this._addButton, false);
+  UIUtils.setEnabled(this._refreshButton, false);
+  this._statusLabel.innerHTML = this.getLocale().UpdatingDevicesLabel;
+  
+  this._deviceSelector.setEnabled(false);
+  
+  Backend.getRegisteredDeviceIds(function(status, ids) {
+    UIUtils.setEnabled(this._addButton, true);
+    UIUtils.setEnabled(this._refreshButton, true);
+    
+    if (status == Backend.OperationResult.SUCCESS) {
+      this._statusLabel.innerHTML = this.getLocale().DeviceSelectionLabel;
+      this._updateDeviceSelector();
+    }
+    Backend.addCacheChangeListener(this._cacheChangeListener);
+  }.bind(this), true);
+}
+
+DeviceSelectionPage.prototype._updateDeviceSelector = function() {
+  this._deviceSelector.clear();
+  this._devices = {};
+  
+  this._deviceSelector.setEnabled(true);
+
+  var ids = Backend.getRegisteredDeviceIds();
+  for (var i = 0; i < ids.length; i++) {
+    Backend.getDeviceInfo(ids[i], function(result, info) {
+      if (result == Backend.OperationResult.SUCCESS) {
+        this._addDevice(info);
+
+        if (info.status == Backend.Status.UNKNOWN) {
+          Backend.getDeviceInfo(ids[i], true); // we force the system to pull an update to let the backend find if the device is really connected
+        }
+      }
+    }.bind(this)); 
+  }
+}
 
 DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {
   var deviceItem = document.createElement("div");
@@ -91,40 +128,48 @@ DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {
   
   this._devices[deviceInfo.id] = deviceItem;
   
-  
   this._deviceSelector.appendItem(deviceItem);
   UIUtils.addClass(deviceItem, "device");
+
+  var activityIndicator = UIUtils.appendBlock(deviceItem, "ActivityIndicator");
+  UIUtils.addClass(activityIndicator, "device-indicator");
+  UIUtils.addClass(activityIndicator, "device-inactive");
   
   var itemIcon = UIUtils.appendBlock(deviceItem, "Icon");
   UIUtils.addClass(itemIcon, "device-icon");
   itemIcon.style.backgroundImage = deviceInfo.icon;
 
-  var activityIndicator = UIUtils.appendBlock(itemIcon, "ActivityIndicator");
-  UIUtils.addClass(activityIndicator, "device-indicator");
-  UIUtils.addClass(activityIndicator, "device-inactive");
-  
   deviceItem._indicator = activityIndicator;
+  this._setDeviceConnectionStatus(deviceInfo.id);
 
   var itemLabel = UIUtils.appendLabel(deviceItem, "Label", deviceInfo.name);
   UIUtils.addClass(itemLabel, "device-name");
-
-  UIUtils.setClickListener(deviceItem, function() {
-    console.debug("Clicked element " + deviceInfo.id);
-  });
 }
 
-DeviceSelectionPage.prototype._setDeviceConnectionStatus = function(deviceInfo, status) {
-  var deviceItem = this._devices[deviceInfo.id];
+DeviceSelectionPage.prototype._updateDevice = function(deviceId) {
+  var deviceItem = this._devices[deviceId];
+  if (deviceItem == null) {
+    return;
+  }
   
-  if (status == Backend.Status.UNKNOWN) {
+  deviceItem._info = Backend.getDeviceInfo(deviceId);
+  
+  this._setDeviceConnectionStatus(deviceId);
+}
+
+DeviceSelectionPage.prototype._setDeviceConnectionStatus = function(deviceId) {
+  var deviceItem = this._devices[deviceId];
+  var deviceInfo = deviceItem._info;
+  
+  if (deviceInfo.status == Backend.Status.UNKNOWN) {
     UIUtils.removeClass(deviceItem._indicator, "device-connected");
     UIUtils.removeClass(deviceItem._indicator, "device-offline");
     UIUtils.addClass(deviceItem._indicator, "device-inactive");
-  } else if (status == Backend.Status.CONNECTED) {
+  } else if (deviceInfo.status == Backend.Status.CONNECTED) {
     UIUtils.removeClass(deviceItem._indicator, "device-inactive");
     UIUtils.removeClass(deviceItem._indicator, "device-offline");
     UIUtils.addClass(deviceItem._indicator, "device-connected");
-  } else if (status == Backend.Status.OFFLINE) {
+  } else if (deviceInfo.status == Backend.Status.OFFLINE) {
     UIUtils.removeClass(deviceItem._indicator, "device-inactive");
     UIUtils.removeClass(deviceItem._indicator, "device-connected");
     UIUtils.addClass(deviceItem._indicator, "device-offline");
