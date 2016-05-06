@@ -3,7 +3,26 @@
 #AddDeviceByIdDialog-ContentPanel {
 }
 #AddDeviceByIdDialog-ContentPanel-DescriptionLabel {
+  display: block;
   margin-right: 20px;
 }
-#AddDeviceByIdDialog-ContentPanel-DeviceIdInput {
+#AddDeviceByIdDialog-ContentPanel-SnLabel {
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 20px;
+  
+  width: 150px;
+}
+#AddDeviceByIdDialog-ContentPanel-DeviceSnInput {
+  width: 100px;
+}
+#AddDeviceByIdDialog-ContentPanel-VerificationLabel {
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 20px;
+  
+  width: 150px;
+}
+#AddDeviceByIdDialog-ContentPanel-VerificationInput {
+  width: 100px;
 }

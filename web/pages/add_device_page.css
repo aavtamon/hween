@@ -110,9 +110,18 @@
 .discovered-device .device-name {
   display: inline-block;
   vertical-align: top;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 30px;
   
   font-size: 20px;
+  font-weight: bold;
 }
+.discovered-device .device-id {
+  display: inline-block;
+  margin-top: 10px;
+  text-align: center;
+  
+  font-size: 12px;
+}
+
 

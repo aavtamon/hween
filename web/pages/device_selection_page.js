@@ -47,7 +47,9 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
   }.bind(this));
 
   this._addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);
-  this._addButton.setClickListener(Application.showPage.bind(Application, AddDevicePage.name));
+  this._addButton.setClickListener(function() {
+    Application.showPage(AddDevicePage.name);
+  });
 }
 
 DeviceSelectionPage.prototype.onShow = function() {
@@ -71,7 +73,7 @@ DeviceSelectionPage.prototype.onShow = function() {
     }
 
     Backend.addCacheChangeListener(this._cacheChangeListener);
-  }.bind(this), true);
+  }.bind(this));
 }
 
 DeviceSelectionPage.prototype.onHide = function() {
@@ -144,6 +146,9 @@ DeviceSelectionPage.prototype._addDevice = function(deviceInfo) {
 
   var itemLabel = UIUtils.appendLabel(deviceItem, "Label", deviceInfo.name);
   UIUtils.addClass(itemLabel, "device-name");
+
+  var idLabel = UIUtils.appendLabel(deviceItem, "Id", I18n.getLocale().literals.SerialNumber + " " + deviceInfo.serial_number);
+  UIUtils.addClass(idLabel, "device-id");
 }
 
 DeviceSelectionPage.prototype._updateDevice = function(deviceId) {

@@ -48,7 +48,7 @@ Backend._pullRegisteredDeviceIds = function(operationCallback) {
   }, 5000);
 }
 
-Backend.getNewDeviceIds = function(operationCallback) {
+Backend.getUnregisteredDeviceIds = function(operationCallback) {
   //TODO
   setTimeout(function() {
     var deviceIds = [1004, 1005, 1006];
@@ -84,6 +84,7 @@ Backend._pullDeviceInfo = function(deviceId, operationCallback) {
       operations: ["up", "down", "rotate-clockwise", "rotate-couterclockwise", "eyes_on", "eyes_off"],
       name: "Ghost",
       icon: null,
+      serial_number: "000000" + deviceId,
       status: Backend.Status.CONNECTED,
       ip_address: "192.168.0.1"
     }
@@ -96,7 +97,7 @@ Backend._pullDeviceInfo = function(deviceId, operationCallback) {
 }
 
 
-Backend.registerDevices = function(ids, operationCallback) {
+Backend.addRegisterDevices = function(ids, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   
@@ -104,6 +105,20 @@ Backend.registerDevices = function(ids, operationCallback) {
     for (var i in ids) {
       deviceIds.push(ids[i]);
     }
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 5000);
+}
+
+Backend.registerDevice = function(deviceId, verificationCode, operationCallback) {
+  var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
+  
+  setTimeout(function() {
+    deviceIds.push(deviceId);
     Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
 
     if (operationCallback) {

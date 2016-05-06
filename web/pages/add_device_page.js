@@ -3,7 +3,7 @@ AddDevicePage = ClassUtils.defineClass(AbstractDataPage, function AddDevicePage(
   
   this._statusLabel;
   this._progressIndicator;
-  this._addByIdPanel;
+  this._addByIdButton;
   this._addButton;
   this._rescanButton;
   this._deviceList;
@@ -30,7 +30,7 @@ AddDevicePage.prototype.definePageContent = function(root) {
   
   this._addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);
   this._addButton.setClickListener(function() {
-    Backend.registerDevices(this._getSelectedDeviceIds(), function(status) {
+    Backend.addRegisterDevices(this._getSelectedDeviceIds(), function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
         Application.goBack();
       } else {
@@ -52,10 +52,12 @@ AddDevicePage.prototype.definePageContent = function(root) {
   }.bind(this);
   
   
-  this._addByIdPanel = UIUtils.appendBlock(rightPanel, "AddByIdPanel");
-  UIUtils.appendLabel(this._addByIdPanel, "AddByIdLabel", this.getLocale().AddByIdLabel);
-  var addByIdButton = UIUtils.appendButton(this._addByIdPanel, "AddByIdButton", this.getLocale().AddByIdButton);
-  addByIdButton.setClickListener(Dialogs.showAddDeviceByIdDialog);
+  var addByIdPanel = UIUtils.appendBlock(rightPanel, "AddByIdPanel");
+  UIUtils.appendLabel(addByIdPanel, "AddByIdLabel", this.getLocale().AddByIdLabel);
+  this._addByIdButton = UIUtils.appendButton(addByIdPanel, "AddByIdButton", this.getLocale().AddByIdButton);
+  this._addByIdButton.setClickListener(function() {
+    Dialogs.showAddDeviceByIdDialog();
+  });
 }
 
 AddDevicePage.prototype.onShow = function() {
@@ -73,12 +75,12 @@ AddDevicePage.prototype._scanNewDevices = function() {
   this._progressIndicator.start();
   this._statusLabel.innerHTML = this.getLocale().SearchingDevicesLabel;
   UIUtils.setEnabled(this._rescanButton, false);
-  UIUtils.setVisible(this._addByIdPanel, false);
+  UIUtils.setEnabled(this._addByIdButton, false);
   
   this._devices = {};
   UIUtils.emptyContainer(this._deviceList);
   
-  Backend.getNewDeviceIds(function(status, ids) {
+  Backend.getUnregisteredDeviceIds(function(status, ids) {
     if (status != Backend.OperationResult.SUCCESS) {
       this._statusLabel.innerHTML = this.getLocale().ServerErrorLabel;
       return;
@@ -86,7 +88,7 @@ AddDevicePage.prototype._scanNewDevices = function() {
     
     if (ids.length == 0) {
       this._progressIndicator.stop();
-      UIUtils.setVisible(this._addByIdPanel, true);
+      UIUtils.setEnabled(this._addByIdButton, true);
       this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
       return;
     }
@@ -96,19 +98,10 @@ AddDevicePage.prototype._scanNewDevices = function() {
       
       Backend.getDeviceInfo(ids[i], function(result, info) {
         if (result == Backend.OperationResult.SUCCESS) {
-          if (info.status == Backend.Status.DISCOVERED) {
-            Controller.isAvailable(info, function(isAvailable) {
-              if (isAvailable) {
-                this._devices[info.id] = info;
-                
-                this._addDeviceElement(info.id);
-                this._stopProgressIndicationIfDiscoveryCompleted();
-              }
-            }.bind(this));
-          } else {
-            delete this._devices[info.id];
-            this._stopProgressIndicationIfDiscoveryCompleted();
-          }
+          this._devices[info.id] = info;
+
+          this._addDeviceElement(info.id);
+          this._stopProgressIndicationIfDiscoveryCompleted();
         } else {
           delete this._devices[info.id];
           this._stopProgressIndicationIfDiscoveryCompleted();
@@ -127,7 +120,7 @@ AddDevicePage.prototype._stopProgressIndicationIfDiscoveryCompleted = function()
   }
   
   this._progressIndicator.stop();
-  UIUtils.setVisible(this._addByIdPanel, true);
+  UIUtils.setEnabled(this._addByIdButton, true);
   
   if (Object.keys(this._devices).length == 0) {
     this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
@@ -157,8 +150,11 @@ AddDevicePage.prototype._addDeviceElement = function(id) {
   UIUtils.addClass(itemIcon, "device-icon");
   itemIcon.style.backgroundImage = info.icon;
 
-  var itemLabel = UIUtils.appendLabel(deviceItem, "Label", info.name);
+  var itemLabel = UIUtils.appendLabel(deviceItem, "NameLabel", info.name);
   UIUtils.addClass(itemLabel, "device-name");
+
+  var idLabel = UIUtils.appendLabel(deviceItem, "IdLabel", I18n.getLocale().literals.SerialNumber + " " + info.serial_number);
+  UIUtils.addClass(idLabel, "device-id");
 }
 
 AddDevicePage.prototype._getSelectedDeviceIds = function() {
