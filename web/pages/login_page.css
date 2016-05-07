@@ -56,6 +56,8 @@
 }
 
 #LoginPage-LoginPanel-ControlPanel-RememberLoginCheck {
+  margin-top: 5px;
+  height: 14px;
   font: inherit;
   font-size: 12px;
 }

@@ -115,6 +115,10 @@ DeviceSelectionPage.prototype._updateDeviceSelector = function() {
     Backend.getDeviceInfo(ids[i], function(result, info) {
       if (result == Backend.OperationResult.SUCCESS) {
         this._addDevice(info);
+        
+        Controller.reportToServer(info, function(success) {
+          // success == true means that the device was contacted successfully
+        });
 
         if (info.status == Backend.Status.UNKNOWN) {
           Backend.getDeviceInfo(ids[i], true); // we force the system to pull an update to let the backend find if the device is really connected

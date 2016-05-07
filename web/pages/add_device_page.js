@@ -137,7 +137,7 @@ AddDevicePage.prototype._addDeviceElement = function(id) {
   deviceItem._info = info;
   this._devices[id] = deviceItem;
   
-  UIUtils.addClass(deviceItem, "discovered-device");
+  UIUtils.addClass(deviceItem, "discovered-device notselectable");
 
   var selectionBox = UIUtils.appendCheckbox(deviceItem, "Selection");
   UIUtils.addClass(selectionBox, "device-selection");
