@@ -97,7 +97,7 @@ Backend._pullDeviceInfo = function(deviceId, operationCallback) {
 }
 
 
-Backend.addRegisterDevices = function(ids, operationCallback) {
+Backend.registerDevices = function(ids, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   
@@ -113,7 +113,23 @@ Backend.addRegisterDevices = function(ids, operationCallback) {
   }, 5000);
 }
 
-Backend.registerDevice = function(deviceId, verificationCode, operationCallback) {
+Backend.unregisterDevices = function(ids, operationCallback) {
+  var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
+  
+  setTimeout(function() {
+    for (var i in ids) {
+      GeneralUtils.removeFromArray(deviceIds, ids[i]);
+    }
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 5000);
+}
+
+Backend.addNewDevice = function(deviceId, verificationCode, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   

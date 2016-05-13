@@ -100,6 +100,7 @@ var Locale_eng = {
       "NoDevicesAvailableLabel": "You have no devices yet activated. Click <b>Add Device</b> button",
       "UpdatingDevicesLabel": "Retriving your devices, please wait...",
       "AddButton": "Add Device",
+      "RemoveButton": "Remove Device",
       "RefreshButton": "Refresh"
     },
     "AddDevicePage": {
@@ -128,6 +129,11 @@ var Locale_eng = {
       "IncorrectVerificationCodeMessage": "The verification code is invalid.<br>It should be a 6 symbol alpha-digital case-insensitive combination.",
       "DeviceAddedMessage": "The device was successfully added",
       "UnrecognizedDeviceMessage": "The Device s/n or verification code do not match our records. Please check your input and try again"
+    },
+    "ConfirmDeviceRemovalDialog": {
+      "Title": "Removal Confirmation",
+      "TextProvider": function(deviceName) { return "Are you sure you want to remove the device " + deviceName + "?"; },
+      "ConfirmRemovalButton": "Remove",
     }
   }
 }

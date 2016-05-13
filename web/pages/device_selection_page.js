@@ -7,6 +7,7 @@ DeviceSelectionPage = ClassUtils.defineClass(AbstractDataPage, function DeviceSe
   this._deviceSelectionPanel;
   this._deviceSelector;
   this._addButton;
+  this._removeButton;
   this._refreshButton;
   
   this._devices = {};
@@ -33,6 +34,11 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
   
 
   this._deviceSelectionPanel = UIUtils.appendBlock(contentPanel, "DeviceSelectionPanel");
+  this._refreshButton = UIUtils.appendButton(this._deviceSelectionPanel, "RefreshButton", this.getLocale().RefreshButton);
+  this._refreshButton.setClickListener(function() {
+    this._refreshDevices();
+  }.bind(this));
+  
   this._statusLabel = UIUtils.appendLabel(this._deviceSelectionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
   this._deviceSelector = UIUtils.appendGallery(this._deviceSelectionPanel, "DeviceSelector");
   this._deviceSelector.setClickListener(function(item) {
@@ -41,9 +47,12 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
 
   
   var buttonsPanel = UIUtils.appendBlock(this._deviceSelectionPanel, "ButtonsPanel");
-  this._refreshButton = UIUtils.appendButton(buttonsPanel, "RefreshButton", this.getLocale().RefreshButton);
-  this._refreshButton.setClickListener(function() {
-    this._refreshDevices();
+
+  this._removeButton = UIUtils.appendButton(buttonsPanel, "RemoveButton", this.getLocale().RemoveButton);
+  this._removeButton.setClickListener(function() {
+    if (this._deviceSelector.getSelectedItem() != null) {
+      Dialogs.showConfirmDeviceRemovalDialog(this._deviceSelector.getSelectedItem()._info.id);
+    }
   }.bind(this));
 
   this._addButton = UIUtils.appendButton(buttonsPanel, "AddButton", this.getLocale().AddButton);

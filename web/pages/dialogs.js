@@ -38,7 +38,7 @@ Dialogs.showAddDeviceByIdDialog = function() {
         }
         
         Dialogs._processing = true;
-        Backend.registerDevice(deviceSnInput.getValue(), verificationInput.getValue(), function(status) {
+        Backend.addNewDevice(deviceSnInput.getValue(), verificationInput.getValue(), function(status) {
           if (status == Backend.OperationResult.SUCCESS) {
             dialog.close();
             UIUtils.showMessage(I18n.getLocale().dialogs.AddDeviceByIdDialog.DeviceAddedMessage);
@@ -49,6 +49,26 @@ Dialogs.showAddDeviceByIdDialog = function() {
             UIUtils.showMessage(I18n.getLocale().literal.ServerErrorMessage);
           }
         });
+      }
+    },
+    cancel: {
+      display: I18n.getLocale().literals.CancelOperationButton,
+      alignment: "left"
+    }
+  });
+}
+
+
+Dialogs.showConfirmDeviceRemovalDialog = function(deviceId) {
+  var dialog = UIUtils.showDialog("ConfirmDeviceRemovalDialog", I18n.getLocale().dialogs.ConfirmDeviceRemovalDialog.Title, I18n.getLocale().dialogs.ConfirmDeviceRemovalDialog.TextProvider(Backend.getDeviceInfo(deviceId).name), {
+    ok: {
+      display: I18n.getLocale().dialogs.ConfirmDeviceRemovalDialog.ConfirmRemovalButton,
+      listener: function() {
+        Backend.unregisterDevices([deviceId], function(status) {
+          if (status == Backend.OperationResult.SUCCESS) {
+            dialog.close();
+          }
+        })
       }
     },
     cancel: {

@@ -30,7 +30,7 @@ AddDevicePage.prototype.definePageContent = function(root) {
   
   this._addButton = UIUtils.appendButton(buttonsPanel, "AddDevicesButton", this.getLocale().AddDevicesButton);
   this._addButton.setClickListener(function() {
-    Backend.addRegisterDevices(this._getSelectedDeviceIds(), function(status) {
+    Backend.registerDevices(this._getSelectedDeviceIds(), function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
         Application.goBack();
       } else {
