@@ -1,0 +1,21 @@
+#DeviceManagementPage {
+  text-align: center;
+  min-width: 950px;
+}
+
+
+#DeviceManagementPage-ContentPanel {
+  display: inline-block;
+  width: 90%;
+  margin-top: 50px;
+}
+
+#DeviceManagementPage-ContentPanel-ToolbarPanel {
+  text-align: left;
+}
+#DeviceManagementPage-ContentPanel-ToolbarPanel-ManualModeButton {
+}
+#DeviceManagementPage-ContentPanel-ToolbarPanel-DeviceSettingsButton {
+  float: right;
+}
+

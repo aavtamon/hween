@@ -84,6 +84,8 @@
 
 #LoginPage-LoginPanel-ControlPanel-ButtonsPanel-SignInButton {
   font: inherit;
+  
+  border-radius: 0px;
 }
 
 #LoginPage-LoginPanel-ControlPanel-ButtonsPanel-SignUpLink {

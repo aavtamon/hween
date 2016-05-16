@@ -114,6 +114,10 @@ var Locale_eng = {
       "AddByIdLabel": "Don't see your device in the list?",
       "AddByIdButton": "Add By Serial Number",
       "UnrecognizedDeviceIdMessage": "The Device with this s/n is not found. Please make sure the device is online",
+    },
+    "DeviceManagementPage": {
+      "ManualModeButton": "Manual Mode",
+      "DeviceSettingsButton": "Device Settings",
     }
   },
   

@@ -42,7 +42,7 @@ DeviceSelectionPage.prototype.definePageContent = function(root) {
   this._statusLabel = UIUtils.appendLabel(this._deviceSelectionPanel, "DeviceSelectionLabel", this.getLocale().DeviceSelectionLabel);
   this._deviceSelector = UIUtils.appendGallery(this._deviceSelectionPanel, "DeviceSelector");
   this._deviceSelector.setClickListener(function(item) {
-    console.debug(item._info);
+    Application.showPage(DeviceManagementPage.name, {deviceId: item._info.id});
   });
 
   
