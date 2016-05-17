@@ -118,6 +118,12 @@ var Locale_eng = {
     "DeviceManagementPage": {
       "ManualModeButton": "Manual Mode",
       "DeviceSettingsButton": "Device Settings",
+      "ProgramSelectionLabel": "Select Programs:",
+      "RemoveSelectedButton": "Remove selected",
+      "AddProgramButton": "Add program",
+      "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
+      "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
+      
     }
   },
   

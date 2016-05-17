@@ -19,3 +19,27 @@
   float: right;
 }
 
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel {
+  margin-top: 20px;
+  padding: 5px;
+  
+  border-width: 1px;
+  border-style: solid;
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionLabel {
+  display: block;
+  
+  font-size: 30px;
+  text-align: left;
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionList {
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel {
+  margin-top: 20px;
+  text-align: left;
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-RemoveSelectedButton {
+  margin-right: 50px;
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-AddProgramButton {
+}

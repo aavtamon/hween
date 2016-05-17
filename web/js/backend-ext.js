@@ -6,6 +6,8 @@ Backend.OperationResult.ERROR = "error";
 Backend.CacheChangeEvent.TYPE_DEVICE_IDS = "device_ids";
 Backend.CacheChangeEvent.TYPE_DEVICE_INFO = "device_info";
 
+Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS = "device_programs";
+
 
 Backend.DeviceType = {};
 Backend.DeviceType.STUMP_GHOST = "stump_ghost";
@@ -15,6 +17,14 @@ Backend.Status.UNKNOWN = "unknown";
 Backend.Status.CONNECTED = "connected";
 Backend.Status.OFFLINE = "offline";
 Backend.Status.DISCOVERED = "discovered";
+
+
+Backend.Program = {};
+Backend.Program.FREQUENCY_NEVER;
+Backend.Program.FREQUENCY_ONCE;
+Backend.Program.FREQUENCY_RARE;
+Backend.Program.FREQUENCY_OFTER;
+Backend.Program.FREQUENCY_ALWAYS;
 
 
 
@@ -146,3 +156,31 @@ Backend.addNewDevice = function(deviceId, verificationCode, operationCallback) {
 
 
 // Program Management
+Backend.getPrograms = function(deviceId, operationCallback) {
+  var devicePrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+  
+  if (devicePrograms == null) {
+    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+    
+    this._pullDevicePrograms(deviceId, operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, devicePrograms);
+  }
+  
+  return devicePrograms;
+}
+Backend._pullDevicePrograms = function(deviceId, operationCallback) {
+  //TODO
+  setTimeout(function() {
+    var devicePrograms = [{
+      id: 1,
+      title: "Roar",
+      frequency: Backend.Program.FREQUENCY_ONCE
+    }]
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, devicePrograms);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS, devicePrograms);
+    }
+  }, 1000);
+}
