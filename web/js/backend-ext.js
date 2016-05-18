@@ -176,6 +176,10 @@ Backend._pullDevicePrograms = function(deviceId, operationCallback) {
       id: 1,
       title: "Roar",
       frequency: Backend.Program.FREQUENCY_ONCE
+    }, {
+      id: 2,
+      title: "Loud Roar",
+      frequency: Backend.Program.FREQUENCY_ONCE
     }]
     Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, devicePrograms);
 

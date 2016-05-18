@@ -22,7 +22,11 @@ AddDevicePage.prototype.definePageContent = function(root) {
   this._rescanButton = UIUtils.appendButton(scanStatusPanel, "ScanButton", this.getLocale().ScanButton);
   this._rescanButton.setClickListener(this._scanNewDevices.bind(this));
   
-  this._deviceList = UIUtils.appendBlock(devicesPanel, "DevicesList");
+  this._deviceList = UIUtils.appendList(devicesPanel, "DevicesList");
+  this._deviceList.setSelectionListener(function(selectedItem) {
+    selectedItem.element._selectionBox.setChecked(!selectedItem.element._selectionBox.isChecked());
+  });
+  
   
   var buttonsPanel = UIUtils.appendBlock(devicesPanel, "ButtonsPanel");
   var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().GoBackButton);
@@ -78,7 +82,7 @@ AddDevicePage.prototype._scanNewDevices = function() {
   UIUtils.setEnabled(this._addByIdButton, false);
   
   this._devices = {};
-  UIUtils.emptyContainer(this._deviceList);
+  this._deviceList.clear();
   
   Backend.getUnregisteredDeviceIds(function(status, ids) {
     if (status != Backend.OperationResult.SUCCESS) {
@@ -134,8 +138,9 @@ AddDevicePage.prototype._stopProgressIndicationIfDiscoveryCompleted = function()
 AddDevicePage.prototype._addDeviceElement = function(id) {
   var info = this._devices[id];
   var deviceItem = UIUtils.appendBlock(this._deviceList, info.id);
+  this._deviceList.addItem({element: deviceItem});
+  
   deviceItem._info = info;
-  this._devices[id] = deviceItem;
   
   UIUtils.addClass(deviceItem, "discovered-device notselectable");
 
@@ -160,8 +165,9 @@ AddDevicePage.prototype._addDeviceElement = function(id) {
 AddDevicePage.prototype._getSelectedDeviceIds = function() {
   var selectedIds = [];
 
-  for (var id in this._devices) {
-    if (this._devices[id]._selectionBox.isChecked()) {
+  var deviceItems = this._deviceList.getItems();
+  for (var id in deviceItems) {
+    if (deviceItems[id].element._selectionBox.isChecked()) {
       selectedIds.push(id);
     }
   }

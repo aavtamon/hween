@@ -33,6 +33,7 @@
   text-align: left;
 }
 #DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionList {
+  margin-left: 20px;
 }
 #DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel {
   margin-top: 20px;
@@ -42,4 +43,18 @@
   margin-right: 50px;
 }
 #DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-AddProgramButton {
+}
+
+
+
+.program-item {
+  text-align: left;
+}
+.program-selection {
+  vertical-align: middle;
+  margin-left: 30px;
+}
+.program-title {
+  vertical-align: bottom;
+  margin-left: 30px;
 }

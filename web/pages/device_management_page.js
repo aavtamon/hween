@@ -4,7 +4,6 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
   this._deviceId;
   
   this._programList;
-  this._programItems;
   this._removeSelectedButton;
   
   this._cacheChangeListener = function(event) {
@@ -33,7 +32,11 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var programSelectionPanel = UIUtils.appendBlock(contentPanel, "ProgramSelectionPanel");
   UIUtils.appendLabel(programSelectionPanel, "ProgramSelectionLabel", this.getLocale().ProgramSelectionLabel);
   
-  this._programList = UIUtils.appendBlock(programSelectionPanel, "ProgramSelectionList");
+  this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
+  this._programList.setSelectionListener(function(selectedItem) {
+    selectedItem.element._selectionBox.setChecked(!selectedItem.element._selectionBox.isChecked());
+  });
+  
 
   var buttonsPanel = UIUtils.appendBlock(programSelectionPanel, "ProgramButtonsPanel");
   this._removeSelectedButton = UIUtils.appendButton(buttonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
@@ -70,7 +73,7 @@ DeviceManagementPage.prototype.onHide = function() {
 }
 
 DeviceManagementPage.prototype._refreshProgramList = function() {
-  UIUtils.emptyContainer(this._programList);
+  this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
   
   var programs = Backend.getPrograms(this._deviceId);
@@ -78,17 +81,16 @@ DeviceManagementPage.prototype._refreshProgramList = function() {
     return;
   }
   
-  this._programItems = [];
   for (var i = 0; i < programs.length; i++) {
     this._addProgramToList(programs[i]);
   }
 }
 
 DeviceManagementPage.prototype._addProgramToList = function(program) {
-  var programItem = UIUtils.appendBlock(this._programList, program.id);
-  programItem._program = program;
+  var programItem = document.createElement("div");
+  this._programList.addItem({element: programItem});
   
-  this._programItems.push(programItem);
+  programItem._program = program;
   
   UIUtils.addClass(programItem, "program-item notselectable");
 
@@ -98,7 +100,7 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   selectionBox.setChangeListener(function() {
     UIUtils.setEnabled(this._removeSelectedButton, this._getSelectedPrograms().length > 0);
   }.bind(this));
-                       
+  
   var itemTitle = UIUtils.appendLabel(programItem, "Title", program.title);
   UIUtils.addClass(itemTitle, "program-title");
 }
@@ -106,9 +108,10 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
 DeviceManagementPage.prototype._getSelectedPrograms = function() {
   var selectedPrograms = [];
 
-  for (var i = 0; i < this._programItems.length; i++) {
-    if (this._programItems[i]._selectionBox.isChecked()) {
-      selectedPrograms.push(this._programItems[i]._program);
+  var programItems = this._programList.getItems();
+  for (var i = 0; i < programItems.length; i++) {
+    if (programItems[i].element._selectionBox.isChecked()) {
+      selectedPrograms.push(programItems[i].element._program);
     }
   }
   

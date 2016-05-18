@@ -31,6 +31,8 @@
   border-color: black;
   border-width: 1px;
   border-style: solid;
+  
+  background-color: rgb(245, 215, 120);
 }
 
 #AddDevicePage-ContentPanel-DevicesPanel-ButtonsPanel {
@@ -83,12 +85,7 @@
 
 
 .discovered-device {
-  margin-bottom: 10px;
   padding: 5px;
-  
-  background-color: rgb(245, 215, 120);
-  
-  border-radius: 5px;
 }
 .discovered-device .device-selection {
   margin-left: 30px;
