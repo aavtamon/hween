@@ -157,9 +157,6 @@ AddDevicePage.prototype._addDeviceElement = function(id) {
 
   var itemLabel = UIUtils.appendLabel(deviceItem, "NameLabel", info.name);
   UIUtils.addClass(itemLabel, "device-name");
-
-  var idLabel = UIUtils.appendLabel(deviceItem, "IdLabel", I18n.getLocale().literals.SerialNumber + " " + info.serial_number);
-  UIUtils.addClass(idLabel, "device-id");
 }
 
 AddDevicePage.prototype._getSelectedDeviceIds = function() {

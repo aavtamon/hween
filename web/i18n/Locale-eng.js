@@ -12,6 +12,12 @@ var Locale_eng = {
     "LanguageEnglish": "English",
     "LanguageSpanish": "Spanish",
     
+    "FrequencyAlways": "always",
+    "FrequencyOften": "often",
+    "FrequencyRare": "rare",
+    "FrequencyOnce": "once",
+    "FrequencyNever": "never",
+    
     "ServerErrorMessage": "Server communication error",
     
     "CancelOperationButton": "Cancel",
@@ -118,12 +124,12 @@ var Locale_eng = {
     "DeviceManagementPage": {
       "ManualModeButton": "Manual Mode",
       "DeviceSettingsButton": "Device Settings",
-      "ProgramSelectionLabel": "Select Programs:",
+      "ProgramSelectionLabel": "Build your schedule for the device:",
       "RemoveSelectedButton": "Remove selected",
       "AddProgramButton": "Add program",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
-      
+      "SendToDeviceButton": "Send To Device >>"
     }
   },
   

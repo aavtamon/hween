@@ -38,15 +38,20 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   });
   
 
-  var buttonsPanel = UIUtils.appendBlock(programSelectionPanel, "ProgramButtonsPanel");
-  this._removeSelectedButton = UIUtils.appendButton(buttonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
+  var programButtonsPanel = UIUtils.appendBlock(programSelectionPanel, "ProgramButtonsPanel");
+  this._removeSelectedButton = UIUtils.appendButton(programButtonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
   this._removeSelectedButton.setClickListener(function() {
   }.bind(this));
 
-  var addProgramButton = UIUtils.appendButton(buttonsPanel, "AddProgramButton", this.getLocale().AddProgramButton);
+  var addProgramButton = UIUtils.appendButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton);
   this._removeSelectedButton.setClickListener(function() {
   }.bind(this));
   
+  
+  var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
+  var sendToDeviceButton = UIUtils.appendButton(buttonsPanel, "SendToDeviceButton", this.getLocale().SendToDeviceButton);
+  sendToDeviceButton.setClickListener(function() {
+  }.bind(this));
 }
 
 DeviceManagementPage.prototype.onShow = function(root, bundle) {
@@ -103,6 +108,10 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   
   var itemTitle = UIUtils.appendLabel(programItem, "Title", program.title);
   UIUtils.addClass(itemTitle, "program-title");
+
+  var freqChooser = UIUtils.appendDropList(programItem, "FrequencyChooser", Application.Configuration.PROGRAM_FREQUENCIES);
+  freqChooser.selectData(program.frequency);
+  UIUtils.addClass(freqChooser, "program-frequency");
 }
 
 DeviceManagementPage.prototype._getSelectedPrograms = function() {

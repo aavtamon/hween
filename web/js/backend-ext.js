@@ -20,11 +20,11 @@ Backend.Status.DISCOVERED = "discovered";
 
 
 Backend.Program = {};
-Backend.Program.FREQUENCY_NEVER;
-Backend.Program.FREQUENCY_ONCE;
-Backend.Program.FREQUENCY_RARE;
-Backend.Program.FREQUENCY_OFTER;
-Backend.Program.FREQUENCY_ALWAYS;
+Backend.Program.FREQUENCY_NEVER = "never";
+Backend.Program.FREQUENCY_ONCE = "once";
+Backend.Program.FREQUENCY_RARE = "rare";
+Backend.Program.FREQUENCY_OFTER = "often";
+Backend.Program.FREQUENCY_ALWAYS = "always";
 
 
 

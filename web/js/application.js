@@ -3,6 +3,9 @@ Application = {
   Configuration: {
     LANGUAGES: [ {data: "eng", display: I18n.getLocale().literals.LanguageEnglish}, {data: "esp", display: I18n.getLocale().literals.LanguageSpanish} ],
 
+    PROGRAM_FREQUENCIES: [ {data: Backend.Program.FREQUENCY_ONCE, display: I18n.getLocale().literals.FrequencyOnce}, {data: Backend.Program.FREQUENCY_RARE, display: I18n.getLocale().literals.FrequencyRare}, {data: Backend.Program.FREQUENCY_OFTEN, display: I18n.getLocale().literals.FrequencyOften}, {data: Backend.Program.FREQUENCY_ALWAYS, display: I18n.getLocale().literals.FrequencyAlways}, {data: Backend.Program.FREQUENCY_NEVER, display: I18n.getLocale().literals.FrequencyNever} ],
+
+    
     dataToString: function(configurationItem, data) {
       var item = this.findConfigurationItem(configurationItem, data);
       return item != null ? item.display : null;
