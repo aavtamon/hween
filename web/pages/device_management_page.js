@@ -41,6 +41,13 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var programButtonsPanel = UIUtils.appendBlock(programSelectionPanel, "ProgramButtonsPanel");
   this._removeSelectedButton = UIUtils.appendButton(programButtonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
   this._removeSelectedButton.setClickListener(function() {
+    var items = this._programList.getItems();
+    for (var i in items) {
+      var item = items[i];
+      if (item.element._selectionBox.isChecked()) {
+        this._programList.removeItem(item);
+      }
+    }
   }.bind(this));
 
   var addProgramButton = UIUtils.appendButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton);
@@ -49,8 +56,18 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().BackButton);
+  cancelButton.setClickListener(Application.goBack.bind(Application));
   var sendToDeviceButton = UIUtils.appendButton(buttonsPanel, "SendToDeviceButton", this.getLocale().SendToDeviceButton);
   sendToDeviceButton.setClickListener(function() {
+    var programs = [];
+    var items = this._programList.getItems();
+    for (var i in items) {
+      programs.push(items[i].element._program);
+    }
+
+    Backend.setPrograms(this._deviceId, programs);
+    Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
   }.bind(this));
 }
 
@@ -80,7 +97,7 @@ DeviceManagementPage.prototype.onHide = function() {
 DeviceManagementPage.prototype._refreshProgramList = function() {
   this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
-  
+
   var programs = Backend.getPrograms(this._deviceId);
   if (programs == null) {
     return;
@@ -112,6 +129,9 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   var freqChooser = UIUtils.appendDropList(programItem, "FrequencyChooser", Application.Configuration.PROGRAM_FREQUENCIES);
   freqChooser.selectData(program.frequency);
   UIUtils.addClass(freqChooser, "program-frequency");
+  freqChooser.setChangeListener(function() {
+    program.frequency = freqChooser.getValue();
+  });
 }
 
 DeviceManagementPage.prototype._getSelectedPrograms = function() {

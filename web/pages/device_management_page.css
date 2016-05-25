@@ -47,9 +47,12 @@
 
 #DeviceManagementPage-ContentPanel-ButtonsPanel {
   margin-top: 20px;
-  text-align: right;
+  text-align: left;
+}
+#DeviceManagementPage-ContentPanel-ButtonsPanel-CancelButton {
 }
 #DeviceManagementPage-ContentPanel-ButtonsPanel-SendToDeviceButton {
+  float: right;
 }
 
 

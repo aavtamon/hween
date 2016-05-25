@@ -129,7 +129,8 @@ var Locale_eng = {
       "AddProgramButton": "Add program",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
-      "SendToDeviceButton": "Send To Device >>"
+      "SendToDeviceButton": "Accept & Send To Device >>",
+      "BackButton": "Back To Device Selection",
     }
   },
   

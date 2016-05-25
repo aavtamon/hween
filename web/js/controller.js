@@ -5,11 +5,15 @@ Controller.Command = {}
 Controller.Command.CONNECT_TO_BACKEND = "connect_to_backend";
 
 Controller.isAvailable = function(deviceInfo, observer) {
-  setTimeout(observer.bind(this, true), 2000);
+  if (observer != null) {
+    setTimeout(observer.bind(this, true), 2000);
+  }
 }
 
 Controller.reportToServer = function(deviceInfo, observer) {
-  setTimeout(observer.bind(this, true), 2000);
+  if (observer != null) {
+    setTimeout(observer.bind(this, true), 2000);
+  }
 }
 
 // command: {id: Controller.Command, arg: <any data>}

@@ -188,3 +188,15 @@ Backend._pullDevicePrograms = function(deviceId, operationCallback) {
     }
   }, 1000);
 }
+
+Backend.setPrograms = function(deviceId, programs, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+  
+  setTimeout(function() {
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, programs);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 3000);
+}
