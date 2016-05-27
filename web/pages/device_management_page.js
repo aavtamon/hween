@@ -50,10 +50,17 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
     }
   }.bind(this));
 
-  var addProgramButton = UIUtils.appendButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton);
-  this._removeSelectedButton.setClickListener(function() {
-  }.bind(this));
-  
+  var addProgramButton = UIUtils.appendExpandableButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton, [
+    {display: this.getLocale().AddNewProgramButton, clickListener: function() {
+      console.debug("Add new program");
+    }},
+    {display: this.getLocale().AddLibraryProgramButton, clickListener: function() {
+      console.debug("Add library program");
+    }},
+    {display: this.getLocale().AddStockProgramButton, clickListener: function() {
+      console.debug("Add stock program");
+    }}
+  ]);
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
   var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().BackButton);
