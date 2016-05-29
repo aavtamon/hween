@@ -60,18 +60,18 @@
 
 
 
-.program-item {
+#DeviceManagementPage .program-item {
   text-align: left;
 }
-.program-selection {
+#DeviceManagementPage .program-item .program-selection {
   vertical-align: middle;
   margin-left: 30px;
 }
-.program-title {
+#DeviceManagementPage .program-item .program-title {
   vertical-align: bottom;
   margin-left: 30px;
 }
-.program-frequency {
+#DeviceManagementPage .program-item .program-frequency {
   float: right;
   width: 100px;
   margin-top: -2px;

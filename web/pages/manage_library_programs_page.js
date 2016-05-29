@@ -6,6 +6,12 @@ ManageLibraryProgramsPage = ClassUtils.defineClass(AbstractDataPage, function Ma
   this._programList;
   this._loadSelectedButton;
   this._removeSelectedButton;
+  
+  this._cacheChangeListener = function(event) {
+    if (event.type == Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS && this._deviceId == event.objectId) {
+      this._refreshProgramList();
+    }
+  }.bind(this);
 });
 
 ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
@@ -14,14 +20,20 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
   
   var programSelectionPanel = UIUtils.appendBlock(contentPanel, "ProgramSelectionPanel");
-  this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
+  this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList");
+  var descriptionPanel = UIUtils.appendBlock(programSelectionPanel, "DescriptionPanel");
+  var descriptionLabel = UIUtils.appendBlock(descriptionPanel, "DescriptionPanelLabel");
+  var descriptionLabel = UIUtils.appendLabel(descriptionPanel, "DescriptionPanelLabel", this.getLocale().DescriptionLabel);
+  var descriptionText = UIUtils.appendBlock(descriptionPanel, "DescriptionPanelText");
+  
   this._programList.setSelectionListener(function(selectedItem) {
+    descriptionText.innerHTML = selectedItem != null ? selectedItem.element._program.description : "";
   });
   
-  
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().BackButton);
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
   cancelButton.setClickListener(Application.goBack.bind(Application));
+  
   this._removeSelectedButton = UIUtils.appendButton(buttonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
   this._removeSelectedButton.setClickListener(function() {
     var hasSelected = false;
@@ -44,7 +56,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
             Backend.removeLibraryProgram(this._deviceId, item._program);
           }
         }
-      });
+      }.bind(this));
     }
     
   }.bind(this));
@@ -57,7 +69,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
     for (var i in items) {
       var item = items[i];
       if (item.element._selectionBox.isChecked()) {
-        programs.push(item._program);
+        programs.push(this._convertLibraryToDeviceProgram(item.element._program));
       }
     }
     
@@ -84,10 +96,14 @@ ManageLibraryProgramsPage.prototype.onShow = function(root, bundle) {
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
   UIUtils.setEnabled(this._loadSelectedButton, false);
+  
+  Backend.addCacheChangeListener(this._cacheChangeListener);
 }
 
 ManageLibraryProgramsPage.prototype.onHide = function() {
   AbstractDataPage.prototype.onHide.call(this);
+  
+  Backend.removeCacheChangeListener(this._cacheChangeListener);
 }
 
 ManageLibraryProgramsPage.prototype._refreshProgramList = function() {
@@ -95,7 +111,7 @@ ManageLibraryProgramsPage.prototype._refreshProgramList = function() {
   UIUtils.setEnabled(this._removeSelectedButton, false);
   UIUtils.setEnabled(this._loadSelectedButton, false);
 
-  var programs = Backend.getLivraryPrograms(this._deviceId);
+  var programs = Backend.getLibraryPrograms(this._deviceId);
   if (programs == null) {
     return;
   }
@@ -117,18 +133,14 @@ ManageLibraryProgramsPage.prototype._addProgramToList = function(program) {
   UIUtils.addClass(selectionBox, "program-selection");
   programItem._selectionBox = selectionBox;
   selectionBox.setChangeListener(function() {
-    UIUtils.setEnabled(this._removeSelectedButton, this._getSelectedPrograms().length > 0);
+    var hasSelection = this._getSelectedPrograms().length > 0;
+    
+    UIUtils.setEnabled(this._removeSelectedButton, hasSelection);
+    UIUtils.setEnabled(this._loadSelectedButton, hasSelection);
   }.bind(this));
   
   var itemTitle = UIUtils.appendLabel(programItem, "Title", program.title);
   UIUtils.addClass(itemTitle, "program-title");
-
-  var freqChooser = UIUtils.appendDropList(programItem, "FrequencyChooser", Application.Configuration.PROGRAM_FREQUENCIES);
-  freqChooser.selectData(program.frequency);
-  UIUtils.addClass(freqChooser, "program-frequency");
-  freqChooser.setChangeListener(function() {
-    program.frequency = freqChooser.getValue();
-  });
 }
 
 ManageLibraryProgramsPage.prototype._getSelectedPrograms = function() {
@@ -144,3 +156,10 @@ ManageLibraryProgramsPage.prototype._getSelectedPrograms = function() {
   return selectedPrograms;
 }
 
+
+ManageLibraryProgramsPage.prototype._convertLibraryToDeviceProgram = function(libraryProgram) {
+  return {
+    title: libraryProgram.title,
+    frequency: Backend.Program.FREQUENCY_NEVER
+  }
+}

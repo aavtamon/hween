@@ -141,6 +141,7 @@ var Locale_eng = {
       "LoadSelectedButton": "Load selected",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
+      "DescriptionLabel": "Description",
     }
   },
   

@@ -1,77 +1,67 @@
-#DeviceManagementPage {
+#ManageLibraryProgramsPage {
   text-align: center;
   min-width: 950px;
 }
 
 
-#DeviceManagementPage-ContentPanel {
+#ManageLibraryProgramsPage-ContentPanel {
   display: inline-block;
   width: 90%;
   margin-top: 50px;
 }
 
-#DeviceManagementPage-ContentPanel-ToolbarPanel {
-  text-align: left;
-}
-#DeviceManagementPage-ContentPanel-ToolbarPanel-ManualModeButton {
-}
-#DeviceManagementPage-ContentPanel-ToolbarPanel-DeviceSettingsButton {
-  float: right;
-}
-
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel {
+#ManageLibraryProgramsPage-ContentPanel-ProgramSelectionPanel {
   margin-top: 20px;
   padding: 5px;
   
   border-width: 1px;
   border-style: solid;
 }
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionLabel {
-  display: block;
-  
-  font-size: 30px;
-  text-align: left;
-}
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionList {
+#ManageLibraryProgramsPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionList {
+  display: inline-block;
+  width: calc(100% - 250px);
   margin-left: 20px;
 }
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel {
+#ManageLibraryProgramsPage-ContentPanel-ProgramSelectionPanel-DescriptionPanel {
+  display: inline-block;
+  float: right;
+  width: 200px;
+}
+#ManageLibraryProgramsPage-ContentPanel-ProgramSelectionPanel-DescriptionPanel-DescriptionPanelLabel {
+  font-size: 20px;
+}
+#ManageLibraryProgramsPage-ContentPanel-ProgramSelectionPanel-DescriptionPanel-DescriptionPanelText {
+  margin-top: 20px;
+}
+
+#ManageLibraryProgramsPage-ContentPanel-ButtonsPanel {
   margin-top: 20px;
   text-align: left;
 }
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-RemoveSelectedButton {
+#ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-CancelButton {
   margin-right: 50px;
 }
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-AddProgramButton {
+#ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-RemoveSelectedButton {
+  margin-right: 50px;
 }
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-ManageProgramsButton {
-  float: right;
+#ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-LoadSelectedButton {
 }
 
-#DeviceManagementPage-ContentPanel-ButtonsPanel {
-  margin-top: 20px;
+
+
+
+#ManageLibraryProgramsPage .program-item {
   text-align: left;
 }
-#DeviceManagementPage-ContentPanel-ButtonsPanel-CancelButton {
-}
-#DeviceManagementPage-ContentPanel-ButtonsPanel-SendToDeviceButton {
-  float: right;
-}
-
-
-
-.program-item {
-  text-align: left;
-}
-.program-selection {
+#ManageLibraryProgramsPage .program-item .program-selection {
   vertical-align: middle;
   margin-left: 30px;
 }
-.program-title {
+#ManageLibraryProgramsPage .program-item .program-title {
   vertical-align: bottom;
   margin-left: 30px;
 }
-.program-frequency {
+#ManageLibraryProgramsPage .program-item .program-frequency {
   float: right;
   width: 100px;
   margin-top: -2px;

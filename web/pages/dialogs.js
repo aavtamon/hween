@@ -83,7 +83,12 @@ Dialogs.showConfirmProgramRemovalDialog = function(successCallback) {
   var dialog = UIUtils.showDialog("ConfirmProgramRemovalDialog", I18n.getLocale().dialogs.ConfirmProgramRemovalDialog.Title, I18n.getLocale().dialogs.ConfirmProgramRemovalDialog.Text, {
     ok: {
       display: I18n.getLocale().dialogs.ConfirmProgramRemovalDialog.ConfirmRemovalButton,
-      listener: successCallback
+      listener: function() {
+        dialog.close();
+        if (successCallback) {
+          successCallback();
+        }
+      }
     },
     cancel: {
       display: I18n.getLocale().literals.CancelOperationButton,

@@ -34,7 +34,9 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   
   this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
   this._programList.setSelectionListener(function(selectedItem) {
-    selectedItem.element._selectionBox.setChecked(!selectedItem.element._selectionBox.isChecked());
+    if (selectedItem != null) {
+      selectedItem.element._selectionBox.setChecked(!selectedItem.element._selectionBox.isChecked());
+    }
   });
   
 
