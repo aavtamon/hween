@@ -55,12 +55,18 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
       console.debug("Add new program");
     }},
     {display: this.getLocale().AddLibraryProgramButton, clickListener: function() {
-      console.debug("Add library program");
+      Application.showPage(ManageLibraryProgramsPage.name, {deviceId: this._deviceId});
     }},
     {display: this.getLocale().AddStockProgramButton, clickListener: function() {
-      console.debug("Add stock program");
+      Application.showPage(ShowStockProgramsPage.name, {deviceId: this._deviceId});
     }}
   ]);
+  
+  var manageProgramsButton = UIUtils.appendButton(programButtonsPanel, "ManageProgramsButton", this.getLocale().ManageProgramsButton);
+  manageProgramsButton.setClickListener(function() {
+    Application.showPage(ManageLibraryProgramsPage.name, {deviceId: this._deviceId});
+  }.bind(this));
+  
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
   var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().BackButton);

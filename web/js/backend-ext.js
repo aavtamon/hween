@@ -155,7 +155,7 @@ Backend.addNewDevice = function(deviceId, verificationCode, operationCallback) {
 
 
 
-// Program Management
+// Device Program Management
 Backend.getPrograms = function(deviceId, operationCallback) {
   var devicePrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
   
@@ -199,4 +199,18 @@ Backend.setPrograms = function(deviceId, programs, operationCallback) {
       operationCallback(Backend.OperationResult.SUCCESS);
     }
   }, 3000);
+}
+
+
+// Livrary Program Manger
+
+Backend.getLibraryPrograms = function(deviceId) {
+}
+
+Backend.addLibraryProgram = function(deviceId, program) {
+  
+}
+
+Backend.removeLibraryProgram = function(deviceId, program) {
+  
 }

@@ -132,8 +132,15 @@ var Locale_eng = {
       "AddStockProgramButton": "Stock",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
+      "ManageProgramsButton": "Manage Program Library",
       "SendToDeviceButton": "Accept & Send To Device >>",
       "BackButton": "Back To Device Selection",
+    },
+    "ManageLibraryProgramsPage": {
+      "RemoveSelectedButton": "Delete selected",
+      "LoadSelectedButton": "Load selected",
+      "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
+      "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
     }
   },
   
@@ -153,6 +160,11 @@ var Locale_eng = {
     "ConfirmDeviceRemovalDialog": {
       "Title": "Removal Confirmation",
       "TextProvider": function(deviceName) { return "Are you sure you want to remove the device " + deviceName + "?"; },
+      "ConfirmRemovalButton": "Remove",
+    },
+    "ConfirmProgramRemovalDialog": {
+      "Title": "Removal Confirmation",
+      "Text": "Do you really want to remove the selected program(s)?<br>If you click Remove, the slected programs will be permanently deleted.",
       "ConfirmRemovalButton": "Remove",
     }
   }

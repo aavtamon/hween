@@ -77,3 +77,17 @@ Dialogs.showConfirmDeviceRemovalDialog = function(deviceId) {
     }
   });
 }
+
+
+Dialogs.showConfirmProgramRemovalDialog = function(successCallback) {
+  var dialog = UIUtils.showDialog("ConfirmProgramRemovalDialog", I18n.getLocale().dialogs.ConfirmProgramRemovalDialog.Title, I18n.getLocale().dialogs.ConfirmProgramRemovalDialog.Text, {
+    ok: {
+      display: I18n.getLocale().dialogs.ConfirmProgramRemovalDialog.ConfirmRemovalButton,
+      listener: successCallback
+    },
+    cancel: {
+      display: I18n.getLocale().literals.CancelOperationButton,
+      alignment: "left"
+    }
+  });
+}
