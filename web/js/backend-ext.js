@@ -30,6 +30,14 @@ Backend.Program.FREQUENCY_ALWAYS = "always";
 
 
 
+// User Settings
+Backend.getStockCategories = function() {
+  //TODO: Backend.getUserSettings().stock_categories
+  
+  return [ {data: "fun", display: "Fun"}, {data: "scary", display: "Scary"} ];
+}
+
+
 
 // Device Management
 
@@ -204,7 +212,7 @@ Backend.setPrograms = function(deviceId, programs, operationCallback) {
 }
 
 
-// Livrary Program Manger
+// Library Program Manger
 
 Backend.getLibraryPrograms = function(deviceId, operationCallback) {
   var libraryPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
@@ -261,6 +269,74 @@ Backend.removeLibraryProgram = function(deviceId, program, operationCallback) {
     var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
     GeneralUtils.removeFromArray(programs, program);
     Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, programs);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 2000);
+}
+
+
+// Stock Program Manger
+
+Backend.getStockPrograms = function(deviceId, operationCallback) {
+  var stockPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+  
+  if (stockPrograms == null) {
+    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+    
+    this._pullStockPrograms(deviceId, operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, stockPrograms);
+  }
+  
+  return stockPrograms;
+}
+Backend._pullStockPrograms = function(deviceId, operationCallback) {
+  //TODO
+  setTimeout(function() {
+    var stockPrograms = [{
+      id: 1,
+      title: "Jopppa",
+      description: "Just jopaaa"
+    }, {
+      id: 2,
+      title: "Loud JOOOOPA",
+      description: "Very loud jopa"
+    }]
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, stockPrograms);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS, stockPrograms);
+    }
+  }, 1000);
+}
+
+
+Backend.addStockProgram = function(deviceId, program, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+  
+  setTimeout(function() {
+    var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+    if (programs == null) {
+      programs = [];
+    }
+    programs.push(program);
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, programs);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 2000);
+}
+
+Backend.removeStockProgram = function(deviceId, program, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+  
+  setTimeout(function() {
+    var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+    GeneralUtils.removeFromArray(programs, program);
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, programs);
 
     if (operationCallback) {
       operationCallback(Backend.OperationResult.SUCCESS);

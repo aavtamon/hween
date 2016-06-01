@@ -59,6 +59,47 @@ Dialogs.showAddDeviceByIdDialog = function() {
 }
 
 
+Dialogs.showUploadStockProgramDialog = function(deviceId, libraryProgram) {
+  var categoryChooser;
+  
+  var dialog = UIUtils.showDialog("UploadStockProgramDialog", I18n.getLocale().dialogs.UploadStockProgramDialog.Title, function(contentPanel) {
+    UIUtils.appendLabel(contentPanel, "CategoryLabel", I18n.getLocale().dialogs.UploadStockProgramDialog.CategoryLabel);
+    categoryChooser = UIUtils.appendDropList(contentPanel, "CategoryChooser", Backend.getStockCategories());
+  }, {
+    ok: {
+      display: I18n.getLocale().dialogs.UploadStockProgramDialog.UploadButton,
+      listener: function() {
+        if (Dialogs._processing) {
+          return;
+        }
+
+        Dialogs._processing = true;
+        
+        var stockProgram = {
+          title: libraryProgram.title,
+          category: categoryChooser.getValue()
+        }
+        
+        Backend.addStockProgram(deviceId, stockProgram, function(status) {
+          if (status == Backend.OperationResult.SUCCESS) {
+            dialog.close();
+            UIUtils.showMessage(I18n.getLocale().dialogs.UploadStockProgramDialog.SuccessfullyUploadedMessage);
+          } else if (status == Backend.OperationResult.FAILURE) {
+            UIUtils.showMessage(I18n.getLocale().dialogs.UploadStockProgramDialog.FailedToUploadMessage);
+          } else {
+            UIUtils.showMessage(I18n.getLocale().literal.ServerErrorMessage);
+          }
+        });
+      }
+    },
+    cancel: {
+      display: I18n.getLocale().literals.CancelOperationButton,
+      alignment: "left"
+    }
+  });  
+}
+
+
 Dialogs.showConfirmDeviceRemovalDialog = function(deviceId) {
   var dialog = UIUtils.showDialog("ConfirmDeviceRemovalDialog", I18n.getLocale().dialogs.ConfirmDeviceRemovalDialog.Title, I18n.getLocale().dialogs.ConfirmDeviceRemovalDialog.TextProvider(Backend.getDeviceInfo(deviceId).name), {
     ok: {

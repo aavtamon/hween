@@ -6,6 +6,7 @@ ManageLibraryProgramsPage = ClassUtils.defineClass(AbstractDataPage, function Ma
   this._programList;
   this._loadSelectedButton;
   this._removeSelectedButton;
+  this._uploadProgramButton;
   
   this._cacheChangeListener = function(event) {
     if (event.type == Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS && this._deviceId == event.objectId) {
@@ -36,25 +37,13 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
   
   this._removeSelectedButton = UIUtils.appendButton(buttonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
   this._removeSelectedButton.setClickListener(function() {
-    var hasSelected = false;
-    var items = this._programList.getItems();
-    for (var i in items) {
-      var item = items[i];
-      if (item.element._selectionBox.isChecked()) {
-        hasSelected = true;
-        break;
-      }
-    }
-    
-    if (hasSelected) {
+    if (this._getSelectedPrograms().length > 0) {
       Dialogs.showConfirmProgramRemovalDialog(function() {
-        var items = this._programList.getItems();
-        for (var i in items) {
-          var item = items[i];
-          if (item.element._selectionBox.isChecked()) {
-            this._programList.removeItem(item);
-            Backend.removeLibraryProgram(this._deviceId, item._program);
-          }
+        var selectedPrograms = this._getSelectedPrograms();
+        for (var i in selectedPrograms) {
+          var program = selectedPrograms[i];
+          this._programList.removeItem(program._item);
+          Backend.removeLibraryProgram(this._deviceId, program);
         }
       }.bind(this));
     }
@@ -65,12 +54,10 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
   this._loadSelectedButton.setClickListener(function() {
     var programs = Backend.getPrograms(this._deviceId);
     
-    var items = this._programList.getItems();
-    for (var i in items) {
-      var item = items[i];
-      if (item.element._selectionBox.isChecked()) {
-        programs.push(this._convertLibraryToDeviceProgram(item.element._program));
-      }
+    var selectedPrograms = this._getSelectedPrograms();
+    for (var i in selectedPrograms) {
+      var program = selectedPrograms[i];
+      programs.push(this._convertLibraryToDeviceProgram(program));
     }
     
     Backend.setPrograms(this._deviceId, programs, function(status) {
@@ -78,6 +65,14 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
         Application.showPage(DeviceManagementPage.name, {deviceId: this._deviceId});
       }
     });
+  }.bind(this));
+
+  this._uploadSelectedButton = UIUtils.appendButton(buttonsPanel, "UploadSelectedButton", this.getLocale().UploadSelectedButton);
+  this._uploadSelectedButton.setClickListener(function() {
+    var programs = Backend.getPrograms(this._deviceId);
+    
+    var selectedProgram = this._getSelectedPrograms()[0];
+    Dialogs.showUploadStockProgramDialog(this._deviceId, selectedProgram);
   }.bind(this));
 }
 
@@ -96,6 +91,7 @@ ManageLibraryProgramsPage.prototype.onShow = function(root, bundle) {
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
   UIUtils.setEnabled(this._loadSelectedButton, false);
+  UIUtils.setEnabled(this._uploadSelectedButton, false);
   
   Backend.addCacheChangeListener(this._cacheChangeListener);
 }
@@ -110,6 +106,7 @@ ManageLibraryProgramsPage.prototype._refreshProgramList = function() {
   this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
   UIUtils.setEnabled(this._loadSelectedButton, false);
+  UIUtils.setEnabled(this._uploadSelectedButton, false);
 
   var programs = Backend.getLibraryPrograms(this._deviceId);
   if (programs == null) {
@@ -126,6 +123,7 @@ ManageLibraryProgramsPage.prototype._addProgramToList = function(program) {
   this._programList.addItem({element: programItem});
   
   programItem._program = program;
+  program._item = programItem;
   
   UIUtils.addClass(programItem, "program-item notselectable");
 
@@ -133,10 +131,11 @@ ManageLibraryProgramsPage.prototype._addProgramToList = function(program) {
   UIUtils.addClass(selectionBox, "program-selection");
   programItem._selectionBox = selectionBox;
   selectionBox.setChangeListener(function() {
-    var hasSelection = this._getSelectedPrograms().length > 0;
+    var selectionLength = this._getSelectedPrograms().length;
     
-    UIUtils.setEnabled(this._removeSelectedButton, hasSelection);
-    UIUtils.setEnabled(this._loadSelectedButton, hasSelection);
+    UIUtils.setEnabled(this._removeSelectedButton, selectionLength > 0);
+    UIUtils.setEnabled(this._loadSelectedButton, selectionLength > 0);
+    UIUtils.setEnabled(this._uploadSelectedButton, selectionLength == 1);
   }.bind(this));
   
   var itemTitle = UIUtils.appendLabel(programItem, "Title", program.title);

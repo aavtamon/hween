@@ -139,6 +139,7 @@ var Locale_eng = {
     "ManageLibraryProgramsPage": {
       "RemoveSelectedButton": "Delete selected",
       "LoadSelectedButton": "Load selected",
+      "UploadSelectedButton": "Upload to stock",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
       "DescriptionLabel": "Description",
@@ -157,6 +158,13 @@ var Locale_eng = {
       "IncorrectVerificationCodeMessage": "The verification code is invalid.<br>It should be a 6 symbol alpha-digital case-insensitive combination.",
       "DeviceAddedMessage": "The device was successfully added",
       "UnrecognizedDeviceMessage": "The Device s/n or verification code do not match our records. Please check your input and try again"
+    },
+    "UploadStockProgramDialog": {
+      "Title": "Upload Library Program To Stock",
+      "CategoryLabel": "Choose the category that best matches this program:",
+      "UploadButton": "Upload",
+      "SuccessfullyUploadedMessage": "The program was successfully posted to the stock",
+      "FailedToUploadMessage": "Failed to post the program"
     },
     "ConfirmDeviceRemovalDialog": {
       "Title": "Removal Confirmation",

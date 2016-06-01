@@ -46,6 +46,9 @@
 }
 #ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-LoadSelectedButton {
 }
+#ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-UploadSelectedButton {
+  float: right;
+}
 
 
 

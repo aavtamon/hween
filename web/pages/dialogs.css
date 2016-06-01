@@ -26,3 +26,17 @@
 #AddDeviceByIdDialog-ContentPanel-VerificationInput {
   width: 100px;
 }
+
+
+#UploadStockProgramDialog-ContentPanel {
+  overflow: visible;
+}
+#UploadStockProgramDialog-ContentPanel-CategoryLabel {
+  vertical-align: top;
+}
+#UploadStockProgramDialog-ContentPanel-CategoryChooser {
+  display: inline-block;
+  width: 200px;
+  
+  margin-left: 20px;
+}
