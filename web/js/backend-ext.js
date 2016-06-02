@@ -31,7 +31,7 @@ Backend.Program.FREQUENCY_ALWAYS = "always";
 
 
 // User Settings
-Backend.getStockCategories = function() {
+Backend.getStockCategories = function(deviceType) {
   //TODO: Backend.getUserSettings().stock_categories
   
   return [ {data: "fun", display: "Fun"}, {data: "scary", display: "Scary"} ];
@@ -211,6 +211,35 @@ Backend.setPrograms = function(deviceId, programs, operationCallback) {
   }, 3000);
 }
 
+Backend.addPrograms = function(deviceId, programs, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+  
+  setTimeout(function() {
+    var currentPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+    currentPrograms = currentPrograms.concat(programs);
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, currentPrograms);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 3000);
+}
+
+Backend.removePrograms = function(deviceId, programs, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+  
+  setTimeout(function() {
+    var currentPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+    currentPrograms = GeneralUtils.removeFromArray(currentPrograms, programs);
+    
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, currentPrograms);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 3000);
+}
+
 
 // Library Program Manger
 
@@ -298,11 +327,13 @@ Backend._pullStockPrograms = function(deviceId, operationCallback) {
     var stockPrograms = [{
       id: 1,
       title: "Jopppa",
-      description: "Just jopaaa"
+      description: "Just jopaaa",
+      category: "fun"
     }, {
       id: 2,
       title: "Loud JOOOOPA",
-      description: "Very loud jopa"
+      description: "Very loud jopa",
+      category: "scary"
     }]
     Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, stockPrograms);
 

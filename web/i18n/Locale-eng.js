@@ -143,6 +143,12 @@ var Locale_eng = {
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
       "DescriptionLabel": "Description",
+    },
+    "StockProgramsPage": {
+      "LoadSelectedButton": "Load selected",
+      "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
+      "NoProgramsAvailableLabel": "No matching stock programs found",
+      "DescriptionLabel": "Description",
     }
   },
   

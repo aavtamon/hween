@@ -1,0 +1,68 @@
+#StockProgramsPage {
+  text-align: center;
+  min-width: 950px;
+}
+
+
+#StockProgramsPage-ContentPanel {
+  display: inline-block;
+  width: 90%;
+  margin-top: 50px;
+}
+
+#StockProgramsPage-ContentPanel-ProgramSelectionPanel {
+  margin-top: 20px;
+  padding: 5px;
+  
+  border-width: 1px;
+  border-style: solid;
+}
+#StockProgramsPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionList {
+  display: inline-block;
+  width: calc(100% - 250px);
+  margin-left: 20px;
+}
+#StockProgramsPage-ContentPanel-ProgramSelectionPanel-DescriptionPanel {
+  display: inline-block;
+  float: right;
+  width: 200px;
+}
+#StockProgramsPage-ContentPanel-ProgramSelectionPanel-DescriptionPanel-DescriptionPanelLabel {
+  font-size: 20px;
+}
+#StockProgramsPage-ContentPanel-ProgramSelectionPanel-DescriptionPanel-DescriptionPanelText {
+  margin-top: 20px;
+}
+
+#StockProgramsPage-ContentPanel-ButtonsPanel {
+  margin-top: 20px;
+  text-align: left;
+}
+#StockProgramsPage-ContentPanel-ButtonsPanel-CancelButton {
+  margin-right: 50px;
+}
+#StockProgramsPage-ContentPanel-ButtonsPanel-LoadSelectedButton {
+  float: right;
+}
+
+
+
+#StockProgramsPage .category-item {
+  text-align: left;
+  
+  font-size: 20px;
+  font-style: italic;
+  font-weight: bold;
+}
+
+#StockProgramsPage .program-item {
+  text-align: left;
+}
+#StockProgramsPage .program-item .program-selection {
+  vertical-align: middle;
+  margin-left: 30px;
+}
+#StockProgramsPage .program-item .program-title {
+  vertical-align: bottom;
+  margin-left: 30px;
+}

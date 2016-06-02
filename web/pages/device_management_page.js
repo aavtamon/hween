@@ -38,6 +38,15 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
       selectedItem.element._selectionBox.setChecked(!selectedItem.element._selectionBox.isChecked());
     }
   });
+  this._programList.setOrderListener(function(items) {
+    var programs = [];
+    var items = this._programList.getItems();
+    for (var i in items) {
+      programs.push(items[i].element._program);
+    }
+
+    Backend.setPrograms(this._deviceId, programs);
+  }.bind(this));
   
 
   var programButtonsPanel = UIUtils.appendBlock(programSelectionPanel, "ProgramButtonsPanel");
@@ -48,6 +57,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
       var item = items[i];
       if (item.element._selectionBox.isChecked()) {
         this._programList.removeItem(item);
+        Backend.removePrograms(this._deviceId, item._program);
       }
     }
   }.bind(this));
@@ -55,13 +65,13 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var addProgramButton = UIUtils.appendExpandableButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton, [
     {display: this.getLocale().AddNewProgramButton, clickListener: function() {
       console.debug("Add new program");
-    }},
+    }.bind(this)},
     {display: this.getLocale().AddLibraryProgramButton, clickListener: function() {
       Application.showPage(ManageLibraryProgramsPage.name, {deviceId: this._deviceId});
-    }},
+    }.bind(this)},
     {display: this.getLocale().AddStockProgramButton, clickListener: function() {
-      Application.showPage(ShowStockProgramsPage.name, {deviceId: this._deviceId});
-    }}
+      Application.showPage(StockProgramsPage.name, {deviceId: this._deviceId});
+    }.bind(this)}
   ]);
   
   var manageProgramsButton = UIUtils.appendButton(programButtonsPanel, "ManageProgramsButton", this.getLocale().ManageProgramsButton);
@@ -75,13 +85,6 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   cancelButton.setClickListener(Application.goBack.bind(Application));
   var sendToDeviceButton = UIUtils.appendButton(buttonsPanel, "SendToDeviceButton", this.getLocale().SendToDeviceButton);
   sendToDeviceButton.setClickListener(function() {
-    var programs = [];
-    var items = this._programList.getItems();
-    for (var i in items) {
-      programs.push(items[i].element._program);
-    }
-
-    Backend.setPrograms(this._deviceId, programs);
     Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
   }.bind(this));
 }
@@ -146,6 +149,7 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   UIUtils.addClass(freqChooser, "program-frequency");
   freqChooser.setChangeListener(function() {
     program.frequency = freqChooser.getValue();
+    Backend.updateProgram(this._deviceId, program);
   });
 }
 
