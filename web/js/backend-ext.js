@@ -29,12 +29,20 @@ Backend.Program.FREQUENCY_OFTER = "often";
 Backend.Program.FREQUENCY_ALWAYS = "always";
 
 
+Backend.DeviceCommand = {};
+Backend.DeviceCommand.MOVE_UP = "up";
+Backend.DeviceCommand.MOVE_DOWN = "down";
 
-// User Settings
+
+
+// Device Type Management
+
 Backend.getStockCategories = function(deviceType) {
-  //TODO: Backend.getUserSettings().stock_categories
-  
   return [ {data: "fun", display: "Fun"}, {data: "scary", display: "Scary"} ];
+}
+
+Backend.getSupportedCommands = function(deviceType) {
+  return [ {data: "up", display: "Move Up"}, {data: "down", display: "Move Down"} ];
 }
 
 

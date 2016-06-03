@@ -1,0 +1,32 @@
+#CreateProgramPage {
+  text-align: center;
+  min-width: 950px;
+}
+
+
+#CreateProgramPage-ContentPanel {
+  display: inline-block;
+  width: 90%;
+  margin-top: 50px;
+}
+
+#CreateProgramPage-ContentPanel-ButtonsPanel {
+  margin-top: 20px;
+  text-align: left;
+}
+#CreateProgramPage-ContentPanel-ButtonsPanel-CancelButton {
+}
+#CreateProgramPage-ContentPanel-ButtonsPanel-SaveButton {
+  float: right;
+}
+
+
+
+
+#CreateProgramPage .command-item {
+  text-align: left;
+}
+#ManageLibraryProgramsPage .command-item .command-title {
+  vertical-align: bottom;
+  margin-left: 30px;
+}

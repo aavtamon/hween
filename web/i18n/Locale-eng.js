@@ -149,6 +149,14 @@ var Locale_eng = {
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "No matching stock programs found",
       "DescriptionLabel": "Description",
+    },
+    "CreateProgramPage": {
+      "ProgramLabel": "Program",
+      "PlayButton": "Play",
+      "RemoveCommandButton": "Delete",
+      "AddCommandButton": "Add",
+      "AddCommandButton": "Add",
+      "SaveButton": "Save"
     }
   },
   

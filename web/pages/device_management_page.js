@@ -64,7 +64,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
 
   var addProgramButton = UIUtils.appendExpandableButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton, [
     {display: this.getLocale().AddNewProgramButton, clickListener: function() {
-      console.debug("Add new program");
+      Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId});
     }.bind(this)},
     {display: this.getLocale().AddLibraryProgramButton, clickListener: function() {
       Application.showPage(ManageLibraryProgramsPage.name, {deviceId: this._deviceId});
