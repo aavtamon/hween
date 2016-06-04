@@ -139,6 +139,7 @@ var Locale_eng = {
     "ManageLibraryProgramsPage": {
       "RemoveSelectedButton": "Delete selected",
       "LoadSelectedButton": "Load selected",
+      "CreateProgramButton": "Create Program",
       "UploadSelectedButton": "Upload to stock",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
@@ -153,10 +154,17 @@ var Locale_eng = {
     "CreateProgramPage": {
       "ProgramLabel": "Program",
       "PlayButton": "Play",
+      "PauseButton": "Pause",
+      "StopButton": "Stop",
       "RemoveCommandButton": "Delete",
-      "AddCommandButton": "Add",
-      "AddCommandButton": "Add",
-      "SaveButton": "Save"
+      "AddCommandButton": "Add Command To Program",
+      "SaveButton": "Save",
+      "DescriptionLabel": "Description",
+      
+      "Executing": "executing",
+      "Paused": "paused...",
+      
+      "ProgramExecutionTerminatedMessage": "Program Execution interrupted"
     }
   },
   

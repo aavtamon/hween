@@ -46,6 +46,12 @@
 }
 #ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-LoadSelectedButton {
 }
+
+#ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-CreateProgramButton {
+  float: right;
+  
+  margin-right: 50px;
+}
 #ManageLibraryProgramsPage-ContentPanel-ButtonsPanel-UploadSelectedButton {
   float: right;
 }

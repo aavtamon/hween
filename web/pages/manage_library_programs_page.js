@@ -67,12 +67,18 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
     });
   }.bind(this));
 
+
   this._uploadSelectedButton = UIUtils.appendButton(buttonsPanel, "UploadSelectedButton", this.getLocale().UploadSelectedButton);
   this._uploadSelectedButton.setClickListener(function() {
     var programs = Backend.getPrograms(this._deviceId);
     
     var selectedProgram = this._getSelectedPrograms()[0];
     Dialogs.showUploadStockProgramDialog(this._deviceId, selectedProgram);
+  }.bind(this));
+  
+  this._createProgramButton = UIUtils.appendButton(buttonsPanel, "CreateProgramButton", this.getLocale().CreateProgramButton);
+  this._createProgramButton.setClickListener(function() {
+    Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId});
   }.bind(this));
 }
 

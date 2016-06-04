@@ -42,7 +42,7 @@ Backend.getStockCategories = function(deviceType) {
 }
 
 Backend.getSupportedCommands = function(deviceType) {
-  return [ {data: "up", display: "Move Up"}, {data: "down", display: "Move Down"} ];
+  return [ {data: "up", display: "Move Up", description: "Move toy up one inch"}, {data: "down", display: "Move Down", description: "Move toy down one inch"} ];
 }
 
 
