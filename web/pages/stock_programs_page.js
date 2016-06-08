@@ -38,7 +38,7 @@ StockProgramsPage.prototype.definePageContent = function(root) {
   
   this._loadSelectedButton = UIUtils.appendButton(buttonsPanel, "LoadSelectedButton", this.getLocale().LoadSelectedButton);
   this._loadSelectedButton.setClickListener(function() {
-    var programs = Backend.getPrograms(this._deviceId);
+    var programs = [];
     
     var selectedPrograms = this._getSelectedPrograms();
     for (var i in selectedPrograms) {
@@ -46,7 +46,7 @@ StockProgramsPage.prototype.definePageContent = function(root) {
       programs.push(this._convertStockToDeviceProgram(program));
     }
     
-    Backend.setPrograms(this._deviceId, programs, function(status) {
+    Backend.addDevicePrograms(this._deviceId, programs, function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
         Application.showPage(DeviceManagementPage.name, {deviceId: this._deviceId});
       }

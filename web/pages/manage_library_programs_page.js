@@ -52,7 +52,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
   
   this._loadSelectedButton = UIUtils.appendButton(buttonsPanel, "LoadSelectedButton", this.getLocale().LoadSelectedButton);
   this._loadSelectedButton.setClickListener(function() {
-    var programs = Backend.getPrograms(this._deviceId);
+    var programs = [];
     
     var selectedPrograms = this._getSelectedPrograms();
     for (var i in selectedPrograms) {
@@ -60,7 +60,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
       programs.push(this._convertLibraryToDeviceProgram(program));
     }
     
-    Backend.addPrograms(this._deviceId, programs, function(status) {
+    Backend.addDevicePrograms(this._deviceId, programs, function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
         Application.showPage(DeviceManagementPage.name, {deviceId: this._deviceId});
       }
@@ -70,8 +70,6 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
 
   this._uploadSelectedButton = UIUtils.appendButton(buttonsPanel, "UploadSelectedButton", this.getLocale().UploadSelectedButton);
   this._uploadSelectedButton.setClickListener(function() {
-    var programs = Backend.getPrograms(this._deviceId);
-    
     var selectedProgram = this._getSelectedPrograms()[0];
     Dialogs.showUploadStockProgramDialog(this._deviceId, selectedProgram);
   }.bind(this));

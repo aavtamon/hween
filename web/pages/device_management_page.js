@@ -2,12 +2,14 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
   AbstractDataPage.call(this, DeviceManagementPage.name);
   
   this._deviceId;
+  this._deviceType;
   
   this._programList;
   this._removeSelectedButton;
+  this._triggerList;
   
   this._cacheChangeListener = function(event) {
-    if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS && this._deviceId == event.objectId) {
+    if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE && this._deviceId == event.objectId) {
       this._refreshProgramList();
     }
   }.bind(this);
@@ -30,7 +32,9 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   }.bind(this));
   
   var programSelectionPanel = UIUtils.appendBlock(contentPanel, "ProgramSelectionPanel");
-  UIUtils.appendLabel(programSelectionPanel, "ProgramSelectionLabel", this.getLocale().ProgramSelectionLabel);
+  var scheduleControlPanel = UIUtils.appendBlock(programSelectionPanel, "ScheduleControlPanel");
+  UIUtils.appendLabel(scheduleControlPanel, "ProgramSelectionLabel", this.getLocale().ProgramSelectionLabel);
+  this._triggerList = UIUtils.appendDropList(scheduleControlPanel, "ProgramSelectionLabel");
   
   this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
   this._programList.setSelectionListener(function(selectedItem) {
@@ -57,7 +61,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
       var item = items[i];
       if (item.element._selectionBox.isChecked()) {
         this._programList.removeItem(item);
-        Backend.removePrograms(this._deviceId, item._program);
+        Backend.removeDevicePrograms(this._deviceId, item._program);
       }
     }
   }.bind(this));
@@ -92,15 +96,18 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
 DeviceManagementPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
+  this._deviceType = Backend.getDeviceInfo(this._deviceId).type;
   
-  var programs = Backend.getPrograms(this._deviceId);
-  if (programs == null) {
+  var schedule = Backend.getDeviceSchedule(this._deviceId);
+  if (schedule == null) {
     this._programList.innerHTML = this.getLocale().UpdatingListOfProgramsLabel;
   } else if (programs.length == 0) {
     this._programList.innerHTML = this.getLocale().NoProgramsAvailableLabel;
   } else {
-    this._refreshProgramList(programs);
+    this._refreshProgramList(schedule.programs);
   }
+  
+  this._triggerList.setItems(Backend.getSupportedProgramTriggers(this._deviceType));
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
   Backend.addCacheChangeListener(this._cacheChangeListener);
@@ -116,13 +123,13 @@ DeviceManagementPage.prototype._refreshProgramList = function() {
   this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
 
-  var programs = Backend.getPrograms(this._deviceId);
-  if (programs == null) {
+  var schedule = Backend.getDeviceSchedule(this._deviceId);
+  if (schedule == null) {
     return;
   }
   
-  for (var i = 0; i < programs.length; i++) {
-    this._addProgramToList(programs[i]);
+  for (var i = 0; i < schedule.programs.length; i++) {
+    this._addProgramToList(schedule.programs[i]);
   }
 }
 
@@ -149,8 +156,8 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   UIUtils.addClass(freqChooser, "program-frequency");
   freqChooser.setChangeListener(function() {
     program.frequency = freqChooser.getValue();
-    Backend.updateProgram(this._deviceId, program);
-  });
+    Backend.updateDeviceProgram(this._deviceId, program);
+  }.bind(this));
 }
 
 DeviceManagementPage.prototype._getSelectedPrograms = function() {

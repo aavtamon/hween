@@ -6,7 +6,7 @@ Backend.OperationResult.ERROR = "error";
 Backend.CacheChangeEvent.TYPE_DEVICE_IDS = "device_ids";
 Backend.CacheChangeEvent.TYPE_DEVICE_INFO = "device_info";
 
-Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS = "device_programs";
+Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE = "device_schedule";
 Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS = "livrary_programs";
 Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS = "stock_programs";
 
@@ -27,6 +27,9 @@ Backend.Program.FREQUENCY_ONCE = "once";
 Backend.Program.FREQUENCY_RARE = "rare";
 Backend.Program.FREQUENCY_OFTER = "often";
 Backend.Program.FREQUENCY_ALWAYS = "always";
+Backend.Program.TRIGGER_IMMEDIATELY = "immediately";
+Backend.Program.TRIGGER_DELAY = "delay";
+Backend.Program.TRIGGER_MOTION = "motion";
 
 
 Backend.DeviceCommand = {};
@@ -42,7 +45,11 @@ Backend.getStockCategories = function(deviceType) {
 }
 
 Backend.getSupportedCommands = function(deviceType) {
-  return [ {data: "up", display: "Move Up", description: "Move toy up one inch"}, {data: "down", display: "Move Down", description: "Move toy down one inch"} ];
+  return [ {data: Backend.DeviceCommand.MOVE_UP, display: "Move Up", description: "Move toy up one inch"}, {data: Backend.DeviceCommand.MOVE_DOWN, display: "Move Down", description: "Move toy down one inch"} ];
+}
+
+Backend.getSupportedProgramTriggers = function(deviceType) {
+  return [ {data: Backend.Program.TRIGGER_IMMEDIATELY, display: "One by one"}, {data: Backend.Program.TRIGGER_DELAY, display: "Little delay"}, {data: Backend.Program.TRIGGER_MOTION, display: "Motion sensor"} ];
 }
 
 
@@ -174,44 +181,47 @@ Backend.addNewDevice = function(deviceId, verificationCode, operationCallback) {
 
 
 // Device Program Management
-Backend.getPrograms = function(deviceId, operationCallback) {
-  var devicePrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+Backend.getDeviceSchedule = function(deviceId, operationCallback) {
+  var deviceSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
   
-  if (devicePrograms == null) {
-    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+  if (deviceSchedule == null) {
+    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
     
-    this._pullDevicePrograms(deviceId, operationCallback);
+    this._pullDeviceSchedule(deviceId, operationCallback);
   } else if (operationCallback) {
-    operationCallback(Backend.OperationResult.SUCCESS, devicePrograms);
+    operationCallback(Backend.OperationResult.SUCCESS, deviceSchedule);
   }
   
-  return devicePrograms;
+  return deviceSchedule;
 }
-Backend._pullDevicePrograms = function(deviceId, operationCallback) {
+Backend._pullDeviceSchedule = function(deviceId, operationCallback) {
   //TODO
   setTimeout(function() {
-    var devicePrograms = [{
-      id: 1,
-      title: "Roar",
-      frequency: Backend.Program.FREQUENCY_ONCE
-    }, {
-      id: 2,
-      title: "Loud Roar",
-      frequency: Backend.Program.FREQUENCY_ONCE
-    }]
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, devicePrograms);
+    var deviceSchedule = {
+      trigger: Backend.Program.TRIGGER_MOTION,
+      programs: [{
+        id: 1,
+        title: "Roar",
+        frequency: Backend.Program.FREQUENCY_ONCE
+      }, {
+        id: 2,
+        title: "Loud Roar",
+        frequency: Backend.Program.FREQUENCY_ONCE
+      }],      
+    }
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, deviceSchedule);
 
     if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS, devicePrograms);
+      operationCallback(Backend.OperationResult.SUCCESS, deviceSchedule);
     }
   }, 1000);
 }
 
-Backend.setPrograms = function(deviceId, programs, operationCallback) {
-  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+Backend.setDeviceSchedule = function(deviceId, schedule, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
   
   setTimeout(function() {
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, programs);
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, schedule);
 
     if (operationCallback) {
       operationCallback(Backend.OperationResult.SUCCESS);
@@ -219,13 +229,13 @@ Backend.setPrograms = function(deviceId, programs, operationCallback) {
   }, 3000);
 }
 
-Backend.addPrograms = function(deviceId, programs, operationCallback) {
-  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+Backend.addDevicePrograms = function(deviceId, programs, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
   
   setTimeout(function() {
-    var currentPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
-    currentPrograms = currentPrograms.concat(programs);
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, currentPrograms);
+    var currentSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
+    currentSchedule.programs = currentSchedule.programs.concat(programs);
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, currentSchedule);
 
     if (operationCallback) {
       operationCallback(Backend.OperationResult.SUCCESS);
@@ -233,20 +243,43 @@ Backend.addPrograms = function(deviceId, programs, operationCallback) {
   }, 3000);
 }
 
-Backend.removePrograms = function(deviceId, programs, operationCallback) {
-  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
+Backend.removeDevicePrograms = function(deviceId, programs, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
   
   setTimeout(function() {
-    var currentPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId);
-    currentPrograms = GeneralUtils.removeFromArray(currentPrograms, programs);
+    var currentSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
+    currentSchedule.programs = GeneralUtils.removeFromArray(currentSchedule.programs, programs);
     
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_PROGRAMS, deviceId, currentPrograms);
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, currentPrograms);
 
     if (operationCallback) {
       operationCallback(Backend.OperationResult.SUCCESS);
     }
   }, 3000);
 }
+
+Backend.updateDeviceProgram = function(deviceId, program, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
+  
+  setTimeout(function() {
+    var currentSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
+
+    for (var index in currentSchedule.programs) {
+      if (currentSchedule.programs[index].id == program.id) {
+        currentSchedule.programs[index] = program;
+        break;
+      }
+    }
+    
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, currentSchedule);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 3000);
+}
+
+
 
 
 // Library Program Manger
