@@ -7,10 +7,18 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
   this._programList;
   this._removeSelectedButton;
   this._triggerList;
+  this._runButton;
+  this._stopButton;
   
   this._cacheChangeListener = function(event) {
-    if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE && this._deviceId == event.objectId) {
+    if (this._deviceId != event.objectId) {
+      return;
+    }
+    
+    if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE) {
       this._refreshProgramList();
+    } else if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_MODE) {
+      this._updateModeButtons();
     }
   }.bind(this);
 });
@@ -49,7 +57,9 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
       programs.push(items[i].element._program);
     }
 
-    Backend.setPrograms(this._deviceId, programs);
+    var schedule = Backend.getDeviceSchedule(this._deviceId);
+    schedule.programs = programs;
+    Backend.setDeviceSchedule(this._deviceId, schedule);
   }.bind(this));
   
 
@@ -87,8 +97,15 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
   var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", this.getLocale().BackButton);
   cancelButton.setClickListener(Application.goBack.bind(Application));
-  var sendToDeviceButton = UIUtils.appendButton(buttonsPanel, "SendToDeviceButton", this.getLocale().SendToDeviceButton);
-  sendToDeviceButton.setClickListener(function() {
+  
+  this._runButton = UIUtils.appendButton(buttonsPanel, "RunButton", this.getLocale().RunButton);
+  this._runButton.setClickListener(function() {
+    Backend.setDeviceMode(this._deviceId, Backend.DeviceMode.RUNNING_SCHEDULE);
+    Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
+  }.bind(this));
+  this._stopButton = UIUtils.appendButton(buttonsPanel, "StopButton", this.getLocale().StopButton);
+  this._stopButton.setClickListener(function() {
+    Backend.setDeviceMode(this._deviceId, Backend.DeviceMode.IDLE);
     Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
   }.bind(this));
 }
@@ -101,7 +118,7 @@ DeviceManagementPage.prototype.onShow = function(root, bundle) {
   var schedule = Backend.getDeviceSchedule(this._deviceId);
   if (schedule == null) {
     this._programList.innerHTML = this.getLocale().UpdatingListOfProgramsLabel;
-  } else if (programs.length == 0) {
+  } else if (schedule.programs.length == 0) {
     this._programList.innerHTML = this.getLocale().NoProgramsAvailableLabel;
   } else {
     this._refreshProgramList(schedule.programs);
@@ -110,6 +127,9 @@ DeviceManagementPage.prototype.onShow = function(root, bundle) {
   this._triggerList.setItems(Backend.getSupportedProgramTriggers(this._deviceType));
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
+  
+  this._updateModeButtons();
+  
   Backend.addCacheChangeListener(this._cacheChangeListener);
 }
 
@@ -127,7 +147,7 @@ DeviceManagementPage.prototype._refreshProgramList = function() {
   if (schedule == null) {
     return;
   }
-  
+
   for (var i = 0; i < schedule.programs.length; i++) {
     this._addProgramToList(schedule.programs[i]);
   }
@@ -171,5 +191,18 @@ DeviceManagementPage.prototype._getSelectedPrograms = function() {
   }
   
   return selectedPrograms;
+}
+
+
+DeviceManagementPage.prototype._updateModeButtons = function() {
+  var mode = Backend.getDeviceMode(this._deviceId);
+  
+  if (mode == Backend.DeviceMode.RUNNING_SCHEDULE) {
+    UIUtils.setEnabled(this._runButton, false);
+    UIUtils.setEnabled(this._stopButton, true);
+  } else {
+    UIUtils.setEnabled(this._runButton, true);
+    UIUtils.setEnabled(this._stopButton, false);
+  }
 }
 

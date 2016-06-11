@@ -54,8 +54,12 @@
 }
 #DeviceManagementPage-ContentPanel-ButtonsPanel-CancelButton {
 }
-#DeviceManagementPage-ContentPanel-ButtonsPanel-SendToDeviceButton {
+#DeviceManagementPage-ContentPanel-ButtonsPanel-RunButton {
   float: right;
+}
+#DeviceManagementPage-ContentPanel-ButtonsPanel-StopButton {
+  float: right;
+  margin-right: 20px;
 }
 
 

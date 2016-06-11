@@ -9,6 +9,7 @@ Backend.CacheChangeEvent.TYPE_DEVICE_INFO = "device_info";
 Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE = "device_schedule";
 Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS = "livrary_programs";
 Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS = "stock_programs";
+Backend.CacheChangeEvent.TYPE_DEVICE_MODE = "device_mode";
 
 
 Backend.DeviceType = {};
@@ -35,6 +36,26 @@ Backend.Program.TRIGGER_MOTION = "motion";
 Backend.DeviceCommand = {};
 Backend.DeviceCommand.MOVE_UP = "up";
 Backend.DeviceCommand.MOVE_DOWN = "down";
+
+
+Backend.DeviceMode = {};
+Backend.DeviceMode.IDLE = "idle";
+Backend.DeviceMode.RUNNING_SCHEDULE = "running";
+Backend.DeviceMode.MANUAL = "manual";
+
+
+
+// User Management - temporary
+
+Backend._communicate = function(resource, method, data, isJsonResponse, headers, callback) {
+  if (resource.indexOf("user?login") == 0) {
+    callback.success({user_id: 1}, 200);
+  } else if (resource.indexOf("user/1") == 0) {
+    callback.success({}, 200);
+  } else if (resource.indexOf("user/1/settings") == 0) {
+    callback.success({}, 200);
+  }
+}
 
 
 
@@ -282,7 +303,51 @@ Backend.updateDeviceProgram = function(deviceId, program, operationCallback) {
 
 
 
-// Library Program Manger
+Backend.getDeviceMode = function(deviceId, operationCallback) {
+  var deviceMode = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_MODE, deviceId);
+  
+  if (deviceMode == null) {
+    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_MODE, deviceId);
+    
+    this._pullDeviceMode(deviceId, operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, deviceMode);
+  }
+  
+  return deviceMode;
+}
+Backend._pullDeviceMode = function(deviceId, operationCallback) {
+  //TODO
+  setTimeout(function() {
+    var deviceMode = Backend.DeviceMode.IDLE;
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_MODE, deviceId, deviceMode);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS, deviceMode);
+    }
+  }, 1000);
+}
+
+
+Backend.setDeviceMode = function(deviceId, mode, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_MODE, deviceId);
+  
+  setTimeout(function() {
+    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_MODE, deviceId, mode);
+
+    if (operationCallback) {
+      operationCallback(Backend.OperationResult.SUCCESS);
+    }
+  }, 1000);
+}
+
+
+
+
+
+
+
+// Library Program Management
 
 Backend.getLibraryPrograms = function(deviceId, operationCallback) {
   var libraryPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
