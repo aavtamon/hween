@@ -42,7 +42,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var programSelectionPanel = UIUtils.appendBlock(contentPanel, "ProgramSelectionPanel");
   var scheduleControlPanel = UIUtils.appendBlock(programSelectionPanel, "ScheduleControlPanel");
   UIUtils.appendLabel(scheduleControlPanel, "ProgramSelectionLabel", this.getLocale().ProgramSelectionLabel);
-  this._triggerList = UIUtils.appendDropList(scheduleControlPanel, "ProgramSelectionLabel");
+  this._triggerList = UIUtils.appendDropList(scheduleControlPanel, "TriggersList");
   
   this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
   this._programList.setSelectionListener(function(selectedItem) {
@@ -124,7 +124,7 @@ DeviceManagementPage.prototype.onShow = function(root, bundle) {
     this._refreshProgramList(schedule.programs);
   }
   
-  this._triggerList.setItems(Backend.getSupportedProgramTriggers(this._deviceType));
+  this._triggerList.setChoices(Backend.getSupportedProgramTriggers(this._deviceType));
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
   
@@ -140,6 +140,7 @@ DeviceManagementPage.prototype.onHide = function() {
 }
 
 DeviceManagementPage.prototype._refreshProgramList = function() {
+  var selectedItem = this._programList.getSelectedItem();
   this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
 
@@ -151,6 +152,8 @@ DeviceManagementPage.prototype._refreshProgramList = function() {
   for (var i = 0; i < schedule.programs.length; i++) {
     this._addProgramToList(schedule.programs[i]);
   }
+  
+  this._programList.setSelectedItem(selectedItem);
 }
 
 DeviceManagementPage.prototype._addProgramToList = function(program) {

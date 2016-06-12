@@ -124,7 +124,7 @@ var Locale_eng = {
     "DeviceManagementPage": {
       "ManualModeButton": "Manual Mode",
       "DeviceSettingsButton": "Device Settings",
-      "ProgramSelectionLabel": "Build your schedule for the device:",
+      "ProgramSelectionLabel": "Each program in the list runs after:",
       "RemoveSelectedButton": "Remove selected",
       "AddProgramButton": "Add program",
       "AddNewProgramButton": "New",

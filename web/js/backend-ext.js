@@ -26,7 +26,7 @@ Backend.Program = {};
 Backend.Program.FREQUENCY_NEVER = "never";
 Backend.Program.FREQUENCY_ONCE = "once";
 Backend.Program.FREQUENCY_RARE = "rare";
-Backend.Program.FREQUENCY_OFTER = "often";
+Backend.Program.FREQUENCY_OFTEN = "often";
 Backend.Program.FREQUENCY_ALWAYS = "always";
 Backend.Program.TRIGGER_IMMEDIATELY = "immediately";
 Backend.Program.TRIGGER_DELAY = "delay";
@@ -70,7 +70,7 @@ Backend.getSupportedCommands = function(deviceType) {
 }
 
 Backend.getSupportedProgramTriggers = function(deviceType) {
-  return [ {data: Backend.Program.TRIGGER_IMMEDIATELY, display: "One by one"}, {data: Backend.Program.TRIGGER_DELAY, display: "Little delay"}, {data: Backend.Program.TRIGGER_MOTION, display: "Motion sensor"} ];
+  return [ {data: Backend.Program.TRIGGER_IMMEDIATELY, display: "Previous"}, {data: Backend.Program.TRIGGER_DELAY, display: "Delay"}, {data: Backend.Program.TRIGGER_MOTION, display: "Motion"} ];
 }
 
 

@@ -26,12 +26,21 @@
   border-width: 1px;
   border-style: solid;
 }
-#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionLabel {
-  display: block;
-  
+
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ScheduleControlPanel {
+  text-align: left;
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ScheduleControlPanel-ProgramSelectionLabel {
   font-size: 30px;
   text-align: left;
 }
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ScheduleControlPanel-TriggersList {
+  display: inline-block;
+  width: 200px;
+  
+  margin-left: 30px;
+}
+
 #DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramSelectionList {
   margin-left: 20px;
 }
