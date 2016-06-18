@@ -92,7 +92,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
     this._addCommandToList(command);
   }.bind(this);
   
-  var commands = Backend.getSupportedCommands(Backend.getDeviceInfo(this._deviceId));
+  var commands = Backend.getSupportedCommands(this._deviceInfo);
   var actions = [];
   for (var i in commands) {
     var command = commands[i];

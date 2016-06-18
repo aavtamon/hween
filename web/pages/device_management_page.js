@@ -9,6 +9,8 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
   this._triggerList;
   this._runButton;
   this._stopButton;
+  this._scheduleStatusPanel;
+  this._manualModeButton;
   
   this._cacheChangeListener = function(event) {
     if (this._deviceId != event.objectId) {
@@ -29,8 +31,8 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
   
   var toolbarPanel = UIUtils.appendBlock(contentPanel, "ToolbarPanel");
-  var manualModeButton = UIUtils.appendButton(toolbarPanel, "ManualModeButton", this.getLocale().ManualModeButton);
-  manualModeButton.setClickListener(function() {
+  this._manualModeButton = UIUtils.appendButton(toolbarPanel, "ManualModeButton", this.getLocale().ManualModeButton);
+  this._manualModeButton.setClickListener(function() {
     Application.showPage(ManualModePage.name, {deviceId: this._deviceId});
   }.bind(this));
 
@@ -43,6 +45,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var scheduleControlPanel = UIUtils.appendBlock(programSelectionPanel, "ScheduleControlPanel");
   UIUtils.appendLabel(scheduleControlPanel, "ProgramSelectionLabel", this.getLocale().ProgramSelectionLabel);
   this._triggerList = UIUtils.appendDropList(scheduleControlPanel, "TriggersList");
+  this._scheduleStatusPanel = UIUtils.appendBlock(scheduleControlPanel, "ScheduleStatusPanel");
   
   this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
   this._programList.setSelectionListener(function(selectedItem) {
@@ -113,7 +116,14 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
 DeviceManagementPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
-  this._deviceType = Backend.getDeviceInfo(this._deviceId).type;
+  
+  var deviceInfo = Backend.getDeviceInfo(this._deviceId);
+  this._deviceType = deviceInfo.type;
+  
+  this._manualModeButton.setEnabled(false);
+  Controller.isAvailable(deviceInfo, function(isEnabled) {
+    this._manualModeButton.setEnabled(isEnabled);
+  }.bind(this));
   
   var schedule = Backend.getDeviceSchedule(this._deviceId);
   if (schedule == null) {
@@ -203,9 +213,17 @@ DeviceManagementPage.prototype._updateModeButtons = function() {
   if (mode == Backend.DeviceMode.RUNNING_SCHEDULE) {
     UIUtils.setEnabled(this._runButton, false);
     UIUtils.setEnabled(this._stopButton, true);
+
+    this._scheduleStatusPanel.innerHTML = this.getLocale().ScheduleStatusRunning;
   } else {
     UIUtils.setEnabled(this._runButton, true);
     UIUtils.setEnabled(this._stopButton, false);
+
+    if (mode == Backend.DeviceMode.IDLE) {
+      this._scheduleStatusPanel.innerHTML = this.getLocale().ScheduleStatusIdle;
+    } else if (mode == Backend.DeviceMode.MANUAL) {
+      this._scheduleStatusPanel.innerHTML = this.getLocale().ScheduleStatusManual;
+    }
   }
 }
 

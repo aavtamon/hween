@@ -136,6 +136,9 @@ var Locale_eng = {
       "RunButton": "Run On Device",
       "StopButton": "Stop",
       "BackButton": "Back To Device Selection",
+      "ScheduleStatusIdle": "Device is idle",
+      "ScheduleStatusRunning": "Currently Running On Device",
+      "ScheduleStatusManual": "Device is controled manually",
     },
     "ManageLibraryProgramsPage": {
       "RemoveSelectedButton": "Delete selected",
@@ -166,6 +169,14 @@ var Locale_eng = {
       "Paused": "paused...",
       
       "ProgramExecutionTerminatedMessage": "Program Execution interrupted"
+    },
+    "ManualModePage": {
+      "CommandsLabel": "The device is ready to your commands. Just click it",
+      "ResetToInitialPositionButton": "Reset To Initial Position",
+      "MoveUpButton": "Move Up",
+      "MoveDownButton": "Move Down",
+      "TurnLeftButton": "Turn Left",
+      "TurnRightButton": "Turn Right",
     }
   },
   

@@ -36,6 +36,8 @@ Backend.Program.TRIGGER_MOTION = "motion";
 Backend.DeviceCommand = {};
 Backend.DeviceCommand.MOVE_UP = "up";
 Backend.DeviceCommand.MOVE_DOWN = "down";
+Backend.DeviceCommand.TURN_LEFT = "left";
+Backend.DeviceCommand.TURN_RIGHT = "right";
 
 
 Backend.DeviceMode = {};
