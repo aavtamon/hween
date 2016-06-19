@@ -214,7 +214,7 @@ CreateProgramPage.prototype._executeCommand = function(commandIndex) {
   this._commandList.scrollTop = offset;
   
   
-//  Controller.sendCommand(this._deviceInfo, item._command.data);
+//  Controller.sendCommand(this._deviceInfo, {id: item._command.data});
 }
 CreateProgramPage.prototype._pauseCommandExecution = function(commandIndex) {
   if (commandIndex == null) {

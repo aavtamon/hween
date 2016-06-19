@@ -24,7 +24,3 @@ Controller.reset = function(deviceInfo, observer) {
 Controller.sendCommand = function(deviceInfo, command, observer) {
     setTimeout(observer.bind(this, true), 2000);
 }
-
-Controller.sendProgram = function(deviceInfo, commands, observer) {
-    setTimeout(observer.bind(this, true), 2000);
-}

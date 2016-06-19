@@ -181,7 +181,8 @@ var Locale_eng = {
       "TurnRightButton": "Turn Right",
       "EyeControlButtonOn": "Eyes On",
       "EyeControlButtonOff": "Eyes Off",
-      "TalkButton": "Make A Noise"
+      "TalkButton": "Make A Noise",
+      "IncorrectAudioFileMessage": "The file should be a valid audio file"
     }
   },
   

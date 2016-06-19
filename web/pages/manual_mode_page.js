@@ -25,7 +25,7 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._moveUpButton = UIUtils.appendButton(commandsPanel, "MoveUpButton", this.getLocale().MoveUpButton);
   this._moveUpButton.setClickListener(function() {
     this._disableActions();
-    Controller.sendCommand(this._deviceInfo, Backend.DeviceCommand.MOVE_UP, function() {
+    Controller.sendCommand(this._deviceInfo, {id: Backend.DeviceCommand.MOVE_UP}, function() {
       this._enableActions();
     }.bind(this));
   }.bind(this));
@@ -33,7 +33,7 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._moveDownButton = UIUtils.appendButton(commandsPanel, "MoveDownButton", this.getLocale().MoveDownButton);
   this._moveDownButton.setClickListener(function() {
     this._disableActions();
-    Controller.sendCommand(this._deviceInfo, Backend.DeviceCommand.MOVE_DOWN, function() {
+    Controller.sendCommand(this._deviceInfo, {id: Backend.DeviceCommand.MOVE_DOWN}, function() {
       this._enableActions();
     }.bind(this));
   }.bind(this));
@@ -42,7 +42,7 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._turnLeftButton = UIUtils.appendButton(commandsPanel, "TurnLeftButton", this.getLocale().TurnLeftButton);
   this._turnLeftButton.setClickListener(function() {
     this._disableActions();
-    Controller.sendCommand(this._deviceInfo, Backend.DeviceCommand.TURN_LEFT, function() {
+    Controller.sendCommand(this._deviceInfo, {id: Backend.DeviceCommand.TURN_LEFT}, function() {
       this._enableActions();
     }.bind(this));
   }.bind(this));
@@ -50,7 +50,7 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._turnRightButton = UIUtils.appendButton(commandsPanel, "TurnRightButton", this.getLocale().TurnRightButton);
   this._turnRightButton.setClickListener(function() {
     this._disableActions();
-    Controller.sendCommand(this._deviceInfo, Backend.DeviceCommand.TURN_RIGHT, function() {
+    Controller.sendCommand(this._deviceInfo, {id: Backend.DeviceCommand.TURN_RIGHT}, function() {
       this._enableActions();
     }.bind(this));
   }.bind(this));
@@ -59,19 +59,35 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._eyeControlButton = UIUtils.appendToggleButton(commandsPanel, "EyeControlButton", this.getLocale().EyeControlButtonOn, this.getLocale().EyeControlButtonOff);
   this._eyeControlButton.setClickListener(function() {
     this._disableActions();
-    Controller.sendCommand(this._deviceInfo, Backend.DeviceCommand.EYES_ON, function() {
+    Controller.sendCommand(this._deviceInfo, {id: Backend.DeviceCommand.EYES_ON}, function() {
       this._enableActions();
       this._eyeControlButton.setSelected(!this._eyeControlButton.isSelected());
     }.bind(this));
   }.bind(this));
   
+  
+  var fileChooser = UIUtils.appendFileChooser(commandsPanel);
   this._talkButton = UIUtils.appendButton(commandsPanel, "TalkButton", this.getLocale().TalkButton);
   this._talkButton.setClickListener(function() {
-    this._disableActions();
-    Controller.sendCommand(this._deviceInfo, Backend.DeviceCommand.EYES_ON, function() {
-      this._enableActions();
+    fileChooser.open(function(files) {
+      if (files == null && files.lenght == 0) {
+        return;
+      }
+      var selectedFile = files[0];
+
+      if (FileUtils.isAudio(selectedFile)) {
+        FileUtils.loadFile(selectedFile, function(file, dataUrl) {
+          this._disableActions();
+          Controller.sendCommand(this._deviceInfo, {id: Backend.DeviceCommand.TALK, arg: dataUrl}, function() {
+            this._enableActions();
+          }.bind(this));
+        }.bind(this));
+      } else {
+        UIUtils.showMessage(this.getLocale().IncorrectAudioFileMessage);
+      }
     }.bind(this));
   }.bind(this));
+
   
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
