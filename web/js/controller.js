@@ -17,14 +17,14 @@ Controller.reportToServer = function(deviceInfo, observer) {
 }
 
 Controller.reset = function(deviceInfo, observer) {
-  //  setTimeout(observer.bind(this, true), 2000);
+    setTimeout(observer.bind(this, true), 2000);
 }
 
 // command: {id: Controller.Command, arg: <any data>}
 Controller.sendCommand = function(deviceInfo, command, observer) {
-  //  setTimeout(observer.bind(this, true), 2000);
+    setTimeout(observer.bind(this, true), 2000);
 }
 
 Controller.sendProgram = function(deviceInfo, commands, observer) {
-  //  setTimeout(observer.bind(this, true), 2000);
+    setTimeout(observer.bind(this, true), 2000);
 }

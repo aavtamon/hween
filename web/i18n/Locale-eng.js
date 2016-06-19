@@ -171,12 +171,17 @@ var Locale_eng = {
       "ProgramExecutionTerminatedMessage": "Program Execution interrupted"
     },
     "ManualModePage": {
-      "CommandsLabel": "The device is ready to your commands. Just click it",
+      "DeviceReadyForCommandLabel": "The device is ready to your commands. Just click it",
+      "DeviceProcessingCommandLabel": "The device is processing your command",
+      "BackButton": "Go Back",
       "ResetToInitialPositionButton": "Reset To Initial Position",
       "MoveUpButton": "Move Up",
       "MoveDownButton": "Move Down",
       "TurnLeftButton": "Turn Left",
       "TurnRightButton": "Turn Right",
+      "EyeControlButtonOn": "Eyes On",
+      "EyeControlButtonOff": "Eyes Off",
+      "TalkButton": "Make A Noise"
     }
   },
   
