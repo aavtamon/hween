@@ -33,7 +33,7 @@ StockProgramsPage.prototype.definePageContent = function(root) {
   });
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().CancelOperationButton);
   cancelButton.setClickListener(Application.goBack.bind(Application));
   
   this._loadSelectedButton = UIUtils.appendButton(buttonsPanel, "LoadSelectedButton", this.getLocale().LoadSelectedButton);

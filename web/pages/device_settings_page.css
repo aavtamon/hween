@@ -1,0 +1,30 @@
+#DeviceSettingsPage {
+  text-align: center;
+  min-width: 950px;
+}
+
+
+#DeviceSettingsPage-ContentPanel {
+  display: inline-block;
+  width: 90%;
+  margin-top: 50px;
+  
+  text-align: left;
+}
+
+#DeviceSettingsPage-ContentPanel-SettingsLabel {
+  display: block;
+  
+  text-align: center;
+  
+  font-size: 30px;
+}
+
+#DeviceSettingsPage-ContentPanel-ButtonsPanel {
+  margin-top: 50px;
+}
+#DeviceSettingsPage-ContentPanel-ButtonsPanel-CancelButton {
+}
+#DeviceSettingsPage-ContentPanel-ButtonsPanel-SaveButton {
+  float: right;
+}

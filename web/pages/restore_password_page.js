@@ -14,9 +14,9 @@ RestorePasswordPage.prototype.definePageContent = function(root) {
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
 
   var labelPanel = UIUtils.appendBlock(contentPanel, "LabelPanel");
-  UIUtils.appendLabel(labelPanel, "EmailLabel", I18n.getLocale().literals.EmailLoginLabel);
-  UIUtils.appendLabel(labelPanel, "PasswordLabel", I18n.getLocale().literals.PasswordLabel);
-  UIUtils.appendLabel(labelPanel, "RetypePasswordLabel", I18n.getLocale().literals.RetypePasswordLabel);
+  UIUtils.appendLabel(labelPanel, "EmailLabel", I18n.getLocale().EmailLoginLabel);
+  UIUtils.appendLabel(labelPanel, "PasswordLabel", I18n.getLocale().PasswordLabel);
+  UIUtils.appendLabel(labelPanel, "RetypePasswordLabel", I18n.getLocale().RetypePasswordLabel);
   
   var controlPanel = UIUtils.appendBlock(contentPanel, "ControlPanel");
   this._loginElement = UIUtils.appendTextInput(controlPanel, "Login");
@@ -91,7 +91,7 @@ RestorePasswordPage.prototype._changePassword = function() {
     },
     error: function() {
       this._onCompletion();
-      UIUtils.showMessage(I18n.getLocale().literals.ServerErrorMessage);
+      UIUtils.showMessage(I18n.getLocale().ServerErrorMessage);
     },
 
     _onCompletion: function() {

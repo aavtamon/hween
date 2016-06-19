@@ -64,12 +64,11 @@ CreateProgramPage.prototype.definePageContent = function(root) {
     }
   }.bind(this));
   
-  
   UIUtils.appendLabel(contentPanel, "DescriptionLabel", this.getLocale().DescriptionLabel);
   var descriptionInput = UIUtils.appendTextInput(contentPanel, "DescriptionInput");
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().CancelOperationButton);
   cancelButton.setClickListener(Application.goBack.bind(Application));
   
   this._saveButton = UIUtils.appendButton(buttonsPanel, "SaveButton", this.getLocale().SaveButton);
@@ -83,24 +82,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._deviceId = bundle.deviceId;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
-  var clickListener = function(command) {
-    if (this._playbackTimer != null) {
-      UIUtils.showMessage(this.getLocale().ProgramExecutionTerminatedMessage);      
-    }
-    this._stopProgram();
-    
-    this._addCommandToList(command);
-  }.bind(this);
-  
-  var commands = Backend.getSupportedCommands(this._deviceInfo);
-  var actions = [];
-  for (var i in commands) {
-    var command = commands[i];
-    
-    var action = {display: command.display, clickListener: clickListener.bind(this, command)};
-    actions.push(action);
-  }
-  this._addCommandButton.setExpandableActions(actions);
+  this._addCommandButton.setExpandableActions(this._getCommandActions());
   
   this._commandList.clear();
   
@@ -117,6 +99,56 @@ CreateProgramPage.prototype.onHide = function() {
   AbstractDataPage.prototype.onHide.call(this);
   
   this._stopProgram();
+}
+
+
+CreateProgramPage.prototype._getCommandActions = function() {
+  var clickListener = function(command) {
+    if (this._playbackTimer != null) {
+      UIUtils.showMessage(this.getLocale().ProgramExecutionTerminatedMessage);      
+    }
+    this._stopProgram();
+    
+    this._addCommandToList(command);
+  }.bind(this);
+  
+  
+  var commands = Backend.getSupportedCommands(this._deviceInfo);
+  var actions = [];
+  for (var i in commands) {
+    var command = commands[i];
+    
+    var clickAction;
+    if (command.data == Backend.DeviceCommand.TALK) {
+      clickAction = function(command) {
+        var fileChooser = UIUtils.appendFileChooser(this._addCommandButton);
+
+        fileChooser.open(function(files) {
+          UIUtils.remove(fileChooser);
+          
+          if (files == null || files.length == 0) {
+            return;
+          }
+          var selectedFile = files[0];
+          if (FileUtils.isAudio(selectedFile)) {
+            FileUtils.loadFile(selectedFile, function(file, dataUrl) {
+              command.description = file.name;
+              command.arg = dataUrl;
+              clickListener(command);
+            });
+          } else {
+            UIUtils.showMessage(this.getLocale().IncorrectAudioFileMessage);
+          }
+        }.bind(this));
+      }.bind(this, command);
+    } else {
+      clickAction = clickListener.bind(this, command);
+    }
+    var action = {display: command.display, clickListener: clickAction};
+    actions.push(action);
+  }
+  
+  return actions;
 }
 
 

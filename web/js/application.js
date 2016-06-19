@@ -1,9 +1,9 @@
 
 Application = {
   Configuration: {
-    LANGUAGES: [ {data: "eng", display: I18n.getLocale().literals.LanguageEnglish}, {data: "esp", display: I18n.getLocale().literals.LanguageSpanish} ],
+    LANGUAGES: [ {data: "eng", display: I18n.getLocale().LanguageEnglish}, {data: "esp", display: I18n.getLocale().LanguageSpanish} ],
 
-    PROGRAM_FREQUENCIES: [ {data: Backend.Program.FREQUENCY_ONCE, display: I18n.getLocale().literals.FrequencyOnce}, {data: Backend.Program.FREQUENCY_RARE, display: I18n.getLocale().literals.FrequencyRare}, {data: Backend.Program.FREQUENCY_OFTEN, display: I18n.getLocale().literals.FrequencyOften}, {data: Backend.Program.FREQUENCY_ALWAYS, display: I18n.getLocale().literals.FrequencyAlways}, {data: Backend.Program.FREQUENCY_NEVER, display: I18n.getLocale().literals.FrequencyNever} ],
+    PROGRAM_FREQUENCIES: [ {data: Backend.Program.FREQUENCY_ONCE, display: I18n.getLocale().FrequencyOnce}, {data: Backend.Program.FREQUENCY_RARE, display: I18n.getLocale().FrequencyRare}, {data: Backend.Program.FREQUENCY_OFTEN, display: I18n.getLocale().FrequencyOften}, {data: Backend.Program.FREQUENCY_ALWAYS, display: I18n.getLocale().FrequencyAlways}, {data: Backend.Program.FREQUENCY_NEVER, display: I18n.getLocale().FrequencyNever} ],
 
     
     dataToString: function(configurationItem, data) {
@@ -36,9 +36,9 @@ Application.start = function() {
     Backend.logOut();
   }
   
-  $("#Title-Caption").text(I18n.getLocale().literals.AppTitle);
+  $("#Title-Caption").text(I18n.getLocale().AppTitle);
   
-  $("#Footer-ContactUs").text(I18n.getLocale().literals.ContactUs);
+  $("#Footer-ContactUs").text(I18n.getLocale().ContactUs);
   $("#Footer-ContactUs").click(function() {
     UIUtils.showDialog("ContactInformation", "Contact Information", "We will need to find a way to open this page");
   });
@@ -86,7 +86,7 @@ Application.reload = function() {
   UIUtils.hideSpinningWheel();
   UIUtils.hideDialog();
   
-  $("#Footer-ContactUs").text(I18n.getLocale().literals.ContactUs);
+  $("#Footer-ContactUs").text(I18n.getLocale().ContactUs);
 }
 
 
@@ -118,14 +118,14 @@ Application.setupUserMenuChooser = function() {
       });
     };
     
-    var item = UIUtils.appendLink(popup, "ProfileItem", I18n.getLocale().literals.ProfileItem);
+    var item = UIUtils.appendLink(popup, "ProfileItem", I18n.getLocale().ProfileItem);
     UIUtils.addClass(item, "user-menu-item");
     UIUtils.setClickListener(item, function(lr) {
       popupCloser();
       Application.showPage(UserProfilePage.name);
     });
     
-    var item = UIUtils.appendLink(popup, "PreferencesItem", I18n.getLocale().literals.PreferencesItem);
+    var item = UIUtils.appendLink(popup, "PreferencesItem", I18n.getLocale().PreferencesItem);
     UIUtils.addClass(item, "user-menu-item");
     UIUtils.setClickListener(item, function(lr) {
       popupCloser();
@@ -134,7 +134,7 @@ Application.setupUserMenuChooser = function() {
     
     UIUtils.appendSeparator(popup);
     
-    var item = UIUtils.appendLink(popup, "LogOutItem", I18n.getLocale().literals.LogOutItem);
+    var item = UIUtils.appendLink(popup, "LogOutItem", I18n.getLocale().LogOutItem);
     UIUtils.addClass(item, "user-menu-item");
     UIUtils.setClickListener(item, function(lr) {
       popupCloser();

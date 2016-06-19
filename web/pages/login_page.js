@@ -16,8 +16,8 @@ LoginPage.prototype.definePageContent = function(root) {
   var loginPanel = UIUtils.appendBlock(root, "LoginPanel");
 
   var labelPanel = UIUtils.appendBlock(loginPanel, "LabelPanel");
-  UIUtils.appendLabel(labelPanel, "EmailLabel", I18n.getLocale().literals.EmailLoginLabel);
-  UIUtils.appendLabel(labelPanel, "PasswordLabel", I18n.getLocale().literals.PasswordLabel);
+  UIUtils.appendLabel(labelPanel, "EmailLabel", I18n.getLocale().EmailLoginLabel);
+  UIUtils.appendLabel(labelPanel, "PasswordLabel", I18n.getLocale().PasswordLabel);
   
   var controlPanel = UIUtils.appendBlock(loginPanel, "ControlPanel");
   this._loginElement = UIUtils.appendTextInput(controlPanel, "Login");
@@ -112,7 +112,7 @@ LoginPage.prototype._restorePassword = function() {
     }.bind(this),
     error: function() {
       UIUtils.hideSpinningWheel();
-      UIUtils.showMessage(I18n.getLocale().literals.ServerErrorMessage);
+      UIUtils.showMessage(I18n.getLocale().ServerErrorMessage);
     }
   }
 
@@ -164,7 +164,7 @@ LoginPage.prototype._signIn = function() {
     },
     error: function() {
       this._onCompletion();
-      UIUtils.showMessage(I18n.getLocale().literals.ServerErrorMessage);
+      UIUtils.showMessage(I18n.getLocale().ServerErrorMessage);
     },
 
     _onCompletion: function() {

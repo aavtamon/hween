@@ -52,7 +52,7 @@ Dialogs.showAddDeviceByIdDialog = function() {
       }
     },
     cancel: {
-      display: I18n.getLocale().literals.CancelOperationButton,
+      display: I18n.getLocale().CancelOperationButton,
       alignment: "left"
     }
   });
@@ -93,7 +93,7 @@ Dialogs.showUploadStockProgramDialog = function(deviceId, libraryProgram) {
       }
     },
     cancel: {
-      display: I18n.getLocale().literals.CancelOperationButton,
+      display: I18n.getLocale().CancelOperationButton,
       alignment: "left"
     }
   });  
@@ -113,7 +113,7 @@ Dialogs.showConfirmDeviceRemovalDialog = function(deviceId) {
       }
     },
     cancel: {
-      display: I18n.getLocale().literals.CancelOperationButton,
+      display: I18n.getLocale().CancelOperationButton,
       alignment: "left"
     }
   });
@@ -132,7 +132,7 @@ Dialogs.showConfirmProgramRemovalDialog = function(successCallback) {
       }
     },
     cancel: {
-      display: I18n.getLocale().literals.CancelOperationButton,
+      display: I18n.getLocale().CancelOperationButton,
       alignment: "left"
     }
   });

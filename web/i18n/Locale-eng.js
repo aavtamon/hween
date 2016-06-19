@@ -1,45 +1,44 @@
 var Locale_eng = {
-  "images": {
-  },
-  "literals": {
-    "AppTitle": "Helloween Toy Controller",
-    "ContactUs": "Contact Us",
-    
-    "ProfileItem": "Profile",
-    "PreferencesItem": "Preferences",
-    "LogOutItem": "Log Out",
+  "AppTitle": "Helloween Toy Controller",
+  "ContactUs": "Contact Us",
 
-    "LanguageEnglish": "English",
-    "LanguageSpanish": "Spanish",
-    
-    "FrequencyAlways": "always",
-    "FrequencyOften": "often",
-    "FrequencyRare": "rare",
-    "FrequencyOnce": "once",
-    "FrequencyNever": "never",
-    
-    "ServerErrorMessage": "Server communication error",
-    
-    "CancelOperationButton": "Cancel",
-    "OkButton": "OK",
-    "AttachButton": "Attach",
-    "ConfirmButton": "Confirm",
-    "SearchButton": "Search",
-    "ClearSearchButton": "Clear",
-        
-    "EmailLoginLabel": "Email",
-    "PasswordLabel": "Password",
-    "RetypePasswordLabel": "Confirm Password",
-    
-    "NoResultsFound": "No results found",
-    
-    "SerialNumber": "s/n",
-    
+  "ProfileItem": "Profile",
+  "PreferencesItem": "Preferences",
+  "LogOutItem": "Log Out",
 
-    
-    "IncorrectAttachmentMessage": "You can only attach images",
-    "AttachmentTooBigMessageProvider": function(maxSize) { return "The image size should be less than " + maxSize +" MGb" },
-  },
+  "LanguageEnglish": "English",
+  "LanguageSpanish": "Spanish",
+
+  "FrequencyAlways": "always",
+  "FrequencyOften": "often",
+  "FrequencyRare": "rare",
+  "FrequencyOnce": "once",
+  "FrequencyNever": "never",
+
+  "ServerErrorMessage": "Server communication error",
+
+  "IncorrectAudioFileMessage": "The file should be a valid audio file",
+
+  "CancelOperationButton": "Cancel",
+  "OkButton": "OK",
+  "AttachButton": "Attach",
+  "ConfirmButton": "Confirm",
+  "SearchButton": "Search",
+  "ClearSearchButton": "Clear",
+
+  "EmailLoginLabel": "Email",
+  "PasswordLabel": "Password",
+  "RetypePasswordLabel": "Confirm Password",
+
+  "NoResultsFound": "No results found",
+
+  "SerialNumber": "s/n",
+
+  "IncorrectAttachmentMessage": "You can only attach images",
+  "AttachmentTooBigMessageProvider": function(maxSize) { return "The image size should be less than " + maxSize +" MGb" },
+  
+  
+  
   "pages": {
     "AbstractDataPage": {
       "NoContentLabel": "This page cannot be displayed because you are not logged in",
@@ -182,7 +181,10 @@ var Locale_eng = {
       "EyeControlButtonOn": "Eyes On",
       "EyeControlButtonOff": "Eyes Off",
       "TalkButton": "Make A Noise",
-      "IncorrectAudioFileMessage": "The file should be a valid audio file"
+    },
+    "DeviceSettingsPage": {
+      "NoSettings": "This device does not have anything configurable",
+      "SaveButton": "Save"
     }
   },
   

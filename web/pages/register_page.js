@@ -17,7 +17,7 @@ RegisterPage.prototype.definePageContent = function(root) {
   UIUtils.appendLabel(signUpPanel, "SignUpLabel", this.getLocale().SignUpLabel);
   
   var emailPanel = UIUtils.appendBlock(signUpPanel, "EmailPanel");
-  UIUtils.appendLabel(emailPanel, "EmailLabel", I18n.getLocale().literals.EmailLoginLabel);
+  UIUtils.appendLabel(emailPanel, "EmailLabel", I18n.getLocale().EmailLoginLabel);
   this._emailElement = UIUtils.appendTextInput(emailPanel, "Email");
 
   var namePanel = UIUtils.appendBlock(signUpPanel, "NamePanel");
@@ -30,11 +30,11 @@ RegisterPage.prototype.definePageContent = function(root) {
   UIUtils.appendExplanationPad(accessCodePanel, "AccessCodeExplanation", this.getLocale().AccessCodeExplanationTilte, this.getLocale().AccessCodeExplanationText);
 
   var passwordPanel = UIUtils.appendBlock(signUpPanel, "PasswordPanel");
-  UIUtils.appendLabel(passwordPanel, "PasswordLabel", I18n.getLocale().literals.PasswordLabel);
+  UIUtils.appendLabel(passwordPanel, "PasswordLabel", I18n.getLocale().PasswordLabel);
   this._passwordElement = UIUtils.appendPasswordInput(passwordPanel, "Password");
   
   var retypePasswordPanel = UIUtils.appendBlock(signUpPanel, "RetypePasswordPanel");
-  UIUtils.appendLabel(retypePasswordPanel, "RetypePasswordLabel", I18n.getLocale().literals.RetypePasswordLabel);
+  UIUtils.appendLabel(retypePasswordPanel, "RetypePasswordLabel", I18n.getLocale().RetypePasswordLabel);
   this._retypePasswordElement = UIUtils.appendPasswordInput(retypePasswordPanel, "RetypePassword");
 
   UIUtils.get$(this._passwordElement).on("input", function() {
@@ -149,7 +149,7 @@ RegisterPage.prototype._signUp = function() {
     }.bind(this),
     error: function() {
       backendCallback._onCompletion();
-      UIUtils.showMessage(I18n.getLocale().literals.ServerErrorMessage);
+      UIUtils.showMessage(I18n.getLocale().ServerErrorMessage);
     },
 
     _onCompletion: function() {

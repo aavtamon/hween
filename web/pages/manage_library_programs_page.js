@@ -32,7 +32,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
   });
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
-  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().literals.CancelOperationButton);
+  var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().CancelOperationButton);
   cancelButton.setClickListener(Application.goBack.bind(Application));
   
   this._removeSelectedButton = UIUtils.appendButton(buttonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
