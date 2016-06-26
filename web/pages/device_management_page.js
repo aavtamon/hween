@@ -173,7 +173,7 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   programItem._program = program;
   
   UIUtils.addClass(programItem, "program-item notselectable");
-
+  
   var selectionBox = UIUtils.appendCheckbox(programItem, "Selection");
   UIUtils.addClass(selectionBox, "program-selection");
   programItem._selectionBox = selectionBox;

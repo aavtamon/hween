@@ -14,6 +14,8 @@ CreateProgramPage = ClassUtils.defineClass(AbstractDataPage, function CreateProg
   
   this._playbackTimer;
   this._currentCommandIndex;
+  
+  this._toy;
 });
 
 CreateProgramPage.prototype._PLAYBACK_SPEED = 2000;
@@ -23,7 +25,8 @@ CreateProgramPage.prototype.definePageContent = function(root) {
 
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
   
-  var amimationPanel = UIUtils.appendBlock(contentPanel, "AnimationPanel");
+  this._toy = new Ghost("AnimationPanel");
+  this._toy.append(contentPanel);
   
   var programPanel = UIUtils.appendBlock(contentPanel, "ProgramPanel");
   var headerProgramPanel = UIUtils.appendBlock(programPanel, "ProgramHeaderPanel");
@@ -93,6 +96,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   UIUtils.setEnabled(this._programPauseButton, false);
   UIUtils.setEnabled(this._programStopButton, false);
   
+  this._toy.reset();
 }
 
 CreateProgramPage.prototype.onHide = function() {
@@ -228,6 +232,8 @@ CreateProgramPage.prototype._stopProgram = function() {
 
 CreateProgramPage.prototype._resetExecution = function() {
   this._commandList.scrollTop = 0;
+  
+  this._drawDefaultAnimation();
   
 //  Controller.reset(this._deviceInfo);
 }
