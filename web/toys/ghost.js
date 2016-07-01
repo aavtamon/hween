@@ -32,8 +32,6 @@ Ghost.prototype.initializeState = function(state) {
 }
 
 Ghost.prototype.drawState = function(state) {
-  console.debug("CALLED with " + JSON.stringify(state))
-  
   // draw stump
   this.getCanvasContext().beginPath();
   this.addArc(50, 48, 14, 0.25, 0.75);

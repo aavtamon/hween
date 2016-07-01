@@ -45,6 +45,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   this._removeCommandButton = UIUtils.appendButton(footerProgramPanel, "RemoveCommandButton", this.getLocale().RemoveCommandButton);
   this._removeCommandButton.setClickListener(function() {
     this._commandList.removeItem(this._commandList.getSelectedItem());
+    this._stopProgram();
   }.bind(this));
   
   this._addCommandButton = UIUtils.appendExpandableButton(footerProgramPanel, "AddCommandButton", this.getLocale().AddCommandButton);
@@ -52,18 +53,13 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   this._commandList.setSelectionListener(function(selectedItem) {
     UIUtils.setEnabled(this._removeCommandButton, selectedItem != null);
   }.bind(this));
-  this._commandList.setOrderListener(function(items) {
+  this._commandList.setPreorderListener(function(items) {
     if (this._playbackTimer == null) {
       return;
     }
     
     UIUtils.showMessage(this.getLocale().ProgramExecutionTerminatedMessage);      
     this._stopProgram();
-
-    var items = this._commandList.getItems();
-    for (var i = 0; i < items.length; i++) {
-      this._stopCommandExecution(i);
-    }
   }.bind(this));
   
   UIUtils.appendLabel(contentPanel, "DescriptionLabel", this.getLocale().DescriptionLabel);
@@ -102,10 +98,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   UIUtils.setEnabled(this._removeCommandButton, false);
   UIUtils.setEnabled(this._saveButton, false);
   
-  UIUtils.setEnabled(this._programPlayButton, false);
-  UIUtils.setEnabled(this._programPauseButton, false);
-  UIUtils.setEnabled(this._programStopButton, false);
-  
+  this._stopProgram();
   this._toy.reset();
 }
 
@@ -123,9 +116,9 @@ CreateProgramPage.prototype._getCommandActions = function() {
     if (this._playbackTimer != null) {
       UIUtils.showMessage(this.getLocale().ProgramExecutionTerminatedMessage);      
     }
-    this._stopProgram();
     
     this._addCommandToList(command);
+    this._stopProgram();
   }.bind(this);
   
   
@@ -197,7 +190,7 @@ CreateProgramPage.prototype._playProgram = function() {
     this._currentCommandIndex++;
   }
   
-  if (this._commandList.getItems().length == this._currentCommandIndex + 1) {
+  if (this._commandList.getItems().length == this._currentCommandIndex) {
     this._stopProgram();
     return;
   }
@@ -228,7 +221,7 @@ CreateProgramPage.prototype._pauseProgram = function() {
 }
 
 CreateProgramPage.prototype._stopProgram = function() {
-  UIUtils.setEnabled(this._programPlayButton, true);
+  UIUtils.setEnabled(this._programPlayButton, this._commandList.getItems().length > 0);
   UIUtils.setEnabled(this._programPauseButton, false);
   UIUtils.setEnabled(this._programStopButton, false);
   
@@ -237,6 +230,8 @@ CreateProgramPage.prototype._stopProgram = function() {
   clearInterval(this._playbackTimer);
   this._playbackTimer = null;
   this._currentCommandIndex = null;
+  
+  this._commandList.scrollToItem(this._commandList.getItems()[0]);
 }
 
 
@@ -250,9 +245,8 @@ CreateProgramPage.prototype._executeCommand = function(commandIndex) {
   UIUtils.addClass(item, "command-executing");
   UIUtils.removeClass(item, "command-paused");
   item._activityElement.innerHTML = this.getLocale().Executing;
-    
-  var offset = item.parentNode.getBoundingClientRect().top - this._commandList.getBoundingClientRect().top;
-  this._commandList.scrollTop = offset;
+  
+  this._commandList.scrollToItem(this._commandList.getItems()[commandIndex]);
   
   this._toy.performCommand(item._command.data);
 }
