@@ -34,6 +34,7 @@ Backend.Program.TRIGGER_MOTION = "motion";
 
 
 Backend.DeviceCommand = {};
+Backend.DeviceCommand.RESET = "reset";
 Backend.DeviceCommand.MOVE_UP = "up";
 Backend.DeviceCommand.MOVE_DOWN = "down";
 Backend.DeviceCommand.TURN_LEFT = "left";
@@ -73,7 +74,7 @@ Backend.getStockCategories = function(deviceType) {
 }
 
 Backend.getSupportedCommands = function(deviceType) {
-  return [ {data: Backend.DeviceCommand.MOVE_UP, display: "Move Up", description: "Move toy up one inch"}, {data: Backend.DeviceCommand.MOVE_DOWN, display: "Move Down", description: "Move toy down one inch"}, {data: Backend.DeviceCommand.TURN_LEFT, display: "Turn Left", description: "Turn left a bit"}, {data: Backend.DeviceCommand.TURN_RIGHT, display: "Turn Right", description: "Turn right a bit"}, {data: Backend.DeviceCommand.EYES_ON, display: "Turn Eyes On", description: "Turn eyes on"}, {data: Backend.DeviceCommand.EYES_OFF, display: "Turn Eyes Off", description: "Turn eyes off"}, {data: Backend.DeviceCommand.TALK, display: "Speak", description: "Say something"}, {data: Backend.DeviceCommand.PAUSE, display: "Do nothing", description: "Do nothing for a bit"} ];
+  return [ {data: Backend.DeviceCommand.RESET, display: "Reset", description: "Sets toy to the initial position"}, {data: Backend.DeviceCommand.MOVE_UP, display: "Move Up", description: "Move toy up one inch"}, {data: Backend.DeviceCommand.MOVE_DOWN, display: "Move Down", description: "Move toy down one inch"}, {data: Backend.DeviceCommand.TURN_LEFT, display: "Turn Left", description: "Turn left a bit"}, {data: Backend.DeviceCommand.TURN_RIGHT, display: "Turn Right", description: "Turn right a bit"}, {data: Backend.DeviceCommand.EYES_ON, display: "Turn Eyes On", description: "Turn eyes on"}, {data: Backend.DeviceCommand.EYES_OFF, display: "Turn Eyes Off", description: "Turn eyes off"}, {data: Backend.DeviceCommand.TALK, display: "Speak", description: "Say something"}, {data: Backend.DeviceCommand.PAUSE, display: "Do nothing", description: "Do nothing for a bit"} ];
 }
 
 Backend.getSupportedProgramTriggers = function(deviceType) {

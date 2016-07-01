@@ -24,9 +24,8 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   AbstractDataPage.prototype.definePageContent.call(this, root);
 
   var contentPanel = UIUtils.appendBlock(root, "ContentPanel");
-  
-  this._toy = new Ghost("AnimationPanel");
-  this._toy.append(contentPanel);
+
+  this._toyPanel = UIUtils.appendBlock(contentPanel, "AnimationPanel");
   
   var programPanel = UIUtils.appendBlock(contentPanel, "ProgramPanel");
   var headerProgramPanel = UIUtils.appendBlock(programPanel, "ProgramHeaderPanel");
@@ -85,9 +84,20 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._deviceId = bundle.deviceId;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
+  this._toy = Toy.createToy(this._deviceInfo.type, "Toy");
+  this._toy.append(this._toyPanel);
+  
   this._addCommandButton.setExpandableActions(this._getCommandActions());
   
   this._commandList.clear();
+  var commands = Backend.getSupportedCommands(this._deviceInfo);
+  for (var i in commands) {
+    if (commands[i].data == Backend.DeviceCommand.RESET) {
+      this._addCommandToList(commands[i]);
+      break;
+    }
+  }
+  
   
   UIUtils.setEnabled(this._removeCommandButton, false);
   UIUtils.setEnabled(this._saveButton, false);
@@ -103,6 +113,8 @@ CreateProgramPage.prototype.onHide = function() {
   AbstractDataPage.prototype.onHide.call(this);
   
   this._stopProgram();
+  
+  this._toy.remove();
 }
 
 
@@ -179,7 +191,6 @@ CreateProgramPage.prototype._playProgram = function() {
   UIUtils.setEnabled(this._programStopButton, true);
   
   if (this._currentCommandIndex == null) {
-    this._resetExecution();
     this._currentCommandIndex = 0;
   } else {
     this._stopCommandExecution(this._currentCommandIndex);
@@ -230,14 +241,6 @@ CreateProgramPage.prototype._stopProgram = function() {
 
 
 
-CreateProgramPage.prototype._resetExecution = function() {
-  this._commandList.scrollTop = 0;
-  
-  this._drawDefaultAnimation();
-  
-//  Controller.reset(this._deviceInfo);
-}
-
 CreateProgramPage.prototype._executeCommand = function(commandIndex) {
   if (commandIndex == null) {
     return;
@@ -251,8 +254,7 @@ CreateProgramPage.prototype._executeCommand = function(commandIndex) {
   var offset = item.parentNode.getBoundingClientRect().top - this._commandList.getBoundingClientRect().top;
   this._commandList.scrollTop = offset;
   
-  
-//  Controller.sendCommand(this._deviceInfo, {id: item._command.data});
+  this._toy.performCommand(item._command.data);
 }
 CreateProgramPage.prototype._pauseCommandExecution = function(commandIndex) {
   if (commandIndex == null) {

@@ -13,11 +13,16 @@
 }
 
 #CreateProgramPage-ContentPanel-AnimationPanel {
+  display: inline-block;
   width: 400px;
   height: 300px;
   
   border-width: 1px;
   border-style: solid;
+}
+#CreateProgramPage-ContentPanel-AnimationPanel-Toy {
+  width: 100%;
+  height: 100%;
 }
 
 
