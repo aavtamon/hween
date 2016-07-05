@@ -21,6 +21,12 @@ Ghost.prototype.changeState = function(state, command) {
       state[Ghost.HEAD].position--;
       return true;
     }
+  } else if (command == Backend.DeviceCommand.EYES_ON) {
+    state[Ghost.EYES].on = true;
+    return true;
+  } else if (command == Backend.DeviceCommand.EYES_OFF) {
+    state[Ghost.EYES].on = false;
+    return true;
   }
   
   return false;
@@ -46,15 +52,20 @@ Ghost.prototype.drawState = function(state) {
   this.getCanvasContext().beginPath();
   var headPosition = 60 - 3 * state[Ghost.HEAD].position;
   this.addArc(50, headPosition, 5, 0, 2);
+  this.getCanvasContext().fillStyle = "#CDAA9B";
+  this.getCanvasContext().fill();
   this.getCanvasContext().stroke();
   
   // draw ghost eyes
   this.getCanvasContext().beginPath();
   var eyePosition = headPosition - 1;
   this.addArc(47, eyePosition, 1, 0, 2);
+  this.getCanvasContext().fillStyle = state[Ghost.EYES].on ? "#FF0000" : "#C8BEB9";
+  this.getCanvasContext().fill();
   this.getCanvasContext().stroke();
   this.getCanvasContext().beginPath();
   this.addArc(53, eyePosition, 1, 0, 2);
+  this.getCanvasContext().fill();
   this.getCanvasContext().stroke();
   
   // draw ghost mouth
@@ -64,10 +75,10 @@ Ghost.prototype.drawState = function(state) {
   
   
   // draw ghost neck
+  this.fillRect(48.25, headPosition + 6, 3.5, 66 - (headPosition + 6), "#CDAA9B");
   this.addLine(48, headPosition + 6, 48, 66);
   this.addLine(52, headPosition + 6, 52, 66);
   this.getCanvasContext().stroke();
-  this.fillRect(48.25, 53, 3.5, 3, "#FFFFFF");
   
   
 
