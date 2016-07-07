@@ -167,7 +167,8 @@ var Locale_eng = {
       "Executing": "executing",
       "Paused": "paused...",
       
-      "ProgramExecutionTerminatedMessage": "Program Execution interrupted"
+      "ProgramExecutionTerminatedMessage": "Program Execution interrupted",
+      "IncorrectAudioFileMessage": "Please choose an audio file"
     },
     "ManualModePage": {
       "DeviceReadyForCommandLabel": "The device is ready to your commands. Just click it",

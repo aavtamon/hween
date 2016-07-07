@@ -1,31 +1,51 @@
 Ghost = ClassUtils.defineClass(Toy, function Ghost(id) {
   Toy.call(this, id, Backend.DeviceType.STUMP_GHOST);
+  
+  this._talker = null;
 });
 
 Ghost.EYES = "eyes";
 Ghost.HEAD = "head";
 
 Ghost._HEAD_HIGH_POSITION = 10;
+Ghost._HEAD_TURN_ANGLE = 45;
 
 
 Ghost.prototype.changeState = function(state, command) {
   Toy.prototype.changeState.call(this, state, command);
   
-  if (command == Backend.DeviceCommand.MOVE_UP) {
+  if (command.data == Backend.DeviceCommand.MOVE_UP) {
     if (state[Ghost.HEAD].position + 1 <= Ghost._HEAD_HIGH_POSITION) {
       state[Ghost.HEAD].position++;
       return true;
     }
-  } else if (command == Backend.DeviceCommand.MOVE_DOWN) {
+  } else if (command.data == Backend.DeviceCommand.MOVE_DOWN) {
     if (state[Ghost.HEAD].position >= 1) {
       state[Ghost.HEAD].position--;
       return true;
     }
-  } else if (command == Backend.DeviceCommand.EYES_ON) {
+  } else if (command.data == Backend.DeviceCommand.TURN_LEFT) {
+    if (state[Ghost.HEAD].angle - Ghost._HEAD_TURN_ANGLE < 0) {
+      state[Ghost.HEAD].angle = state[Ghost.HEAD].angle - Ghost._HEAD_TURN_ANGLE + 360;
+    } else {
+      state[Ghost.HEAD].angle -= Ghost._HEAD_TURN_ANGLE;
+    }
+    return true;
+  } else if (command.data == Backend.DeviceCommand.TURN_RIGHT) {
+    if (state[Ghost.HEAD].angle + Ghost._HEAD_TURN_ANGLE >= 360) {
+      state[Ghost.HEAD].angle = state[Ghost.HEAD].angle + Ghost._HEAD_TURN_ANGLE - 360;
+    } else {
+      state[Ghost.HEAD].angle += Ghost._HEAD_TURN_ANGLE;
+    }
+    return true;
+  } else if (command.data == Backend.DeviceCommand.EYES_ON) {
     state[Ghost.EYES].on = true;
     return true;
-  } else if (command == Backend.DeviceCommand.EYES_OFF) {
+  } else if (command.data == Backend.DeviceCommand.EYES_OFF) {
     state[Ghost.EYES].on = false;
+    return true;
+  } else if (command.data == Backend.DeviceCommand.TALK) {
+    state[Ghost.HEAD].talk = command.arg;
     return true;
   }
   
@@ -34,7 +54,7 @@ Ghost.prototype.changeState = function(state, command) {
 
 Ghost.prototype.initializeState = function(state) {
   state[Ghost.EYES] = {on: false};
-  state[Ghost.HEAD] = {position: 0};
+  state[Ghost.HEAD] = {position: 0, angle: 0, talk: null};
 }
 
 Ghost.prototype.drawState = function(state) {
@@ -71,7 +91,27 @@ Ghost.prototype.drawState = function(state) {
   // draw ghost mouth
   var mouthPosition = headPosition + 3;
   this.getCanvasContext().beginPath();
-  this.addArc(50, headPosition + 1 - 10, 10, 0.45, 0.55);
+  if (state[Ghost.HEAD].talk) {
+    //this.addArc(50, headPosition + 4, 1, 0, 2);    
+    this.addArc(50, headPosition + 1 - 3, 5, 0.3, 0.7);
+    this.addArc(50, headPosition + 1 + 8, 5, 1.3, 1.7);
+    
+    if (this._talker != null) {
+      this._talker.pause();
+    }
+    this._talker = new Audio(state[Ghost.HEAD].talk);
+    this._talker.play();
+    this._talker.addEventListener("ended", function() {
+      state[Ghost.HEAD].talk = null;
+      this._talker = null;
+      this.drawState(state);
+    }.bind(this));
+  } else {
+    this.addArc(50, headPosition + 1 - 3, 5, 0.3, 0.7);
+    if (this._talker != null) {
+      this._talker.pause();
+    }
+  }
   
   
   // draw ghost neck

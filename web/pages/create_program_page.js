@@ -248,7 +248,7 @@ CreateProgramPage.prototype._executeCommand = function(commandIndex) {
   
   this._commandList.scrollToItem(this._commandList.getItems()[commandIndex]);
   
-  this._toy.performCommand(item._command.data);
+  this._toy.performCommand(item._command);
 }
 CreateProgramPage.prototype._pauseCommandExecution = function(commandIndex) {
   if (commandIndex == null) {

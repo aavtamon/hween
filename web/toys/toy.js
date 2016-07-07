@@ -48,7 +48,7 @@ Toy.prototype.performCommand = function(command) {
 
 
 Toy.prototype.changeState = function(state, command) {
-  if (command == Backend.DeviceCommand.RESET) {
+  if (command.data == Backend.DeviceCommand.RESET) {
     this.reset();
   }
 }
