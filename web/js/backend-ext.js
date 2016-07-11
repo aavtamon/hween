@@ -1,3 +1,6 @@
+Backend._SERVER_BASE_URL = "http://localhost:8080/HweenToy/";
+
+
 Backend.OperationResult = {};
 Backend.OperationResult.SUCCESS = "success";
 Backend.OperationResult.FAILURE = "failure";
