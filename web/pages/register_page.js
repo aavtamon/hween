@@ -92,7 +92,7 @@ RegisterPage.prototype._signUp = function() {
     return;
   }
 
-  var accessCode = this._accessCodeodeElement.getValue();
+  var accessCode = this._accessCodeElement.getValue();
   if (accessCode == "") {
     UIUtils.indicateInvalidInput(this._accessCodeElement);
     UIUtils.showMessage(this.getLocale().ProvideAccessCodeMessage);

@@ -56,20 +56,6 @@ Backend.DeviceMode.MANUAL = "manual";
 
 
 
-// User Management - temporary
-
-Backend._communicate = function(resource, method, data, isJsonResponse, headers, callback) {
-  if (resource.indexOf("user?login") == 0) {
-    callback.success({user_id: 1}, 200);
-  } else if (resource.indexOf("user/1") == 0) {
-    callback.success({}, 200);
-  } else if (resource.indexOf("user/1/settings") == 0) {
-    callback.success({}, 200);
-  }
-}
-
-
-
 // Device Type Management
 
 Backend.getStockCategories = function(deviceType) {
