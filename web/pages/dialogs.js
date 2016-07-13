@@ -64,7 +64,13 @@ Dialogs.showUploadStockProgramDialog = function(deviceId, libraryProgram) {
   
   var dialog = UIUtils.showDialog("UploadStockProgramDialog", I18n.getLocale().dialogs.UploadStockProgramDialog.Title, function(contentPanel) {
     UIUtils.appendLabel(contentPanel, "CategoryLabel", I18n.getLocale().dialogs.UploadStockProgramDialog.CategoryLabel);
-    categoryChooser = UIUtils.appendDropList(contentPanel, "CategoryChooser", Backend.getStockCategories(Backend.getDeviceInfo(deviceId).type));
+    categoryChooser = UIUtils.appendDropList(contentPanel, "CategoryChooser");
+    
+    Backend.getDeviceSettings(Backend.getDeviceInfo(deviceId).type, function(status, deviceSettings) {
+      if (status == Backend.OperationResult.SUCCESS) {
+        categoryChooser.setChoices(deviceSettings.categories);
+      }
+    });
   }, {
     ok: {
       display: I18n.getLocale().dialogs.UploadStockProgramDialog.UploadButton,

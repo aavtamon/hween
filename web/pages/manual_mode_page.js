@@ -111,7 +111,11 @@ ManualModePage.prototype.onShow = function(root, bundle) {
   this._deviceId = bundle.deviceId;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
-  this._enableActions();
+  Backend.getDeviceSettings(this._deviceInfo.type, function(status, deviceSettings) {
+    if (status == Backend.OperationResult.SUCCESS) {
+      this._enableActions(deviceSettings.supportedCommands);
+    }
+  }.bind(this));
 }
 
 ManualModePage.prototype.onHide = function() {
@@ -119,11 +123,9 @@ ManualModePage.prototype.onHide = function() {
 }
 
 
-ManualModePage.prototype._enableActions = function() {
+ManualModePage.prototype._enableActions = function(deviceCommands) {
   this._deviceStatusLabel.innerHTML = this.getLocale().DeviceReadyForCommandLabel;
   
-  var deviceCommands = Backend.getSupportedCommands(this._deviceInfo);
-
   UIUtils.setEnabled(this._resetButton, true);
   UIUtils.setEnabled(this._moveUpButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.MOVE_UP) != null);
   UIUtils.setEnabled(this._moveDownButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.MOVE_DOWN) != null);

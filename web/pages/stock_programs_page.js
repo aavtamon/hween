@@ -88,18 +88,22 @@ StockProgramsPage.prototype._refreshProgramList = function() {
     return;
   }
   
-  var categories = Backend.getStockCategories(this._deviceType);
-  for (var categoryIndex in categories) {
-    var category = categories[categoryIndex];
-    this._addCategoryToList(category);
-    
-    for (var progIndex in programs) {
-      var program = programs[progIndex];
-      if (program.category == category.data) {
-        this._addProgramToList(program);
+  Backend.getDeviceSettings(this._deviceType, function(status, deviceSettings) {
+    if (status == Backend.OperationResult.SUCCESS) {
+      var categories = deviceSettings.categories;
+      for (var categoryIndex in categories) {
+        var category = categories[categoryIndex];
+        this._addCategoryToList(category);
+
+        for (var progIndex in programs) {
+          var program = programs[progIndex];
+          if (program.category == category.data) {
+            this._addProgramToList(program);
+          }
+        }
       }
     }
-  }
+  }.bind(this));
 }
 
 

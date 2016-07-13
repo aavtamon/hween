@@ -83,17 +83,21 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._toy = Toy.createToy(this._deviceInfo.type, "Toy");
   this._toy.append(this._toyPanel);
   
-  this._addCommandButton.setExpandableActions(this._getCommandActions());
-  
   this._commandList.clear();
-  var commands = Backend.getSupportedCommands(this._deviceInfo);
-  for (var i in commands) {
-    if (commands[i].data == Backend.DeviceCommand.RESET) {
-      this._addCommandToList(commands[i]);
-      break;
-    }
-  }
   
+  Backend.getDeviceSettings(this._deviceType, function(status, deviceSettings) {
+    if (status == Backend.OperationResult.SUCCESS) {
+      var commands = deviceSettings.supportedCommands;
+      this._addCommandButton.setExpandableActions(this._getCommandActions(deviceSettings.supportedCommands));
+      
+      for (var i in commands) {
+        if (commands[i].data == Backend.DeviceCommand.RESET) {
+          this._addCommandToList(commands[i]);
+          break;
+        }
+      }
+    }
+  }.bind(this));
   
   UIUtils.setEnabled(this._removeCommandButton, false);
   UIUtils.setEnabled(this._saveButton, false);
@@ -111,7 +115,7 @@ CreateProgramPage.prototype.onHide = function() {
 }
 
 
-CreateProgramPage.prototype._getCommandActions = function() {
+CreateProgramPage.prototype._getCommandActions = function(supportedCommands) {
   var clickListener = function(command) {
     if (this._playbackTimer != null) {
       UIUtils.showMessage(this.getLocale().ProgramExecutionTerminatedMessage);      
@@ -122,10 +126,9 @@ CreateProgramPage.prototype._getCommandActions = function() {
   }.bind(this);
   
   
-  var commands = Backend.getSupportedCommands(this._deviceInfo);
   var actions = [];
-  for (var i in commands) {
-    var command = commands[i];
+  for (var i in supportedCommands) {
+    var command = supportedCommands[i];
     
     var clickAction;
     if (command.data == Backend.DeviceCommand.TALK) {

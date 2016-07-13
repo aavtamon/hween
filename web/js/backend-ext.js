@@ -10,9 +10,11 @@ Backend.CacheChangeEvent.TYPE_DEVICE_IDS = "device_ids";
 Backend.CacheChangeEvent.TYPE_DEVICE_INFO = "device_info";
 
 Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE = "device_schedule";
-Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS = "livrary_programs";
+Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS = "library_programs";
 Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS = "stock_programs";
 Backend.CacheChangeEvent.TYPE_DEVICE_MODE = "device_mode";
+
+Backend.CacheChangeEvent.TYPE_DEVICE_SETTINGS = "device_settings";
 
 
 Backend.DeviceType = {};
@@ -38,12 +40,12 @@ Backend.Program.TRIGGER_MOTION = "motion";
 
 Backend.DeviceCommand = {};
 Backend.DeviceCommand.RESET = "reset";
-Backend.DeviceCommand.MOVE_UP = "up";
-Backend.DeviceCommand.MOVE_DOWN = "down";
-Backend.DeviceCommand.TURN_LEFT = "left";
-Backend.DeviceCommand.TURN_RIGHT = "right";
-Backend.DeviceCommand.EYES_ON = "eyes on";
-Backend.DeviceCommand.EYES_OFF = "eyes off";
+Backend.DeviceCommand.MOVE_UP = "move_up";
+Backend.DeviceCommand.MOVE_DOWN = "move_down";
+Backend.DeviceCommand.TURN_LEFT = "turn_left";
+Backend.DeviceCommand.TURN_RIGHT = "turn_right";
+Backend.DeviceCommand.EYES_ON = "eyes_on";
+Backend.DeviceCommand.EYES_OFF = "eyes_off";
 Backend.DeviceCommand.TALK = "talk";
 Backend.DeviceCommand.PAUSE = "pause";
 
@@ -58,13 +60,43 @@ Backend.DeviceMode.MANUAL = "manual";
 
 // Device Type Management
 
-Backend.getStockCategories = function(deviceType) {
-  return [ {data: "fun", display: "Fun"}, {data: "scary", display: "Scary"} ];
+Backend.getDeviceSettings = function(deviceType, operationCallback) {
+  var categories = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SETTINGS, deviceType);
+
+  if (categories == null) {
+    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SETTINGS, deviceType);
+      
+    this._pullDeviceSettings(deviceType, operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, categories);
+  }
+  
+  return categories;
+}
+Backend._pullDeviceSettings = function(deviceType, operationCallback) {
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SETTINGS, deviceType, data);
+
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS, data);
+      }
+    },
+    error: function(xhr, status, error) {
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
+    }
+  }
+  
+  this._communicate("device/" + deviceType + "/settings", "GET", null, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
-Backend.getSupportedCommands = function(deviceType) {
-  return [ {data: Backend.DeviceCommand.RESET, display: "Reset", description: "Sets toy to the initial position"}, {data: Backend.DeviceCommand.MOVE_UP, display: "Move Up", description: "Move toy up one inch"}, {data: Backend.DeviceCommand.MOVE_DOWN, display: "Move Down", description: "Move toy down one inch"}, {data: Backend.DeviceCommand.TURN_LEFT, display: "Turn Left", description: "Turn left a bit"}, {data: Backend.DeviceCommand.TURN_RIGHT, display: "Turn Right", description: "Turn right a bit"}, {data: Backend.DeviceCommand.EYES_ON, display: "Turn Eyes On", description: "Turn eyes on"}, {data: Backend.DeviceCommand.EYES_OFF, display: "Turn Eyes Off", description: "Turn eyes off"}, {data: Backend.DeviceCommand.TALK, display: "Speak", description: "Say something"}, {data: Backend.DeviceCommand.PAUSE, display: "Do nothing", description: "Do nothing for a bit"} ];
-}
+
 
 Backend.getSupportedProgramTriggers = function(deviceType) {
   return [ {data: Backend.Program.TRIGGER_IMMEDIATELY, display: "Previous"}, {data: Backend.Program.TRIGGER_DELAY, display: "Delay"}, {data: Backend.Program.TRIGGER_MOTION, display: "Motion"} ];

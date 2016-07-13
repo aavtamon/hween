@@ -134,7 +134,11 @@ DeviceManagementPage.prototype.onShow = function(root, bundle) {
     this._refreshProgramList(schedule.programs);
   }
   
-  this._triggerList.setChoices(Backend.getSupportedProgramTriggers(this._deviceType));
+  Backend.getDeviceSettings(this._deviceType, function(status, deviceSettings) {
+    if (status == Backend.OperationResult.SUCCESS) {
+      this._triggerList.setChoices(deviceSettings.supportedProgramTriggers);
+    }
+  }.bind(this));
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
   

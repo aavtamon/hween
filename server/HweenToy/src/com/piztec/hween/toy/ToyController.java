@@ -1,4 +1,4 @@
-package com.piztec.hween;
+package com.piztec.hween.toy;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
