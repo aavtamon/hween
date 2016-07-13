@@ -98,12 +98,6 @@ Backend._pullDeviceSettings = function(deviceType, operationCallback) {
 
 
 
-Backend.getSupportedProgramTriggers = function(deviceType) {
-  return [ {data: Backend.Program.TRIGGER_IMMEDIATELY, display: "Previous"}, {data: Backend.Program.TRIGGER_DELAY, display: "Delay"}, {data: Backend.Program.TRIGGER_MOTION, display: "Motion"} ];
-}
-
-
-
 // Device Management
 
 Backend.getRegisteredDeviceIds = function(operationCallback, forceUpdate) {
