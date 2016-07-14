@@ -87,6 +87,5 @@ public class UserDeviceManagementController {
 		String info = "{\"id\": " + deviceId + ", \"type\": \"stump_ghost\", \"version\": \"1.0\", \"name\": \"Ghost-" + deviceId + "\", \"icon\": null, \"serial_number\": \"000000" + deviceId + "\", \"status\": \"connected\", \"ip_address\": \"192.168.0.100\"}";
 		
 		return ControllerUtils.buildResponse(Response.Status.OK, info);
-	}	
-	
+	}
 }

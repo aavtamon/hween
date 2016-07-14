@@ -24,6 +24,9 @@ AddDevicePage.prototype.definePageContent = function(root) {
   
   this._deviceList = UIUtils.appendList(devicesPanel, "DevicesList");
   this._deviceList.setSelectionListener(function(selectedItem) {
+    if (selectedItem == null) {
+      return;
+    }
     selectedItem.element._selectionBox.setChecked(!selectedItem.element._selectionBox.isChecked());
   });
   
@@ -84,23 +87,23 @@ AddDevicePage.prototype._scanNewDevices = function() {
   this._devices = {};
   this._deviceList.clear();
   
-  Backend.getUnregisteredDeviceIds(function(status, ids) {
+  Backend.getDeviceIds(function(status, ids) {
     if (status != Backend.OperationResult.SUCCESS) {
       this._statusLabel.innerHTML = this.getLocale().ServerErrorLabel;
       return;
     }
     
-    if (ids.length == 0) {
+    if (ids.unregistered.length == 0) {
       this._progressIndicator.stop();
       UIUtils.setEnabled(this._addByIdButton, true);
       this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
       return;
     }
 
-    for (var i = 0; i < ids.length; i++) {
-      this._devices[ids[i]] = null;
+    for (var i = 0; i < ids.unregistered.length; i++) {
+      this._devices[ids.unregistered[i]] = null;
       
-      Backend.getDeviceInfo(ids[i], function(result, info) {
+      Backend.getDeviceInfo(ids.unregistered[i], function(result, info) {
         if (result == Backend.OperationResult.SUCCESS) {
           this._devices[info.id] = info;
 
@@ -165,7 +168,7 @@ AddDevicePage.prototype._getSelectedDeviceIds = function() {
   var deviceItems = this._deviceList.getItems();
   for (var id in deviceItems) {
     if (deviceItems[id].element._selectionBox.isChecked()) {
-      selectedIds.push(id);
+      selectedIds.push(deviceItems[id].element._info.id);
     }
   }
   

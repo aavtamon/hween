@@ -7,15 +7,15 @@ import javax.ws.rs.core.Response;
 import org.apache.wink.common.http.OPTIONS;
 import org.json.JSONObject;
 
-@Path("device")
+@Path("settings/device")
 public class DeviceSettingsController {
 	@OPTIONS
-	@Path("{deviceType}/settings")
+	@Path("{deviceType}")
 	public Response getDeviceSettingsOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
 	}
 	@GET
-	@Path("{deviceType}/settings")
+	@Path("{deviceType}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDeviceSettings(@PathParam("deviceType") String deviceType, @HeaderParam("Token") String authHeader) {
 		if (!ControllerUtils.isAuthenticated(authHeader)) {

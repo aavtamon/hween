@@ -7,6 +7,7 @@ import javax.ws.rs.core.Application;
 
 import com.piztec.hween.application.DeviceSettingsController;
 import com.piztec.hween.application.UserAccountController;
+import com.piztec.hween.application.UserDeviceManagementController;
 import com.piztec.hween.toy.ToyController;
 
 public class ControllerRegistrar extends Application {
@@ -15,6 +16,7 @@ public class ControllerRegistrar extends Application {
 		classes.add(ToyController.class);
 		classes.add(UserAccountController.class);
 		classes.add(DeviceSettingsController.class);
+		classes.add(UserDeviceManagementController.class);
 		return classes;
 	}
 }

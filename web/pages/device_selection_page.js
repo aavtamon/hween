@@ -70,8 +70,13 @@ DeviceSelectionPage.prototype.onShow = function() {
   
   UIUtils.setVisible(this._deviceSelectionPanel, false);
   
-  Backend.getRegisteredDeviceIds(function(status, ids) {
-    if (ids.length == 0) {
+  Backend.getDeviceIds(function(status, ids) {
+    if (status != Backend.OperationResult.SUCCESS) {
+      this._initialStatusLabel.innerHTML = this.getLocale().ServerErrorLabel;
+      return;
+    }
+    
+    if (ids.registered.length == 0) {
       this._initialStatusLabel.innerHTML = this.getLocale().NoDevicesAvailableLabel;
       UIUtils.setEnabled(this._addByIdButton, true);
       return;
@@ -101,7 +106,7 @@ DeviceSelectionPage.prototype._refreshDevices = function() {
   
   this._deviceSelector.setEnabled(false);
   
-  Backend.getRegisteredDeviceIds(function(status, ids) {
+  Backend.getDeviceIds(function(status, ids) {
     UIUtils.setEnabled(this._addButton, true);
     UIUtils.setEnabled(this._refreshButton, true);
     
@@ -119,7 +124,7 @@ DeviceSelectionPage.prototype._updateDeviceSelector = function() {
   
   this._deviceSelector.setEnabled(true);
 
-  var ids = Backend.getRegisteredDeviceIds();
+  var ids = Backend.getDeviceIds().registered;
   for (var i = 0; i < ids.length; i++) {
     Backend.getDeviceInfo(ids[i], function(result, info) {
       if (result == Backend.OperationResult.SUCCESS) {
