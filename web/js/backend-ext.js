@@ -204,20 +204,31 @@ Backend.registerDevices = function(ids, operationCallback) {
   this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices", "PUT", {ids: ids}, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
-Backend.unregisterDevices = function(ids, operationCallback) {
+Backend.unregisterDevice = function(deviceId, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   
-  setTimeout(function() {
-    for (var i in ids) {
-      GeneralUtils.removeFromArray(deviceIds, ids[i]);
-    }
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
+  
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS, data);
+      }
+    },
+    error: function(xhr, status, error) {
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 5000);
+  }
+  
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId, "DELETE", null, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
 Backend.addNewDevice = function(deviceId, verificationCode, operationCallback) {

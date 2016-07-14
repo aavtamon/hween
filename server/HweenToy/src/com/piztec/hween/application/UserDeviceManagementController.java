@@ -29,11 +29,13 @@ public class UserDeviceManagementController {
 	}
 	
 	
+	
 	@OPTIONS
 	@Path("{userId}/devices")
 	public Response getDeviceIdsOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
 	}
+	
 	@GET
 	@Path("{userId}/devices")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -44,6 +46,7 @@ public class UserDeviceManagementController {
 		
 		return ControllerUtils.buildResponse(Response.Status.OK, deviceIds);
 	}
+	
 	@PUT
 	@Path("{userId}/devices")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -54,21 +57,56 @@ public class UserDeviceManagementController {
 		}
 		
 		try {
+			JSONArray registeredIds = deviceIds.getJSONArray("registered");
+			JSONArray unregisteredIds = deviceIds.getJSONArray("unregistered");
+
 			JSONObject ids = new JSONObject(idsText);
 			JSONArray newIds = ids.getJSONArray("ids");
-			
-			JSONArray registeredIds = deviceIds.getJSONArray("registered");
 			for (int i = 0; i < newIds.length(); i++) {
 				int newId = newIds.getInt(i);
 				registeredIds.put(newId);
+				
+				unregisteredIds = ControllerUtils.removeFromArray(unregisteredIds, newId);
 			}
 			deviceIds.put("registered", registeredIds);
+			deviceIds.put("unregistered", unregisteredIds);
 
 			return ControllerUtils.buildResponse(Response.Status.OK, deviceIds);
 		} catch (Exception e) {
 			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	@OPTIONS
+	@Path("{userId}/devices/{deviceId}")
+	public Response unregisterDeviceOptions() {
+		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+
+	@DELETE
+	@Path("{userId}/devices/{deviceId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response unregisterDevice(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		try {
+			JSONArray registeredIds = deviceIds.getJSONArray("registered");
+			JSONArray unregisteredIds = deviceIds.getJSONArray("unregistered");
+			
+			registeredIds = ControllerUtils.removeFromArray(registeredIds, deviceId);
+			unregisteredIds.put(deviceId);
+
+			deviceIds.put("registered", registeredIds);
+			deviceIds.put("unregistered", unregisteredIds);
+			
+			return ControllerUtils.buildResponse(Response.Status.OK, deviceIds);
+		} catch (Exception e) {
+			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
 	
 	
 	@OPTIONS

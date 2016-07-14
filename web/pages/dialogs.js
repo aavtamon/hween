@@ -111,7 +111,7 @@ Dialogs.showConfirmDeviceRemovalDialog = function(deviceId) {
     ok: {
       display: I18n.getLocale().dialogs.ConfirmDeviceRemovalDialog.ConfirmRemovalButton,
       listener: function() {
-        Backend.unregisterDevices([deviceId], function(status) {
+        Backend.unregisterDevice(deviceId, function(status) {
           if (status == Backend.OperationResult.SUCCESS) {
             dialog.close();
           }

@@ -3,6 +3,9 @@ package com.piztec.hween.application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 public class ControllerUtils {
 	public static Response buildResponse(final Response.Status status) {
 		return buildResponse(status, null, null);
@@ -54,5 +57,18 @@ public class ControllerUtils {
 		}
 		
 		return true;
+	}
+	
+	
+	public static JSONArray removeFromArray(JSONArray arr, Object element) throws JSONException {
+		JSONArray result = new JSONArray();
+		
+		for (int i = 0; i < arr.length(); i++) {
+			if (!arr.get(i).equals(element)) {
+				result.put(arr.get(i));
+			}
+		}
+		
+		return result;
 	}
 }
