@@ -1,5 +1,9 @@
 package com.piztec.hween.application;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -9,11 +13,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.piztec.hween.persistance.StorageManager;
+
 @Path("devices/user")
 public class UserDeviceManagementController {
 	private JSONObject deviceIds;
 	
 	public UserDeviceManagementController() {
+		StorageManager.getInstance();
+		
 		deviceIds = new JSONObject();
 		try {
 			JSONArray registered = new JSONArray();
