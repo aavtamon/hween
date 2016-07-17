@@ -19,7 +19,7 @@ public class ControllerUtils {
 		ResponseBuilder builder = Response.status(status);
 		
 		if (body != null) {
-			builder.entity(body);
+			builder.entity(body.toString());
 		}
 		if (location != null) {
 			builder.header("Location", location);

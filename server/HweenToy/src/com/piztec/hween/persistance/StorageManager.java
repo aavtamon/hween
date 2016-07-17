@@ -17,18 +17,10 @@ public class StorageManager {
 	}
 	
 	 public EntityManager getEntityManager() {
-		    return f.createEntityManager();
+		return f.createEntityManager();
      }
 	
 	private StorageManager() {
-//		try {
-//			Class.forName("org.sqlite.JDBC");
-//			Connection connection = DriverManager.getConnection("jdbc:sqlite:/Users/aavtamonov/project/other/hween/server/db/hween.db");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		
 		f = Persistence.createEntityManagerFactory("HweenToy");
-		System.out.println("here");
 	}
 }
