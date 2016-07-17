@@ -1,19 +1,46 @@
 package com.piztec.hween.application;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.*;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.wink.common.http.OPTIONS;
 import org.json.JSONObject;
 
+import com.piztec.hween.persistance.StorageManager;
+import com.piztec.hween.persistance.Test;
+
 @Path("settings/device")
 public class DeviceSettingsController {
+    @GET
+	@Path("123")
+	public Response getDeviceSettingsOptions1(@QueryParam(value="id") int id) {
+    	EntityManager em = StorageManager.getInstance().getEntityManager();
+    	Test t = new Test();
+    	t.setId(id);
+    	t.setText("HM");
+    	if (em.find(Test.class, id) != null) {
+        	return ControllerUtils.buildResponse(Response.Status.OK, "Element in DB");
+    	} else {
+    		em.getTransaction().begin();
+    		t = em.merge(t);
+    		em.getTransaction().commit();
+    		return ControllerUtils.buildResponse(Response.Status.OK, "Element added ");
+    	}
+		
+	}
+
+	
 	@OPTIONS
 	@Path("{deviceType}")
 	public Response getDeviceSettingsOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
 	}
+
+
+	
 	@GET
 	@Path("{deviceType}")
 	@Produces(MediaType.APPLICATION_JSON)

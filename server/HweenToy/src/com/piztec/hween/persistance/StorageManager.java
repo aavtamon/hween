@@ -3,16 +3,22 @@ package com.piztec.hween.persistance;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.springframework.orm.jpa.EntityManagerFactoryAccessor;
 
 public class StorageManager {
 	private static final StorageManager instance = new StorageManager();
 	
+	private EntityManagerFactory f;
 	public static StorageManager getInstance() {
 		return instance;
 	}
+	
+	 public EntityManager getEntityManager() {
+		    return f.createEntityManager();
+     }
 	
 	private StorageManager() {
 //		try {
@@ -22,7 +28,7 @@ public class StorageManager {
 //			e.printStackTrace();
 //		}
 		
-		Persistence.createEntityManagerFactory("HweenToy");
+		f = Persistence.createEntityManagerFactory("HweenToy1");
 		System.out.println("here");
 	}
 }
