@@ -28,7 +28,7 @@ public class StorageManager {
 //			e.printStackTrace();
 //		}
 		
-		f = Persistence.createEntityManagerFactory("HweenToy1");
+		f = Persistence.createEntityManagerFactory("HweenToy");
 		System.out.println("here");
 	}
 }
