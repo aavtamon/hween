@@ -1,11 +1,20 @@
 package com.piztec.hween.application;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.wink.common.http.OPTIONS;
 import org.json.JSONObject;
+
+import com.piztec.hween.persistance.StorageManager;
 
 @Path("user")
 public class UserAccountController {
@@ -15,12 +24,17 @@ public class UserAccountController {
 	}
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(@QueryParam("login") String login, @HeaderParam("Token") String authHeader) {
+	public Response login(@QueryParam("login") String login) {
 		if (login == null) {
 			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
 		}
 		
-		return ControllerUtils.buildResponse(Response.Status.OK, "{\"login\": \"" + login + "\", \"user_id\": 1}");
+		int userId = StorageManager.getInstance().getUserAccountManager().getUserId(login);
+		if (userId != -1) {
+			return ControllerUtils.buildResponse(Response.Status.OK, "{\"user_id\": " + userId + "}");
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
 	}
 	
 
@@ -56,11 +70,13 @@ public class UserAccountController {
 		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
-		
-		String[] authTokens = authHeader.split(":");
-		String profile = "{\"login\": \"" + authTokens[0] + "\", \"user_id\": 1, \"name\": \"Antosha\"}";
-		
-		return ControllerUtils.buildResponse(Response.Status.OK, profile);
+
+		JSONObject userProfile = StorageManager.getInstance().getUserAccountManager().getUserProfile(userId);
+		if (userProfile != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, userProfile);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
 	}
 	
 
@@ -76,8 +92,9 @@ public class UserAccountController {
 	public Response registerUser(String profileText) {
 		try {
 			JSONObject profile = new JSONObject(profileText);
+			int userId = StorageManager.getInstance().getUserAccountManager().createUserAccount(profile);
 
-			return ControllerUtils.buildResponse(Response.Status.CREATED, profile, "2");
+			return ControllerUtils.buildResponse(Response.Status.CREATED, profile, userId + "");
 		} catch (Exception e) {
 			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST, e.getMessage());
 		}
@@ -99,8 +116,11 @@ public class UserAccountController {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
-		String profile = "{}";
-		
-		return ControllerUtils.buildResponse(Response.Status.OK, profile);
+		JSONObject userSettings = StorageManager.getInstance().getUserAccountManager().getUserSettings(userId);
+		if (userSettings != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, userSettings);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
 	}
 }
