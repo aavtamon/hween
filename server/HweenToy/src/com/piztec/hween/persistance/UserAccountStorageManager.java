@@ -105,6 +105,8 @@ public class UserAccountStorageManager {
 			
 			userAccountsStorage.put(userId + "", userAccount);
 			
+			StorageManager.getInstance().commit();
+			
 			return userId;
 		} catch (JSONException e) {
 			e.printStackTrace();
