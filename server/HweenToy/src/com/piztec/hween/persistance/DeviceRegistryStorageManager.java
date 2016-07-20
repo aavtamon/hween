@@ -5,19 +5,27 @@ import org.json.JSONObject;
 
 /**
  * {
- *   categories: [{data: String, display: String}],
- *   supportedCommands: [{data: String, display: String, description: String}],
- *   supportedProgramTriggers: [{data: String, display: String}]
+ *   settings: {
+ *     categories: [{data: String, display: String}],
+ *     supportedCommands: [{data: String, display: String, description: String}],
+ *     supportedProgramTriggers: [{data: String, display: String}],
+ *     icon: null
+ *   },
+ *   deviceRegistry: {
+ *     <serialNumber>: {
+ *       
+ *     }
+ *   }
  * }
  */
 
-public class DeviceSettingsStorageManager {
+public class DeviceRegistryStorageManager {
 	public final String DEVICE_TYPE_STUMP_GHOST = "stump_ghost";
 	
-	private final JSONObject deviceSettingsStorage;
+	private final JSONObject deviceRegistryStorage;
 	
-	DeviceSettingsStorageManager(JSONObject deviceSettingsRoot) {
-		deviceSettingsStorage = deviceSettingsRoot;
+	DeviceRegistryStorageManager(JSONObject deviceRegistryRoot) {
+		deviceRegistryStorage = deviceRegistryRoot;
 		
 		String settings = "{\"categories\": [ {\"data\": \"fun\", \"display\": \"Fun\"}, {\"data\": \"scary\", \"display\": \"Scary\"} ],";
 		
@@ -33,10 +41,19 @@ public class DeviceSettingsStorageManager {
 		
 		settings += "\"supportedProgramTriggers\": [ {\"data\": \"immediately\", \"display\": \"Previous\"},";
 		settings += "{\"data\": \"delay\", \"display\": \"Delay\"},";
-		settings += "{\"data\": \"motion\", \"display\": \"Motion\"} ]}";
+		settings += "{\"data\": \"motion\", \"display\": \"Motion\"} ],";
+		
+		settings += "\"icon\": null}";
 		
 		try {
-			deviceSettingsStorage.put(DEVICE_TYPE_STUMP_GHOST, new JSONObject(settings));
+			JSONObject deviceSettings = new JSONObject();
+			deviceSettings.put(DEVICE_TYPE_STUMP_GHOST, new JSONObject(settings));			
+			deviceRegistryStorage.put("settings", deviceSettings);
+			
+			JSONObject devices = new JSONObject();
+			String deviceInfo = "{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\"}";
+			devices.put("0000000001", new JSONObject(deviceInfo));
+			deviceRegistryStorage.put("deviceRegistry", devices);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -45,7 +62,17 @@ public class DeviceSettingsStorageManager {
 	
 	public JSONObject getDeviceSettings(final String deviceType) {
 		try {
-			return deviceSettingsStorage.getJSONObject(deviceType);
+			return deviceRegistryStorage.getJSONObject(deviceType);
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
+	
+	public JSONObject getDeviceInfo(final String serialNumber) {
+		try {
+			JSONObject registry = deviceRegistryStorage.getJSONObject("deviceRegistry");
+			return registry.getJSONObject(serialNumber);
 		} catch (JSONException e) {
 			return null;
 		}

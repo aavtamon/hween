@@ -28,7 +28,7 @@ public class DeviceSettingsController {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
-		JSONObject ds = StorageManager.getInstance().getDeviceSettingsManager().getDeviceSettings(deviceType);
+		JSONObject ds = StorageManager.getInstance().getDeviceRegistryManager().getDeviceSettings(deviceType);
 		if (ds != null) {
 			return ControllerUtils.buildResponse(Response.Status.OK, ds);
 		} else {

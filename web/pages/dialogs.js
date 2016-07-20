@@ -39,6 +39,7 @@ Dialogs.showAddDeviceByIdDialog = function() {
         
         Dialogs._processing = true;
         Backend.addNewDevice(deviceSnInput.getValue(), verificationInput.getValue(), function(status) {
+          Dialogs._processing = false;
           if (status == Backend.OperationResult.SUCCESS) {
             dialog.close();
             UIUtils.showMessage(I18n.getLocale().dialogs.AddDeviceByIdDialog.DeviceAddedMessage);
@@ -46,7 +47,7 @@ Dialogs.showAddDeviceByIdDialog = function() {
           } else if (status == Backend.OperationResult.FAILURE) {
             UIUtils.showMessage(I18n.getLocale().dialogs.AddDeviceByIdDialog.UnrecognizedDeviceMessage);
           } else {
-            UIUtils.showMessage(I18n.getLocale().literal.ServerErrorMessage);
+            UIUtils.showMessage(I18n.getLocale().ServerErrorMessage);
           }
         });
       }
@@ -87,13 +88,14 @@ Dialogs.showUploadStockProgramDialog = function(deviceId, libraryProgram) {
         }
         
         Backend.addStockProgram(deviceId, stockProgram, function(status) {
+          Dialogs._processing = false;
           if (status == Backend.OperationResult.SUCCESS) {
             dialog.close();
             UIUtils.showMessage(I18n.getLocale().dialogs.UploadStockProgramDialog.SuccessfullyUploadedMessage);
           } else if (status == Backend.OperationResult.FAILURE) {
             UIUtils.showMessage(I18n.getLocale().dialogs.UploadStockProgramDialog.FailedToUploadMessage);
           } else {
-            UIUtils.showMessage(I18n.getLocale().literal.ServerErrorMessage);
+            UIUtils.showMessage(I18n.getLocale().ServerErrorMessage);
           }
         });
       }

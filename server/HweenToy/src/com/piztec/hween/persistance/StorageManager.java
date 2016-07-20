@@ -14,7 +14,8 @@ public class StorageManager {
 	
 	private JSONObject storage;
 	private UserAccountStorageManager userAccountStorageManager;
-	private DeviceSettingsStorageManager deviceSettingsStorageManager;
+	private DeviceRegistryStorageManager deviceRegistryStorageManager;
+	private UserDevicesStorageManager userDevicesStorageManager;
 	
 	
 	public static StorageManager getInstance() {
@@ -25,8 +26,12 @@ public class StorageManager {
 		return userAccountStorageManager;
 	}
 	
-	public DeviceSettingsStorageManager getDeviceSettingsManager() {
-		return deviceSettingsStorageManager;
+	public UserDevicesStorageManager getUserDevicesManager() {
+		return userDevicesStorageManager;
+	}
+	
+	public DeviceRegistryStorageManager getDeviceRegistryManager() {
+		return deviceRegistryStorageManager;
 	}
 
 	
@@ -53,7 +58,10 @@ public class StorageManager {
 		
 		try {
 			userAccountStorageManager = new UserAccountStorageManager(storage.getJSONObject("userAccounts"));
-			deviceSettingsStorageManager = new DeviceSettingsStorageManager(storage.getJSONObject("deviceSettings"));
+			userDevicesStorageManager = new UserDevicesStorageManager(storage.getJSONObject("userDevices"));
+			deviceRegistryStorageManager = new DeviceRegistryStorageManager(storage.getJSONObject("deviceSettings"));
+			
+			commit();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -61,7 +69,7 @@ public class StorageManager {
 	
 	
 	private JSONObject initStorage() {
-		String initialContent = "{\"userAccounts\": {}, \"deviceSettings\": {}}";
+		String initialContent = "{\"userAccounts\": {}, \"deviceSettings\": {}, \"userDevices\": {}}";
 		
 		try {
 			return new JSONObject(initialContent);

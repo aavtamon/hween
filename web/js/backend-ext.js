@@ -83,6 +83,7 @@ Backend._pullDeviceSettings = function(deviceType, operationCallback) {
       }
     },
     error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SETTINGS, deviceType, false);
       if (operationCallback) {
         if (xhr.status == 401 || xhr.status == 404) {
           operationCallback(Backend.OperationResult.FAILURE);
@@ -125,6 +126,7 @@ Backend._pullDeviceIds = function(operationCallback) {
       }
     },
     error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, false);
       if (operationCallback) {
         if (xhr.status == 401 || xhr.status == 404) {
           operationCallback(Backend.OperationResult.FAILURE);
@@ -163,6 +165,7 @@ Backend._pullDeviceInfo = function(deviceId, operationCallback) {
       }
     },
     error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_INFO, deviceId, false);
       if (operationCallback) {
         if (xhr.status == 401 || xhr.status == 404) {
           operationCallback(Backend.OperationResult.FAILURE);
@@ -181,7 +184,6 @@ Backend.registerDevices = function(ids, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   
-  
   var communicationCallback = {
     success: function(data, status, xhr) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, data);
@@ -191,6 +193,7 @@ Backend.registerDevices = function(ids, operationCallback) {
       }
     },
     error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, false);
       if (operationCallback) {
         if (xhr.status == 401 || xhr.status == 404) {
           operationCallback(Backend.OperationResult.FAILURE);
@@ -200,15 +203,18 @@ Backend.registerDevices = function(ids, operationCallback) {
       }
     }
   }
+
+  //TODO: Aggregation callback
   
-  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices", "PUT", {ids: ids}, true, this._getAuthenticationHeader(), communicationCallback);
+  for (var index in ids) {
+    this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + ids[index], "PUT", {registered: true}, true, this._getAuthenticationHeader(), communicationCallback);
+  }
 }
 
 Backend.unregisterDevice = function(deviceId, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   
-  
   var communicationCallback = {
     success: function(data, status, xhr) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, data);
@@ -218,6 +224,7 @@ Backend.unregisterDevice = function(deviceId, operationCallback) {
       }
     },
     error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, false);
       if (operationCallback) {
         if (xhr.status == 401 || xhr.status == 404) {
           operationCallback(Backend.OperationResult.FAILURE);
@@ -228,21 +235,34 @@ Backend.unregisterDevice = function(deviceId, operationCallback) {
     }
   }
   
-  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId, "DELETE", null, true, this._getAuthenticationHeader(), communicationCallback);
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId, "PUT", {registered: false}, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
-Backend.addNewDevice = function(deviceId, verificationCode, operationCallback) {
+Backend.addNewDevice = function(deviceSn, verificationCode, operationCallback) {
   var deviceIds = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0);
   
-  setTimeout(function() {
-    deviceIds.push(deviceId);
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, deviceIds);
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS, data);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_IDS, 0, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 5000);
+  }
+  
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices", "POST", {serial_number: deviceSn, verification_code: verificationCode}, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
 

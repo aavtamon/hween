@@ -1,0 +1,154 @@
+package com.piztec.hween.persistance;
+
+import java.util.Iterator;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/**
+ * {
+ *   profile: {
+ *     user_id: int,
+ *     login: String,
+ *     password: String
+ *   },
+ *   preferences: {
+ *   },
+ *   settings: {
+ *   }
+ * }
+ */
+
+public class UserDevicesStorageManager {
+	private final JSONObject userDevicesStorage;
+	
+	UserDevicesStorageManager(JSONObject userDevicesRoot) {
+		userDevicesStorage = userDevicesRoot;
+	}
+	
+	
+	public JSONObject getDeviceIds() {
+		try {
+			JSONObject result = new JSONObject();
+			JSONArray registeredIds = new JSONArray();
+			result.put("registered", registeredIds);
+			JSONArray unregisteredIds = new JSONArray();
+			result.put("unregistered", unregisteredIds);
+			
+			for (Iterator it = userDevicesStorage.keys(); it.hasNext(); ) {
+				String key = it.next().toString();
+				JSONObject deviceInfo = userDevicesStorage.getJSONObject(key);
+				
+				boolean registered = deviceInfo.getBoolean("registered");
+				if (registered) {
+					registeredIds.put(key);
+				} else {
+					unregisteredIds.put(key);
+				}
+			}
+			return result;
+		} catch (Exception e) {
+			return null;
+		}		
+	}
+	
+
+	public boolean registerDevice(final int deviceId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return false;
+			}
+			
+			boolean registered = deviceInfo.getBoolean("registered");
+			if (registered) {
+				return false;
+			}
+			
+			deviceInfo.put("registered", true);
+			
+			StorageManager.getInstance().commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean unregisterDevice(final int deviceId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return false;
+			}
+			
+			boolean registered = deviceInfo.getBoolean("registered");
+			if (!registered) {
+				return false;
+			}
+			
+			deviceInfo.put("registered", false);
+			
+			StorageManager.getInstance().commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public int addDevice(final String serialNumber) {
+		try {
+			JSONObject registryInfo = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber);
+			
+			int deviceId = (int)System.currentTimeMillis();
+
+			JSONObject deviceInfo = new JSONObject();
+			deviceInfo.put("id", deviceId);
+			deviceInfo.put("name", registryInfo.getString("name"));
+			deviceInfo.put("type", registryInfo.getString("type"));
+			deviceInfo.put("version", registryInfo.getString("version"));
+			deviceInfo.put("serial_number", registryInfo.getString("serial_number"));
+			deviceInfo.put("status", "connected");
+			deviceInfo.put("ip_address", "192.168.0.100");
+			
+			userDevicesStorage.put(deviceId + "", deviceInfo);
+			
+			return deviceId;
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+	
+	
+	public boolean removeDevice(final int deviceId) {
+		return userDevicesStorage.remove(deviceId + "") != null;
+	}
+	
+	
+	public JSONObject getDeviceInfo(final int deviceId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			JSONObject result = new JSONObject();
+			
+			result.put("id", deviceId);
+			result.put("name", deviceInfo.getString("name"));
+			result.put("type", deviceInfo.getString("type"));
+			result.put("version", deviceInfo.getString("version"));
+			result.put("icon", deviceInfo.get("icon"));
+			result.put("serial_number", deviceInfo.getString("serial_number"));
+			result.put("status", deviceInfo.getString("status"));
+			result.put("ip_address", deviceInfo.getString("ip_address"));
+
+			return result;
+		} catch (Exception e) {
+			return null;
+		}		
+	}
+	
+	
+}
