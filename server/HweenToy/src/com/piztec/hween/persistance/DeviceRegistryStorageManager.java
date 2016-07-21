@@ -5,11 +5,15 @@ import org.json.JSONObject;
 
 /**
  * {
- *   settings: {
- *     categories: [{data: String, display: String}],
- *     supportedCommands: [{data: String, display: String, description: String}],
- *     supportedProgramTriggers: [{data: String, display: String}],
- *     icon: null
+ *   <device type>: {
+ *     settings: {
+ *       categories: [{data: String, display: String}],
+ *       supportedCommands: [{data: String, display: String, description: String}],
+ *       supportedProgramTriggers: [{data: String, display: String}],
+ *       icon: null
+ *     },
+ *     schedule: {
+ *     }
  *   },
  *   deviceRegistry: {
  *     <serialNumber>: {
@@ -45,10 +49,14 @@ public class DeviceRegistryStorageManager {
 		
 		settings += "\"icon\": null}";
 		
+		
+		String defaultSchedule = "{\"trigger\": \"motion\", \"programs\": []}";
+		
 		try {
-			JSONObject deviceSettings = new JSONObject();
-			deviceSettings.put(DEVICE_TYPE_STUMP_GHOST, new JSONObject(settings));			
-			deviceRegistryStorage.put("settings", deviceSettings);
+			JSONObject deviceTypeObject = new JSONObject();
+			deviceTypeObject.put("settings", new JSONObject(settings));
+			deviceTypeObject.put("schedule", new JSONObject(defaultSchedule));
+			deviceRegistryStorage.put(DEVICE_TYPE_STUMP_GHOST, deviceTypeObject);
 			
 			JSONObject devices = new JSONObject();
 			String deviceInfo = "{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\"}";
@@ -62,12 +70,21 @@ public class DeviceRegistryStorageManager {
 	
 	public JSONObject getDeviceSettings(final String deviceType) {
 		try {
-			return deviceRegistryStorage.getJSONObject(deviceType);
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			return typeObject.getJSONObject("settings");
 		} catch (JSONException e) {
 			return null;
 		}
 	}
 	
+	public JSONObject getDeviceSchedule(final String deviceType) {
+		try {
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			return typeObject.getJSONObject("schedule");
+		} catch (JSONException e) {
+			return null;
+		}
+	}
 	
 	public JSONObject getDeviceInfo(final String serialNumber) {
 		try {

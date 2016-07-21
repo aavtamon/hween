@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.wink.common.http.OPTIONS;
-import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.piztec.hween.persistance.StorageManager;
@@ -107,7 +107,7 @@ public class UserDeviceManagementController {
 	@DELETE
 	@Path("{userId}/devices/{deviceId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response unregisterDevice(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+	public Response removeDevice(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
 		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
@@ -119,12 +119,12 @@ public class UserDeviceManagementController {
 	
 	
 	@OPTIONS
-	@Path("{userId}/device/{deviceId}")
+	@Path("{userId}/devices/{deviceId}")
 	public Response getDeviceInfoOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
 	}
 	@GET
-	@Path("{userId}/device/{deviceId}")
+	@Path("{userId}/devices/{deviceId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDeviceInfo(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
 		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
@@ -136,6 +136,90 @@ public class UserDeviceManagementController {
 			return ControllerUtils.buildResponse(Response.Status.OK, deviceInfo);
 		} else {
 			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
+	}
+
+
+	@OPTIONS
+	@Path("{userId}/devices/{deviceId}/schedule")
+	public Response getDeviceScheduleOptions() {
+		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+	@GET
+	@Path("{userId}/devices/{deviceId}/schedule")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceSchedule(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject deviceSchedule = StorageManager.getInstance().getUserDevicesManager().getDeviceSchedule(deviceId);
+		if (deviceSchedule != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, deviceSchedule);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
+	}
+	@PUT
+	@Path("{userId}/devices/{deviceId}/schedule")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setDeviceSchedule(String body, @PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		try {
+			JSONObject deviceSchedule = new JSONObject(body);
+			JSONObject schedule = StorageManager.getInstance().getUserDevicesManager().setDeviceSchedule(deviceId, deviceSchedule);
+			if (schedule != null) {
+				return ControllerUtils.buildResponse(Response.Status.OK, schedule);
+			} else {
+				return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+			}
+		} catch (JSONException e) {
+			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+		}
+	}
+
+
+	@OPTIONS
+	@Path("{userId}/devices/{deviceId}/mode")
+	public Response getDeviceModeOptions() {
+		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+	@GET
+	@Path("{userId}/devices/{deviceId}/mode")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceMode(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		String mode = StorageManager.getInstance().getUserDevicesManager().getDeviceMode(deviceId);
+		if (mode != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, "{\"mode\": \"" + mode + "\"}");
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
+	}
+	@PUT
+	@Path("{userId}/devices/{deviceId}/mode")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setDeviceMode(String body, @PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		try {
+			JSONObject deviceMode = new JSONObject(body);
+			String mode = StorageManager.getInstance().getUserDevicesManager().setDeviceMode(deviceId, deviceMode.getString("mode"));
+			if (mode != null) {
+				return ControllerUtils.buildResponse(Response.Status.OK, "{\"mode\": \"" + mode + "\"}");
+			} else {
+				return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+			}
+		} catch (JSONException e) {
+			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
 		}
 	}
 }

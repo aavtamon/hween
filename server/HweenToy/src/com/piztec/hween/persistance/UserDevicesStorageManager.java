@@ -7,15 +7,6 @@ import org.json.JSONObject;
 
 /**
  * {
- *   profile: {
- *     user_id: int,
- *     login: String,
- *     password: String
- *   },
- *   preferences: {
- *   },
- *   settings: {
- *   }
  * }
  */
 
@@ -104,13 +95,17 @@ public class UserDevicesStorageManager {
 			int deviceId = (int)System.currentTimeMillis();
 
 			JSONObject deviceInfo = new JSONObject();
+			
+			String deviceType = registryInfo.getString("type");
+			
 			deviceInfo.put("id", deviceId);
 			deviceInfo.put("name", registryInfo.getString("name"));
-			deviceInfo.put("type", registryInfo.getString("type"));
+			deviceInfo.put("type", deviceType);
 			deviceInfo.put("version", registryInfo.getString("version"));
 			deviceInfo.put("serial_number", registryInfo.getString("serial_number"));
 			deviceInfo.put("status", "connected");
 			deviceInfo.put("ip_address", "192.168.0.100");
+			deviceInfo.put("schedule", StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType));
 			
 			userDevicesStorage.put(deviceId + "", deviceInfo);
 			
@@ -150,5 +145,57 @@ public class UserDevicesStorageManager {
 		}		
 	}
 	
+	public JSONObject getDeviceSchedule(final int deviceId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			return deviceInfo.getJSONObject("schedule");
+		} catch (Exception e) {
+			return null;
+		}		
+	}
 	
+	public JSONObject setDeviceSchedule(final int deviceId, final JSONObject schedule) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			deviceInfo.put("schedule", schedule);
+			return schedule;
+		} catch (Exception e) {
+			return null;
+		}		
+	}	
+	
+	public String getDeviceMode(final int deviceId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			return deviceInfo.getString("mode");
+		} catch (Exception e) {
+			return null;
+		}		
+	}
+	
+	public String setDeviceMode(final int deviceId, final String mode) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			deviceInfo.put("mode", mode);
+			return mode;
+		} catch (Exception e) {
+			return null;
+		}		
+	}	
 }
