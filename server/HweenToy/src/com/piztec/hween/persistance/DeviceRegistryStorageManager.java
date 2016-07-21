@@ -56,6 +56,7 @@ public class DeviceRegistryStorageManager {
 			JSONObject deviceTypeObject = new JSONObject();
 			deviceTypeObject.put("settings", new JSONObject(settings));
 			deviceTypeObject.put("schedule", new JSONObject(defaultSchedule));
+			deviceTypeObject.put("mode", "idle");
 			deviceRegistryStorage.put(DEVICE_TYPE_STUMP_GHOST, deviceTypeObject);
 			
 			JSONObject devices = new JSONObject();
@@ -86,6 +87,15 @@ public class DeviceRegistryStorageManager {
 		}
 	}
 	
+	public String getDeviceMode(final String deviceType) {
+		try {
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			return typeObject.getString("mode");
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public JSONObject getDeviceInfo(final String serialNumber) {
 		try {
 			JSONObject registry = deviceRegistryStorage.getJSONObject("deviceRegistry");

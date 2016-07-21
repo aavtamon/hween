@@ -92,7 +92,7 @@ public class UserDevicesStorageManager {
 		try {
 			JSONObject registryInfo = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber);
 			
-			int deviceId = (int)System.currentTimeMillis();
+			int deviceId = Integer.parseInt(serialNumber);
 
 			JSONObject deviceInfo = new JSONObject();
 			
@@ -105,10 +105,14 @@ public class UserDevicesStorageManager {
 			deviceInfo.put("serial_number", registryInfo.getString("serial_number"));
 			deviceInfo.put("status", "connected");
 			deviceInfo.put("ip_address", "192.168.0.100");
-			deviceInfo.put("schedule", StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType));
+			deviceInfo.put("schedule", StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType));			
+			deviceInfo.put("mode", StorageManager.getInstance().getDeviceRegistryManager().getDeviceMode(deviceType));
+			deviceInfo.put("registered", true);
 			
 			userDevicesStorage.put(deviceId + "", deviceInfo);
 			
+			StorageManager.getInstance().commit();
+
 			return deviceId;
 		} catch (Exception e) {
 			return -1;
@@ -117,7 +121,11 @@ public class UserDevicesStorageManager {
 	
 	
 	public boolean removeDevice(final int deviceId) {
-		return userDevicesStorage.remove(deviceId + "") != null;
+		Object removedDevice = userDevicesStorage.remove(deviceId + "");
+		
+		StorageManager.getInstance().commit();
+		
+		return removedDevice != null;
 	}
 	
 	
@@ -134,7 +142,6 @@ public class UserDevicesStorageManager {
 			result.put("name", deviceInfo.getString("name"));
 			result.put("type", deviceInfo.getString("type"));
 			result.put("version", deviceInfo.getString("version"));
-			result.put("icon", deviceInfo.get("icon"));
 			result.put("serial_number", deviceInfo.getString("serial_number"));
 			result.put("status", deviceInfo.getString("status"));
 			result.put("ip_address", deviceInfo.getString("ip_address"));
@@ -166,6 +173,9 @@ public class UserDevicesStorageManager {
 			}
 			
 			deviceInfo.put("schedule", schedule);
+			
+			StorageManager.getInstance().commit();
+			
 			return schedule;
 		} catch (Exception e) {
 			return null;
@@ -193,6 +203,9 @@ public class UserDevicesStorageManager {
 			}
 			
 			deviceInfo.put("mode", mode);
+			
+			StorageManager.getInstance().commit();
+			
 			return mode;
 		} catch (Exception e) {
 			return null;

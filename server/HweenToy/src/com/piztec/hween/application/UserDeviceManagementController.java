@@ -78,6 +78,23 @@ public class UserDeviceManagementController {
 	public Response deviceOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
 	}
+	
+	@GET
+	@Path("{userId}/devices/{deviceId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceInfo(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject deviceInfo = StorageManager.getInstance().getUserDevicesManager().getDeviceInfo(deviceId);
+		if (deviceInfo != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, deviceInfo);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
+	}
+
 
 	@PUT
 	@Path("{userId}/devices/{deviceId}")
@@ -118,27 +135,6 @@ public class UserDeviceManagementController {
 	
 	
 	
-	@OPTIONS
-	@Path("{userId}/devices/{deviceId}")
-	public Response getDeviceInfoOptions() {
-		return ControllerUtils.buildResponse(Response.Status.OK);
-	}
-	@GET
-	@Path("{userId}/devices/{deviceId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDeviceInfo(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
-			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
-		}
-		
-		JSONObject deviceInfo = StorageManager.getInstance().getUserDevicesManager().getDeviceInfo(deviceId);
-		if (deviceInfo != null) {
-			return ControllerUtils.buildResponse(Response.Status.OK, deviceInfo);
-		} else {
-			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
-		}
-	}
-
 
 	@OPTIONS
 	@Path("{userId}/devices/{deviceId}/schedule")

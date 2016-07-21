@@ -43,7 +43,9 @@ Dialogs.showAddDeviceByIdDialog = function() {
           if (status == Backend.OperationResult.SUCCESS) {
             dialog.close();
             UIUtils.showMessage(I18n.getLocale().dialogs.AddDeviceByIdDialog.DeviceAddedMessage);
-            Application.showPage(DeviceSelectionPage.name);
+            
+            
+            Application.showPage(DeviceSelectionPage.name, {refresh: true});
           } else if (status == Backend.OperationResult.FAILURE) {
             UIUtils.showMessage(I18n.getLocale().dialogs.AddDeviceByIdDialog.UnrecognizedDeviceMessage);
           } else {
