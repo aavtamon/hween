@@ -85,7 +85,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   
   this._commandList.clear();
   
-  Backend.getDeviceSettings(this._deviceType, function(status, deviceSettings) {
+  Backend.getDeviceSettings(this._deviceInfo.type, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {
       var commands = deviceSettings.supportedCommands;
       this._addCommandButton.setExpandableActions(this._getCommandActions(deviceSettings.supportedCommands));
