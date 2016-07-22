@@ -1,5 +1,8 @@
 package com.piztec.hween.persistance;
 
+import java.util.Iterator;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,7 +16,8 @@ import org.json.JSONObject;
  *       icon: null
  *     },
  *     schedule: {
- *     }
+ *     },
+ *     stockPrograms: []
  *   },
  *   deviceRegistry: {
  *     <serialNumber>: {
@@ -52,11 +56,15 @@ public class DeviceRegistryStorageManager {
 		
 		String defaultSchedule = "{\"trigger\": \"motion\", \"programs\": []}";
 		
+		String stockPrograms = "{\"1\": {\"title\": \"Program 1\", \"description\": \"Program 1 Description\", \"category\": \"fun\"},";
+		       stockPrograms += "\"2\": {\"title\": \"Program 2\", \"description\": \"Program 2 Description\", \"category\": \"scary\"}}";
+		
 		try {
 			JSONObject deviceTypeObject = new JSONObject();
 			deviceTypeObject.put("settings", new JSONObject(settings));
 			deviceTypeObject.put("schedule", new JSONObject(defaultSchedule));
 			deviceTypeObject.put("mode", "idle");
+			deviceTypeObject.put("stockPrograms", new JSONObject(stockPrograms));
 			deviceRegistryStorage.put(DEVICE_TYPE_STUMP_GHOST, deviceTypeObject);
 			
 			JSONObject devices = new JSONObject();
@@ -104,4 +112,49 @@ public class DeviceRegistryStorageManager {
 			return null;
 		}
 	}
+	
+	
+	public JSONObject getStockPrograms(final String deviceType) {
+		try {
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			return typeObject.getJSONObject("stockPrograms");
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
+	public JSONObject addStockProgram(final String deviceType, final JSONObject program) {
+		try {
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			JSONObject programs = typeObject.getJSONObject("stockPrograms");
+			
+			int id = (int)System.currentTimeMillis();
+			programs.put(id + "", program);
+			
+			typeObject.put("stockPrograms", programs);
+			
+			StorageManager.getInstance().commit();
+			
+			return programs;
+		} catch (JSONException e) {
+			return null;
+		}
+	}	
+	
+	public JSONObject removeStockProgram(final String deviceType, final int programId) {
+		try {
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			JSONObject programs = typeObject.getJSONObject("stockPrograms");
+			
+			programs.remove(programId + "");
+			
+			typeObject.put("stockPrograms", programs);
+			
+			StorageManager.getInstance().commit();
+			
+			return programs;
+		} catch (JSONException e) {
+			return null;
+		}
+	}	
 }

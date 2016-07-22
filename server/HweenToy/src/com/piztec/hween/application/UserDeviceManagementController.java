@@ -218,4 +218,46 @@ public class UserDeviceManagementController {
 			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
 		}
 	}
+	
+	
+	@OPTIONS
+	@Path("{userId}/devices/{deviceId}/library")
+	public Response getDeviceProgramLibraryOptions() {
+		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+	@GET
+	@Path("{userId}/devices/{deviceId}/library")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceProgramLibrary(@PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject deviceLibrary = StorageManager.getInstance().getUserDevicesManager().getDeviceProgramLibrary(deviceId);
+		if (deviceLibrary != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, deviceLibrary);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
+	}
+	@PUT
+	@Path("{userId}/devices/{deviceId}/library")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setDeviceProgramLibrary(String body, @PathParam("userId") int userId, @PathParam("deviceId") int deviceId, @HeaderParam("Token") String authHeader) {
+		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		try {
+			JSONObject deviceLibrary = new JSONObject(body);
+			JSONObject library = StorageManager.getInstance().getUserDevicesManager().setDeviceProgramLibrary(deviceId, deviceLibrary);
+			if (library != null) {
+				return ControllerUtils.buildResponse(Response.Status.OK, library);
+			} else {
+				return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+			}
+		} catch (JSONException e) {
+			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+		}
+	}
 }

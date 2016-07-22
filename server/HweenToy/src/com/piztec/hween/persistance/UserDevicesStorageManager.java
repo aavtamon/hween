@@ -211,4 +211,37 @@ public class UserDevicesStorageManager {
 			return null;
 		}		
 	}	
+	
+	
+	
+	public JSONObject getDeviceProgramLibrary(final int deviceId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			return deviceInfo.getJSONObject("library");
+		} catch (Exception e) {
+			return null;
+		}		
+	}
+	
+	public JSONObject setDeviceProgramLibrary(final int deviceId, final JSONObject library) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(deviceId + "");
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			deviceInfo.put("library", library);
+			
+			StorageManager.getInstance().commit();
+			
+			return library;
+		} catch (Exception e) {
+			return null;
+		}		
+	}	
+	
 }

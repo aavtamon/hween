@@ -300,27 +300,6 @@ Backend._pullDeviceSchedule = function(deviceId, operationCallback) {
   }
   
   this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/schedule", "GET", null, true, this._getAuthenticationHeader(), communicationCallback);
-  
-//  //TODO
-//  setTimeout(function() {
-//    var deviceSchedule = {
-//      trigger: Backend.Program.TRIGGER_MOTION,
-//      programs: [{
-//        id: 1,
-//        title: "Roar",
-//        frequency: Backend.Program.FREQUENCY_ONCE
-//      }, {
-//        id: 2,
-//        title: "Loud Roar",
-//        frequency: Backend.Program.FREQUENCY_ONCE
-//      }],      
-//    }
-//    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, deviceSchedule);
-//
-//    if (operationCallback) {
-//      operationCallback(Backend.OperationResult.SUCCESS, deviceSchedule);
-//    }
-//  }, 1000);
 }
 
 Backend.setDeviceSchedule = function(deviceId, schedule, operationCallback) {
@@ -455,8 +434,6 @@ Backend.getLibraryPrograms = function(deviceId, operationCallback) {
   var libraryPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
   
   if (libraryPrograms == null) {
-    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
-    
     this._pullLibraryPrograms(deviceId, operationCallback);
   } else if (operationCallback) {
     operationCallback(Backend.OperationResult.SUCCESS, libraryPrograms);
@@ -465,120 +442,178 @@ Backend.getLibraryPrograms = function(deviceId, operationCallback) {
   return libraryPrograms;
 }
 Backend._pullLibraryPrograms = function(deviceId, operationCallback) {
-  //TODO
-  setTimeout(function() {
-    var libraryPrograms = [{
-      id: 1,
-      title: "Giiii",
-      description: "Just giiii"
-    }, {
-      id: 2,
-      title: "Loud Giiii",
-      description: "Very loud giii"
-    }]
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, libraryPrograms);
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
+    
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS, libraryPrograms);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 1000);
+  }
+  
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library", "GET", null, true, this._getAuthenticationHeader(), communicationCallback);
+//  
+//  //TODO
+//  setTimeout(function() {
+//    var libraryPrograms = [{
+//      id: 1,
+//      title: "Giiii",
+//      description: "Just giiii"
+//    }, {
+//      id: 2,
+//      title: "Loud Giiii",
+//      description: "Very loud giii"
+//    }]
+//    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, libraryPrograms);
+//
+//    if (operationCallback) {
+//      operationCallback(Backend.OperationResult.SUCCESS, libraryPrograms);
+//    }
+//  }, 1000);
 }
 
-
-Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
+Backend.setLibraryPrograms = function(deviceId, programLibrary, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
   
-  setTimeout(function() {
-    var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
-    programs.push(program);
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, programs);
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 2000);
+  }
+  
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/mode", "PUT", programLibrary, true, this._getAuthenticationHeader(), communicationCallback);
+}
+
+Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
+  var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
+  programs.push(program);
+  
+  Backend.setLibraryPrograms(deviceId, programs, operationCallback);
 }
 
 Backend.removeLibraryProgram = function(deviceId, program, operationCallback) {
-  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
+  var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
+  GeneralUtils.removeFromArray(programs, program);
   
-  setTimeout(function() {
-    var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
-    GeneralUtils.removeFromArray(programs, program);
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, programs);
-
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS);
-    }
-  }, 2000);
+  Backend.setLibraryPrograms(deviceId, programs, operationCallback);
 }
 
 
 // Stock Program Manger
 
-Backend.getStockPrograms = function(deviceId, operationCallback) {
-  var stockPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+Backend.getStockPrograms = function(deviceType, operationCallback) {
+  var stockPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType);
   
   if (stockPrograms == null) {
-    Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
-    
-    this._pullStockPrograms(deviceId, operationCallback);
+    this._pullStockPrograms(deviceType, operationCallback);
   } else if (operationCallback) {
     operationCallback(Backend.OperationResult.SUCCESS, stockPrograms);
   }
   
   return stockPrograms;
 }
-Backend._pullStockPrograms = function(deviceId, operationCallback) {
-  //TODO
-  setTimeout(function() {
-    var stockPrograms = [{
-      id: 1,
-      title: "Jopppa",
-      description: "Just jopaaa",
-      category: "fun"
-    }, {
-      id: 2,
-      title: "Loud JOOOOPA",
-      description: "Very loud jopa",
-      category: "scary"
-    }]
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, stockPrograms);
+Backend._pullStockPrograms = function(deviceType, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType);
+  
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS, stockPrograms);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 1000);
+  }
+  
+  this._communicate("settings/device/" + deviceType + "/programs", "GET", null, true, this._getAuthenticationHeader(), communicationCallback);  
 }
 
 
-Backend.addStockProgram = function(deviceId, program, operationCallback) {
-  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
+Backend.addStockProgram = function(deviceType, program, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType);
   
-  setTimeout(function() {
-    var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
-    if (programs == null) {
-      programs = [];
-    }
-    programs.push(program);
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, programs);
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 2000);
+  }
+  
+  this._communicate("settings/device/" + deviceType + "/programs", "POST", program, true, this._getAuthenticationHeader(), communicationCallback);  
 }
 
-Backend.removeStockProgram = function(deviceId, program, operationCallback) {
+Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
   
-  setTimeout(function() {
-    var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
-    GeneralUtils.removeFromArray(programs, program);
-    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId, programs);
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, data);
 
-    if (operationCallback) {
-      operationCallback(Backend.OperationResult.SUCCESS);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
     }
-  }, 2000);
+  }
+  
+  this._communicate("settings/device/" + deviceType + "/programs/" + programId, "DELETE", program, true, this._getAuthenticationHeader(), communicationCallback);  
 }

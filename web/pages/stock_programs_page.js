@@ -65,7 +65,7 @@ StockProgramsPage.prototype.onShow = function(root, bundle) {
   } else if (programs.length == 0) {
     this._programList.innerHTML = this.getLocale().NoProgramsAvailableLabel;
   } else {
-    this._refreshProgramList(programs);
+    this._refreshProgramList();
   }
   
   UIUtils.setEnabled(this._loadSelectedButton, false);
@@ -95,8 +95,8 @@ StockProgramsPage.prototype._refreshProgramList = function() {
         var category = categories[categoryIndex];
         this._addCategoryToList(category);
 
-        for (var progIndex in programs) {
-          var program = programs[progIndex];
+        for (var progId in programs) {
+          var program = programs[progId];
           if (program.category == category.data) {
             this._addProgramToList(program);
           }
