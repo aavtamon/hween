@@ -1,4 +1,4 @@
-package com.piztec.hween.application;
+package com.piztec.hween;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -33,42 +33,17 @@ public class ControllerUtils {
 		return builder.build();
 	}
 	
-	
-	public static boolean isAuthenticated(final String authHeader) {
-		if (authHeader == null) {
-			return false;
-		}
-		
-		String[] authTokens = authHeader.split(":");
-		if (authTokens.length != 2) {
-			return false;
-		}
-		
-		if (authTokens[0] == null || authTokens[1] == null) {
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public static boolean isAuthenticated(final int userId, final String authHeader) {
-		if (!isAuthenticated(authHeader)) {
-			return false;
-		}
-		
-		return true;
-	}
-	
-	
-	public static JSONArray removeFromArray(JSONArray arr, Object element) throws JSONException {
-		JSONArray result = new JSONArray();
-		
-		for (int i = 0; i < arr.length(); i++) {
-			if (!arr.get(i).equals(element)) {
-				result.put(arr.get(i));
-			}
-		}
-		
-		return result;
-	}
+//	
+//	
+//	public static JSONArray removeFromArray(JSONArray arr, Object element) throws JSONException {
+//		JSONArray result = new JSONArray();
+//		
+//		for (int i = 0; i < arr.length(); i++) {
+//			if (!arr.get(i).equals(element)) {
+//				result.put(arr.get(i));
+//			}
+//		}
+//		
+//		return result;
+//	}
 }

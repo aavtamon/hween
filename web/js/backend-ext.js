@@ -206,7 +206,7 @@ Backend.registerDevices = function(ids, operationCallback) {
   //TODO: Aggregation callback
   
   for (var index in ids) {
-    this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + ids[index], "PUT", {registered: true}, true, this._getAuthenticationHeader(), communicationCallback);
+    this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + ids[index], "PUT", null, true, this._getAuthenticationHeader(), communicationCallback);
   }
 }
 
@@ -233,7 +233,7 @@ Backend.unregisterDevice = function(deviceId, operationCallback) {
     }
   }
   
-  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId, "PUT", {registered: false}, true, this._getAuthenticationHeader(), communicationCallback);
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId, "DELETE", null, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
 Backend.addNewDevice = function(deviceSn, verificationCode, operationCallback) {

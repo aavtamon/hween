@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import org.apache.wink.common.http.OPTIONS;
 import org.json.JSONObject;
 
+import com.piztec.hween.ControllerUtils;
 import com.piztec.hween.persistance.StorageManager;
 
 @Path("user")
@@ -49,7 +50,7 @@ public class UserAccountController {
 	@Path("{userId}/logout")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response logout(@PathParam("userId") int userId, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
@@ -67,7 +68,7 @@ public class UserAccountController {
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserProfile(@PathParam("userId") int userId, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 
@@ -112,7 +113,7 @@ public class UserAccountController {
 	@Path("{userId}/settings")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserSettings(@PathParam("userId") int userId, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(userId, authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		

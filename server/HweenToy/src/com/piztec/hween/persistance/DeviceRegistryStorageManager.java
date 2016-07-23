@@ -1,8 +1,5 @@
 package com.piztec.hween.persistance;
 
-import java.util.Iterator;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +17,11 @@ import org.json.JSONObject;
  *     stockPrograms: []
  *   },
  *   deviceRegistry: {
+ *     <serialNumber>: {
+ *       
+ *     }
+ *   },
+ *   deviceStatus: {
  *     <serialNumber>: {
  *       
  *     }
@@ -68,9 +70,11 @@ public class DeviceRegistryStorageManager {
 			deviceRegistryStorage.put(DEVICE_TYPE_STUMP_GHOST, deviceTypeObject);
 			
 			JSONObject devices = new JSONObject();
-			String deviceInfo = "{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\"}";
+			String deviceInfo = "{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\", \"secret_word\": \"secret-1\"}";
 			devices.put("0000000001", new JSONObject(deviceInfo));
 			deviceRegistryStorage.put("deviceRegistry", devices);
+			
+			deviceRegistryStorage.put("deviceStatus", new JSONObject());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -112,7 +116,7 @@ public class DeviceRegistryStorageManager {
 			return null;
 		}
 	}
-	
+
 	
 	public JSONObject getStockPrograms(final String deviceType) {
 		try {
@@ -156,5 +160,5 @@ public class DeviceRegistryStorageManager {
 		} catch (JSONException e) {
 			return null;
 		}
-	}	
+	}
 }

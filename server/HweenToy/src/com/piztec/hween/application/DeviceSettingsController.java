@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.piztec.hween.ControllerUtils;
 import com.piztec.hween.persistance.StorageManager;
 
 @Path("settings/device")
@@ -28,7 +29,7 @@ public class DeviceSettingsController {
 	@Path("{deviceType}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDeviceSettings(@PathParam("deviceType") String deviceType, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
@@ -49,7 +50,7 @@ public class DeviceSettingsController {
 	@Path("{deviceType}/programs")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStockPrograms(@PathParam("deviceType") String deviceType, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
@@ -64,7 +65,7 @@ public class DeviceSettingsController {
 	@Path("{deviceType}/programs")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addStockProgram(String body, @PathParam("deviceType") String deviceType, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
@@ -85,7 +86,7 @@ public class DeviceSettingsController {
 	@Path("{deviceType}/programs/{programId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addStockProgram(@PathParam("deviceType") String deviceType, @PathParam("programId") int programId, @HeaderParam("Token") String authHeader) {
-		if (!ControllerUtils.isAuthenticated(authHeader)) {
+		if (!ApplicationUtils.isAuthenticated(authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		

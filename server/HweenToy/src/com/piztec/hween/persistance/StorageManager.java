@@ -1,6 +1,7 @@
 package com.piztec.hween.persistance;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
@@ -15,7 +16,7 @@ public class StorageManager {
 	private JSONObject storage;
 	private UserAccountStorageManager userAccountStorageManager;
 	private DeviceRegistryStorageManager deviceRegistryStorageManager;
-	private UserDevicesStorageManager userDevicesStorageManager;
+	private DevicesStorageManager userDevicesStorageManager;
 	
 	
 	public static StorageManager getInstance() {
@@ -26,7 +27,7 @@ public class StorageManager {
 		return userAccountStorageManager;
 	}
 	
-	public UserDevicesStorageManager getUserDevicesManager() {
+	public DevicesStorageManager getDevicesManager() {
 		return userDevicesStorageManager;
 	}
 	
@@ -58,7 +59,7 @@ public class StorageManager {
 		
 		try {
 			userAccountStorageManager = new UserAccountStorageManager(storage.getJSONObject("userAccounts"));
-			userDevicesStorageManager = new UserDevicesStorageManager(storage.getJSONObject("userDevices"));
+			userDevicesStorageManager = new DevicesStorageManager(storage.getJSONObject("userDevices"));
 			deviceRegistryStorageManager = new DeviceRegistryStorageManager(storage.getJSONObject("deviceSettings"));
 			
 			commit();
