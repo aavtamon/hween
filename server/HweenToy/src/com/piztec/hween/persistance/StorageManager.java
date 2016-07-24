@@ -13,6 +13,10 @@ public class StorageManager {
 	private static final StorageManager instance = new StorageManager();
 	private static final String STORAGE_FILE_PATH = "storage.json";
 	
+	{
+		System.out.println("Database full path = " + new File(STORAGE_FILE_PATH).getAbsolutePath());
+	}
+	
 	private JSONObject storage;
 	private UserAccountStorageManager userAccountStorageManager;
 	private DeviceRegistryStorageManager deviceRegistryStorageManager;

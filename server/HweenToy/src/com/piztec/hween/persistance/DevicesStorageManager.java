@@ -36,6 +36,8 @@ public class DevicesStorageManager {
 			info.put("status", "connected");
 			
 			userDevicesStorage.put(serialNumber, info);
+			
+			StorageManager.getInstance().commit();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -54,17 +56,10 @@ public class DevicesStorageManager {
 			} catch (Exception e) {
 			}
 			if (info == null) {
-				info = new JSONObject();
-				info.put("status", "offline");
-				info.put("ip_address", "");
-				userDevicesStorage.put(serialNumber, info);
+				userDevicesStorage.put(serialNumber, new JSONObject());
 			}
 
 			info.put("userId", userId);
-			
-			String deviceType = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber).getString("type");
-			info.put("schedule", StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType));			
-			info.put("mode", StorageManager.getInstance().getDeviceRegistryManager().getDeviceMode(deviceType));
 			
 			userDevicesStorage.put(serialNumber, info);
 			
@@ -187,10 +182,24 @@ public class DevicesStorageManager {
 			result.put("type", registryInfo.getString("type"));
 			result.put("version", registryInfo.getString("version"));
 			result.put("serial_number", serialNumber);
-			result.put("status", deviceInfo.getString("status"));
-			result.put("ip_address", deviceInfo.getString("ip_address"));
-			result.put("schedule", deviceInfo.getJSONObject("schedule"));			
-			result.put("mode", deviceInfo.getString("mode"));			
+			
+			
+			String status = "offline";
+			try {
+				status = deviceInfo.getString("status");
+			} catch(Exception e) {
+			}
+			result.put("status", status);
+			
+			String ipAddress = "";
+			try {
+				ipAddress = deviceInfo.getString("ip_address");
+			} catch(Exception e) {
+			}
+			result.put("ip_address", ipAddress);
+			
+			result.put("schedule", getDeviceSchedule(serialNumber));
+			result.put("mode", getDeviceMode(serialNumber));
 
 			return result;
 		} catch (Exception e) {
@@ -202,15 +211,19 @@ public class DevicesStorageManager {
 	public JSONObject getDeviceSchedule(final String serialNumber) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
-			if (deviceInfo == null) {
-				return null;
+			if (deviceInfo != null) {
+				return deviceInfo.getJSONObject("schedule");
 			}
-			
-			return deviceInfo.getJSONObject("schedule");
 		} catch (Exception e) {
+		}
+		
+		try {
+			String deviceType = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber).getString("type");
+			return StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType);			
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 	}
 	
 	public JSONObject setDeviceSchedule(final String serialNumber, final JSONObject schedule) {
@@ -234,15 +247,19 @@ public class DevicesStorageManager {
 	public String getDeviceMode(final String serialNumber) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
-			if (deviceInfo == null) {
-				return null;
+			if (deviceInfo != null) {
+				return deviceInfo.getString("mode");
 			}
-			
-			return deviceInfo.getString("mode");
 		} catch (Exception e) {
+		}		
+
+		try {
+			String deviceType = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber).getString("type");
+			return StorageManager.getInstance().getDeviceRegistryManager().getDeviceMode(deviceType);
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 	}
 	
 	public String setDeviceMode(final String deviceId, final String mode) {

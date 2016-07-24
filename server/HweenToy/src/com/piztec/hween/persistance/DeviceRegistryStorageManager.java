@@ -70,8 +70,10 @@ public class DeviceRegistryStorageManager {
 			deviceRegistryStorage.put(DEVICE_TYPE_STUMP_GHOST, deviceTypeObject);
 			
 			JSONObject devices = new JSONObject();
-			String deviceInfo = "{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\", \"secret_word\": \"secret-1\"}";
-			devices.put("0000000001", new JSONObject(deviceInfo));
+			devices.put("0000000001", new JSONObject("{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\", \"secret_word\": \"secret-1\"}"));
+			devices.put("0000000002", new JSONObject("{\"serial_number\": \"0000000002\", \"verification_code\": 234567, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-2\", \"secret_word\": \"secret-2\"}"));
+			devices.put("0000000003", new JSONObject("{\"serial_number\": \"0000000003\", \"verification_code\": 000345, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-3\", \"secret_word\": \"secret-3\"}"));
+
 			deviceRegistryStorage.put("deviceRegistry", devices);
 			
 			deviceRegistryStorage.put("deviceStatus", new JSONObject());

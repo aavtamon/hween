@@ -96,6 +96,7 @@ AddDevicePage.prototype._scanNewDevices = function() {
     if (ids.unregistered.length == 0) {
       this._progressIndicator.stop();
       UIUtils.setEnabled(this._addByIdButton, true);
+      UIUtils.setEnabled(this._rescanButton, true);
       this._statusLabel.innerHTML = this.getLocale().NoNewDevicesFoundLabel;
       return;
     }

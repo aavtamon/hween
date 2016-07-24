@@ -11,22 +11,13 @@ public class DeviceUtils {
 			return false;
 		}
 		
-		String[] authTokens = authHeader.split(":");
-		if (authTokens.length != 2) {
-			return false;
-		}
-		
-		if (!"secret".equals(authTokens[0])) {
-			return false;
-		}
-		
 		JSONObject info = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber);
 		if (info == null) {
 			return false;
 		}
 		
 		try {
-			if (!info.getString("secret").equals(authTokens[1])) {
+			if (!info.getString("secret_word").equals(authHeader)) {
 				return false;
 			}
 		} catch (JSONException e) {

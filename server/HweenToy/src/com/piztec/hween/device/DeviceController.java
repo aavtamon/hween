@@ -27,7 +27,7 @@ public class DeviceController {
 	@GET
 	@Path("{serialNumber}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDeviceInfo(@PathParam("serialNumber") String serialNumber, @HeaderParam("Token") String authHeader) {
+	public Response getDeviceInfo(@PathParam("serialNumber") String serialNumber, @HeaderParam("Secret") String authHeader) {
 		if (!DeviceUtils.isAuthenticated(serialNumber, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
@@ -38,7 +38,7 @@ public class DeviceController {
 	@PUT
 	@Path("{serialNumber}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setDeviceInfo(String body, @PathParam("serialNumber") String serialNumber, @HeaderParam("Token") String authHeader) {
+	public Response setDeviceInfo(String body, @PathParam("serialNumber") String serialNumber, @HeaderParam("Secret") String authHeader) {
 		if (!DeviceUtils.isAuthenticated(serialNumber, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
