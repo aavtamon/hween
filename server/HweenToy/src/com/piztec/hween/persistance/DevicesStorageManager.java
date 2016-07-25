@@ -189,10 +189,8 @@ public class DevicesStorageManager {
 			
 			
 			String status = "offline";
-			System.out.println("Checking status");
 			try {
 				long updateTimestampt = deviceInfo.getLong("status_update_timestamp");
-				System.out.println(" update stanp = " + updateTimestampt);
 				if (System.currentTimeMillis() - updateTimestampt < STATUS_VALIDITY_TIMEOUT) {
 					status = deviceInfo.getString("status");
 				}				
