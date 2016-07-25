@@ -14,7 +14,10 @@ import org.json.JSONObject;
  */
 
 public class DevicesStorageManager {
+	private static final long STATUS_VALIDITY_TIMEOUT = 60 * 1000; //1 min
+	
 	private final JSONObject userDevicesStorage;
+	
 	
 	DevicesStorageManager(JSONObject userDevicesRoot) {
 		userDevicesStorage = userDevicesRoot;
@@ -34,6 +37,7 @@ public class DevicesStorageManager {
 			info.put("ip_address", reportedInfo.get("ip_address"));
 			info.put("bssid", reportedInfo.get("bssid"));
 			info.put("status", "connected");
+			info.put("status_update_timestamp", System.currentTimeMillis());
 			
 			userDevicesStorage.put(serialNumber, info);
 			
@@ -185,8 +189,13 @@ public class DevicesStorageManager {
 			
 			
 			String status = "offline";
+			System.out.println("Checking status");
 			try {
-				status = deviceInfo.getString("status");
+				long updateTimestampt = deviceInfo.getLong("status_update_timestamp");
+				System.out.println(" update stanp = " + updateTimestampt);
+				if (System.currentTimeMillis() - updateTimestampt < STATUS_VALIDITY_TIMEOUT) {
+					status = deviceInfo.getString("status");
+				}				
 			} catch(Exception e) {
 			}
 			result.put("status", status);

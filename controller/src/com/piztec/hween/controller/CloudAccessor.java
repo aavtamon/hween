@@ -10,25 +10,32 @@ import java.net.URL;
 public class CloudAccessor {
 	private static final String SERVER_URL = "http://localhost:8080/HweenToy/";
 	
-	private static CloudAccessor instance = new CloudAccessor();
+	private static final int FAST_REPORTING_COUNT_LIMIT = 10;
+	private static final int FAST_REPORTING_INTERVAL = 10 * 1000;
+	private static final int NORMAL_REPORTING_INTERVAL = 60 * 1000;
 	
-	private Thread reportingThread;
+	private static CloudAccessor instance;
+	private final Thread reportingThread;
+	private int reportingCount;
+	private int reportingInterval = NORMAL_REPORTING_INTERVAL;
 	
 	private CloudAccessor() {
-	}
-	
-	public static CloudAccessor getInstance() {
-		return instance;
-	}
-
-	
-	public void startStatusReporting() {
 		reportingThread = new Thread() {
 			public void run() {
 				while (!isInterrupted()) {
+					synchronized (CloudAccessor.this) {
+						if (reportingInterval == FAST_REPORTING_INTERVAL) {
+						    if (reportingCount < FAST_REPORTING_COUNT_LIMIT) {
+						    	reportingCount++;
+						    } else {
+						    	reportingInterval = NORMAL_REPORTING_INTERVAL;
+						    }
+						}
+					}
+					
 					reportStatus();
 					try {
-						Thread.sleep(10000);
+						Thread.sleep(reportingInterval);
 					} catch (InterruptedException e) {
 					}
 				}
@@ -38,8 +45,26 @@ public class CloudAccessor {
 		reportingThread.start();
 	}
 	
-	public synchronized void stopStatusReporting() {
+	public static CloudAccessor getInstance() {
+		if (instance == null) {
+			instance = new CloudAccessor();
+		};
+		
+		return instance;
+	}
+	
+	public void stop() {
 		reportingThread.interrupt();
+	}
+
+	
+	public synchronized void startOftenReporting() {
+		reportingCount = 0;
+		reportingInterval = FAST_REPORTING_INTERVAL;
+	}
+	
+	public synchronized void stopOftenReporting() {
+		reportingInterval = NORMAL_REPORTING_INTERVAL;
 	}
 	
 	
@@ -73,7 +98,7 @@ public class CloudAccessor {
 	
 
 	private String getSerialNumber() {
-		return "0000000002";
+		return "0000000001";
 	}
 	
 	private String getIPAddress() {
@@ -85,6 +110,6 @@ public class CloudAccessor {
 	}
 	
 	private String getDeviceSecret() {
-		return "secret-2";
+		return "secret-1";
 	}
 }
