@@ -11,6 +11,8 @@ CreateProgramPage = ClassUtils.defineClass(AbstractDataPage, function CreateProg
   this._programPauseButton;
   this._programStopButton;
   this._addCommandButton;
+  this._programNameInput;
+  this._descriptionInput;
   
   this._playbackTimer;
   this._currentCommandIndex;
@@ -30,7 +32,11 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   var programPanel = UIUtils.appendBlock(contentPanel, "ProgramPanel");
   var headerProgramPanel = UIUtils.appendBlock(programPanel, "ProgramHeaderPanel");
   UIUtils.appendLabel(headerProgramPanel, "ProgramLabel", this.getLocale().ProgramLabel);
-  var programNameInput = UIUtils.appendTextInput(headerProgramPanel, "ProgramNameInput");
+  this._programNameInput = UIUtils.appendTextInput(headerProgramPanel, "ProgramNameInput");
+  this._programNameInput.setChangeListener(function(value) {
+    UIUtils.setEnabled(this._saveButton, (value != null && value.trim() != ""));
+  }.bind(this));
+  
   var programPlaybackPanel = UIUtils.appendBlock(headerProgramPanel, "ProgramPlaybackPanel");
   this._programPlayButton = UIUtils.appendButton(programPlaybackPanel, "PlayButton", this.getLocale().PlayButton);
   this._programPlayButton.setClickListener(this._playProgram.bind(this));
@@ -63,7 +69,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   }.bind(this));
   
   UIUtils.appendLabel(contentPanel, "DescriptionLabel", this.getLocale().DescriptionLabel);
-  var descriptionInput = UIUtils.appendTextInput(contentPanel, "DescriptionInput");
+  this._descriptionInput = UIUtils.appendTextInput(contentPanel, "DescriptionInput");
   
   var buttonsPanel = UIUtils.appendBlock(contentPanel, "ButtonsPanel");
   var cancelButton = UIUtils.appendButton(buttonsPanel, "CancelButton", I18n.getLocale().CancelOperationButton);
@@ -71,8 +77,18 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   
   this._saveButton = UIUtils.appendButton(buttonsPanel, "SaveButton", this.getLocale().SaveButton);
   this._saveButton.setClickListener(function() {
+    var program = {
+      title: this._programNameInput.getValue(),
+      description: this._descriptionInput.getValue(),
+      commands: this._commandList.getItems()
+    }
     
-  });
+    Backend.addLibraryProgram(this._deviceId, program, function(status) {
+      if (status == Backend.OperationResult.SUCCESS) {
+        Application.goBack();
+      }
+    });
+  }.bind(this));
 }
 
 CreateProgramPage.prototype.onShow = function(root, bundle) {
@@ -84,6 +100,8 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._toy.append(this._toyPanel);
   
   this._commandList.clear();
+  this._programNameInput.setValue("");
+  this._descriptionInput.setValue("");
   
   Backend.getDeviceSettings(this._deviceInfo.type, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {

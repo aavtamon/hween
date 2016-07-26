@@ -235,17 +235,17 @@ public class UserDeviceManagementController {
 			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 		}
 	}
-	@PUT
+	@POST
 	@Path("{userId}/devices/{deviceId}/library")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setDeviceProgramLibrary(String body, @PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @HeaderParam("Token") String authHeader) {
+	public Response addDeviceProgramLibrary(String body, @PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @HeaderParam("Token") String authHeader) {
 		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
 		try {
-			JSONObject deviceLibrary = new JSONObject(body);
-			JSONObject library = StorageManager.getInstance().getDevicesManager().setDeviceProgramLibrary(deviceId, deviceLibrary);
+			JSONObject libraryProgram = new JSONObject(body);
+			JSONObject library = StorageManager.getInstance().getDevicesManager().addLibraryProgram(deviceId, libraryProgram);
 			if (library != null) {
 				return ControllerUtils.buildResponse(Response.Status.OK, library);
 			} else {
@@ -253,6 +253,27 @@ public class UserDeviceManagementController {
 			}
 		} catch (JSONException e) {
 			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+		}
+	}
+	
+	@OPTIONS
+	@Path("{userId}/devices/{deviceId}/library/{programId}")
+	public Response deleteDeviceProgramLibraryOptions() {
+		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+	@DELETE
+	@Path("{userId}/devices/{deviceId}/library/{programId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addDeviceProgramLibrary(@PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @PathParam("programId") int programId, @HeaderParam("Token") String authHeader) {
+		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject library = StorageManager.getInstance().getDevicesManager().removeLibraryProgram(deviceId, programId);
+		if (library != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, library);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 		}
 	}
 }

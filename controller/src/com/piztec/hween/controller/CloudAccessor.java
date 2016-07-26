@@ -78,7 +78,7 @@ public class CloudAccessor {
 			connection.setRequestProperty("Secret", getDeviceSecret());
 			
 			OutputStream output = connection.getOutputStream();
-			output.write(("{\"ip_address\": \"" + getIPAddress() + "\", \"bssid\": \"" + getBssid() + "\"}").getBytes());
+			output.write(("{\"ip_address\": \"" + getIPAddress() + "\", \"port\": " + getPort() + ", \"bssid\": \"" + getBssid() + "\"}").getBytes());
 			output.close();
 			
 			InputStream response = connection.getInputStream();
@@ -90,7 +90,7 @@ public class CloudAccessor {
 	        }
 	        reader.close();
 	        
-	        System.out.println(responseText);
+	        System.out.println("Cloud response: " + responseText);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -102,7 +102,11 @@ public class CloudAccessor {
 	}
 	
 	private String getIPAddress() {
-		return "192.168.5.10";
+		return "127.0.0.1";
+	}
+
+	private int getPort() {
+		return ControlServer.SERVER_PORT;
 	}
 
 	private String getBssid() {

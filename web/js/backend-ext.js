@@ -485,7 +485,7 @@ Backend._pullLibraryPrograms = function(deviceId, operationCallback) {
 //  }, 1000);
 }
 
-Backend.setLibraryPrograms = function(deviceId, programLibrary, operationCallback) {
+Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
   
   var communicationCallback = {
@@ -508,21 +508,33 @@ Backend.setLibraryPrograms = function(deviceId, programLibrary, operationCallbac
     }
   }
   
-  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/mode", "PUT", programLibrary, true, this._getAuthenticationHeader(), communicationCallback);
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library", "POST", program, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
-Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
-  var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
-  programs.push(program);
+Backend.removeLibraryProgram = function(deviceId, programId, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
   
-  Backend.setLibraryPrograms(deviceId, programs, operationCallback);
-}
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
 
-Backend.removeLibraryProgram = function(deviceId, program, operationCallback) {
-  var programs = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
-  GeneralUtils.removeFromArray(programs, program);
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
+    }
+  }
   
-  Backend.setLibraryPrograms(deviceId, programs, operationCallback);
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library/" + programId, "DELETE", null, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
 

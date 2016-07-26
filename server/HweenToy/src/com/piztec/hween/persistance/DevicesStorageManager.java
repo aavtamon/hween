@@ -35,6 +35,7 @@ public class DevicesStorageManager {
 			}
 
 			info.put("ip_address", reportedInfo.get("ip_address"));
+			info.put("port", reportedInfo.get("port"));
 			info.put("bssid", reportedInfo.get("bssid"));
 			info.put("status", "connected");
 			info.put("status_update_timestamp", System.currentTimeMillis());
@@ -205,6 +206,13 @@ public class DevicesStorageManager {
 			}
 			result.put("ip_address", ipAddress);
 			
+			int port = -1;
+			try {
+				port = deviceInfo.getInt("port");
+			} catch(Exception e) {
+			}
+			result.put("port", port);
+			
 			result.put("schedule", getDeviceSchedule(serialNumber));
 			result.put("mode", getDeviceMode(serialNumber));
 
@@ -296,28 +304,70 @@ public class DevicesStorageManager {
 				return null;
 			}
 			
-			return deviceInfo.getJSONObject("library");
+			try {
+				JSONObject library = deviceInfo.getJSONObject("library");
+				if (library != null) {
+					return library;
+				}
+			} catch (Exception e) {				
+			}
+			
+			return new JSONObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}		
 	}
 	
-	public JSONObject setDeviceProgramLibrary(final String serialNumber, final JSONObject library) {
+	public JSONObject addLibraryProgram(final String serialNumber, final JSONObject program) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
 			if (deviceInfo == null) {
 				return null;
 			}
 			
+			JSONObject library = null;
+			try {
+				library = deviceInfo.getJSONObject("library");
+			} catch (Exception e) {				
+			}
+			
+			if (library == null) {
+				library = new JSONObject();
+			}
+			
+			
+			int id = (int)System.currentTimeMillis();
+			program.put("id", id);
+			library.put(id + "", program);
+			
 			deviceInfo.put("library", library);
 			
 			StorageManager.getInstance().commit();
-			
+
 			return library;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (JSONException e) {
 			return null;
-		}		
-	}
+		}
+	}	
+	
+	public JSONObject removeLibraryProgram(final String serialNumber, final int programId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
+			if (deviceInfo == null) {
+				return null;
+			}
+
+			JSONObject library = deviceInfo.getJSONObject("library");
+			library.remove(programId + "");
+			
+			deviceInfo.put("library", library);
+
+			StorageManager.getInstance().commit();
+
+			return library;
+		} catch (JSONException e) {
+			return null;
+		}
+	}	
 }

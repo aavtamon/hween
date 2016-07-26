@@ -43,7 +43,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
         for (var i in selectedPrograms) {
           var program = selectedPrograms[i];
           this._programList.removeItem(program._item);
-          Backend.removeLibraryProgram(this._deviceId, program);
+          Backend.removeLibraryProgram(this._deviceId, program.id);
         }
       }.bind(this));
     }
@@ -56,7 +56,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
     
     var selectedPrograms = this._getSelectedPrograms();
     for (var i in selectedPrograms) {
-      var program = selectedPrograms[i];
+      var program = selectedPrograms[id];
       programs.push(this._convertLibraryToDeviceProgram(program));
     }
     
@@ -90,7 +90,7 @@ ManageLibraryProgramsPage.prototype.onShow = function(root, bundle) {
   } else if (programs.length == 0) {
     this._programList.innerHTML = this.getLocale().NoProgramsAvailableLabel;
   } else {
-    this._refreshProgramList(programs);
+    this._refreshProgramList();
   }
   
   UIUtils.setEnabled(this._removeSelectedButton, false);
@@ -117,8 +117,8 @@ ManageLibraryProgramsPage.prototype._refreshProgramList = function() {
     return;
   }
   
-  for (var i = 0; i < programs.length; i++) {
-    this._addProgramToList(programs[i]);
+  for (var id in programs) {
+    this._addProgramToList(programs[id]);
   }
 }
 

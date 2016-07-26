@@ -11,9 +11,31 @@ Controller.isAvailable = function(deviceInfo, observer) {
 }
 
 Controller.reportToServer = function(deviceInfo, observer) {
-  if (observer != null) {
-    setTimeout(observer.bind(this, true), 2000);
+  if (deviceInfo.ip_address == null || deviceInfo.ip_address == "" || deviceInfo.port == null || deviceInfo.port == -1) {
+    return;
   }
+  
+  console.debug("Sending a report request");
+  
+  var request = new XMLHttpRequest();
+  request.onreadystatechange = function() {
+    console.debug("  state change: ready=" + request.readyState + ", status=" + request.status);
+    if (request.readyState == 4 && request.status == 200) {
+      if (observer != null) {
+        observer();
+      }
+    }
+  }
+  
+  var data = JSON.stringify({command: Controller.Command.CONNECT_TO_BACKEND});
+
+  request.open("PUT", "http://" + deviceInfo.ip_address + ":" + deviceInfo.port, true);
+  
+  request.setRequestHeader("Content-Type", "application/json");
+  request.setRequestHeader("Accept", "application/json");
+  
+  request.send(data);
+  console.debug("Request sent");
 }
 
 Controller.reset = function(deviceInfo, observer) {
