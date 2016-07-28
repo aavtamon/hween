@@ -34,15 +34,17 @@ public class CloudAccessor {
 					}
 					
 					reportStatus();
-					try {
-						Thread.sleep(reportingInterval);
-					} catch (InterruptedException e) {
+					
+					synchronized (CloudAccessor.this) {
+						try {
+							CloudAccessor.this.wait(reportingInterval);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
 		};
-		
-		reportingThread.start();
 	}
 	
 	public static CloudAccessor getInstance() {
@@ -53,20 +55,23 @@ public class CloudAccessor {
 		return instance;
 	}
 	
+	public synchronized void start() {
+		reportingInterval = NORMAL_REPORTING_INTERVAL;
+		
+		reportingThread.start();
+	}
+
 	public void stop() {
 		reportingThread.interrupt();
 	}
 
 	
-	public synchronized void startOftenReporting() {
+	public synchronized void enableOftenReporting() {
 		reportingCount = 0;
 		reportingInterval = FAST_REPORTING_INTERVAL;
+		notify();
 	}
-	
-	public synchronized void stopOftenReporting() {
-		reportingInterval = NORMAL_REPORTING_INTERVAL;
-	}
-	
+		
 	
 	private void reportStatus() {
 		try {

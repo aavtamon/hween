@@ -11,7 +11,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class ControlServer {
+	private static final String COMMAND_CONNECT_TO_BACKEND = "connect_to_backend";
+	
 	static final int SERVER_PORT = 8888;
 	
 	private static ControlServer instance;
@@ -114,7 +119,15 @@ public class ControlServer {
 	}
 	
 	
-	private void handleMessage(final String message) {
-		System.out.println("Handling message: " + message);
+	private void handleMessage(final String messageText) {
+		try {
+			JSONObject message = new JSONObject(messageText);
+			String command = message.getString("command");
+			if (COMMAND_CONNECT_TO_BACKEND.equals(command)) {
+				CloudAccessor.getInstance().enableOftenReporting();
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }
