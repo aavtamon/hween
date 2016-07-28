@@ -2,11 +2,14 @@ package com.piztec.hween.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class ControlServer {
 	static final int SERVER_PORT = 8888;
@@ -99,7 +102,11 @@ public class ControlServer {
 		if (content != null) {
 			output.println("Content-Length: " + content.getBytes().length);
 		}
-		output.println("Date: Wed, 27 Jul 2016 02:31:24 GMT");
+		
+	    SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
+	    sdfDate.setTimeZone(TimeZone.getDefault());
+		output.println("Date: " + sdfDate.format(new Date()));
+
 		if (content != null) {
 			output.println();
 			output.println(content);
