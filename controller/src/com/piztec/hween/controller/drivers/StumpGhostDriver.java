@@ -10,7 +10,6 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
 public class StumpGhostDriver implements DeviceDriver {
-	private GpioController gpioController = GpioFactory.getInstance();
 	private Map<String, Command> commands = new HashMap<String, Command>();
 
 	private GpioPinDigitalOutput pin1; 
@@ -20,11 +19,13 @@ public class StumpGhostDriver implements DeviceDriver {
 	
 	
 	public StumpGhostDriver() {
-		initPins();
+//		initPins();
 		initCommands();
 	}
 	
 	private void initPins() {
+		GpioController gpioController = GpioFactory.getInstance();
+		
 		pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, "pin1", PinState.LOW);
 		pin1.setShutdownOptions(true, PinState.LOW);
 		

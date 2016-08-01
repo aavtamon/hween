@@ -4,15 +4,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.piztec.hween.controller.drivers.DeviceDriver;
 import com.piztec.hween.controller.drivers.DeviceDriver.Command;
 
 public class Schedule {
-	private JSONObject cloudSchedule;
+	private static final String TRIGGER_MOTION = "motion";
+	private static final String TRIGGER_IMMEDIATELY = "immediately";
+	private static final String TRIGGER_DELAY = "delay";
+	
+	private final JSONObject cloudSchedule;
+	private final DeviceDriver driver;
 	private Thread executionThread;
 	
 	
-	public Schedule(JSONObject cloudSchedule) {
+	public Schedule(final JSONObject cloudSchedule, final DeviceDriver driver) {
 		this.cloudSchedule = cloudSchedule;
+		this.driver = driver;
 	}
 	
 	void execute() {
@@ -23,6 +30,9 @@ public class Schedule {
 		executionThread = new Thread() {
 			public void run() {
 				try {
+					String trigger = cloudSchedule.getString("trigger");
+					
+					
 					JSONArray programs = cloudSchedule.getJSONArray("programs");
 					
 					for (int i = 0; i < programs.length(); i++) {
@@ -57,7 +67,7 @@ public class Schedule {
 			private void executeCommand(JSONObject cloudCommand) throws JSONException {
 				String commandName = cloudCommand.getString("name");
 				
-				Command command = DriverManager.getDriver().getCommand(commandName);
+				Command command = driver.getCommand(commandName);
 				if (command != null) {
 					command.execute(null);
 				}

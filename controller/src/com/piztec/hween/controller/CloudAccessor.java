@@ -7,6 +7,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class CloudAccessor {
 	private static final String SERVER_URL = "http://localhost:8080/HweenToy/";
 	
@@ -18,6 +21,8 @@ public class CloudAccessor {
 	private final Thread reportingThread;
 	private int reportingCount;
 	private int reportingInterval = NORMAL_REPORTING_INTERVAL;
+	
+	private String lastReportedSchedule = null;
 	
 	private CloudAccessor() {
 		reportingThread = new Thread() {
@@ -95,10 +100,21 @@ public class CloudAccessor {
 	        }
 	        reader.close();
 	        
-	        System.out.println("Cloud response: " + responseText);
+	        handleCloudResponse(responseText.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private void handleCloudResponse(final String responseText) throws JSONException {
+		JSONObject resposeObject = new JSONObject(responseText);
+        JSONObject schedule = resposeObject.getJSONObject("schedule");
+        if (!schedule.toString().equals(lastReportedSchedule)) {
+        	lastReportedSchedule = schedule.toString();
+        	
+        	DeviceManager.getInstance().setSchedule(schedule);        	
+        }
 	}
 	
 
