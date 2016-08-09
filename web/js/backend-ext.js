@@ -640,3 +640,12 @@ Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
   }
 }
 
+Backend.convertStockToDeviceProgram = function(stockProgram) {
+  return {
+    title: stockProgram.title,
+    description: stockProgram.description,
+    frequency: Backend.Program.FREQUENCY_NEVER
+  }
+}
+
+

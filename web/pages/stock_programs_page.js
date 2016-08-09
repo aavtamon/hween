@@ -43,7 +43,7 @@ StockProgramsPage.prototype.definePageContent = function(root) {
     var selectedPrograms = this._getSelectedPrograms();
     for (var i in selectedPrograms) {
       var program = selectedPrograms[i];
-      programs.push(this._convertStockToDeviceProgram(program));
+      programs.push(Backend.convertStockToDeviceProgram(program));
     }
     
     Backend.addDevicePrograms(this._deviceId, programs, function(status) {
@@ -148,13 +148,4 @@ StockProgramsPage.prototype._getSelectedPrograms = function() {
   }
   
   return selectedPrograms;
-}
-
-
-StockProgramsPage.prototype._convertStockToDeviceProgram = function(stockProgram) {
-  return {
-    title: stockProgram.title,
-    description: stockProgram.description,
-    frequency: Backend.Program.FREQUENCY_NEVER
-  }
 }
