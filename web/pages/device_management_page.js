@@ -16,7 +16,7 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
     if (this._deviceId != event.objectId) {
       return;
     }
-    
+
     if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE) {
       this._refreshProgramList();
     } else if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_MODE) {
@@ -81,7 +81,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
 
   var addProgramButton = UIUtils.appendExpandableButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton, [
     {display: this.getLocale().AddNewProgramButton, clickListener: function() {
-      Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId});
+      Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId, addToDevice: true});
     }.bind(this)},
     {display: this.getLocale().AddLibraryProgramButton, clickListener: function() {
       Application.showPage(ManageLibraryProgramsPage.name, {deviceId: this._deviceId});

@@ -304,7 +304,7 @@ Backend._pullDeviceSchedule = function(deviceId, operationCallback) {
 
 Backend.setDeviceSchedule = function(deviceId, schedule, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
-  
+
   var communicationCallback = {
     success: function(data, status, xhr) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, data);
@@ -629,3 +629,14 @@ Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
   
   this._communicate("settings/device/" + deviceType + "/programs/" + programId, "DELETE", program, true, this._getAuthenticationHeader(), communicationCallback);  
 }
+
+
+
+Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
+  return {
+    title: libraryProgram.title,
+    description: libraryProgram.description,
+    frequency: Backend.Program.FREQUENCY_NEVER
+  }
+}
+

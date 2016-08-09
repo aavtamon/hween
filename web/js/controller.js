@@ -15,11 +15,8 @@ Controller.reportToServer = function(deviceInfo, observer) {
     return;
   }
   
-  console.debug("Sending a report request");
-  
   var request = new XMLHttpRequest();
   request.onreadystatechange = function() {
-    console.debug("  state change: ready=" + request.readyState + ", status=" + request.status);
     if (request.readyState == 4 && request.status == 200) {
       if (observer != null) {
         observer();
@@ -35,7 +32,6 @@ Controller.reportToServer = function(deviceInfo, observer) {
   request.setRequestHeader("Accept", "application/json");
   
   request.send(data);
-  console.debug("Request sent");
 }
 
 Controller.reset = function(deviceInfo, observer) {

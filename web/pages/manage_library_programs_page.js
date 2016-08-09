@@ -55,16 +55,16 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
     var programs = [];
     
     var selectedPrograms = this._getSelectedPrograms();
-    for (var i in selectedPrograms) {
+    for (var id in selectedPrograms) {
       var program = selectedPrograms[id];
-      programs.push(this._convertLibraryToDeviceProgram(program));
+      programs.push(Backend.convertLibraryToDeviceProgram(program));
     }
     
     Backend.addDevicePrograms(this._deviceId, programs, function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
         Application.showPage(DeviceManagementPage.name, {deviceId: this._deviceId});
       }
-    });
+    }.bind(this));
   }.bind(this));
 
 
@@ -157,13 +157,4 @@ ManageLibraryProgramsPage.prototype._getSelectedPrograms = function() {
   }
   
   return selectedPrograms;
-}
-
-
-ManageLibraryProgramsPage.prototype._convertLibraryToDeviceProgram = function(libraryProgram) {
-  return {
-    title: libraryProgram.title,
-    description: stockProgram.description,
-    frequency: Backend.Program.FREQUENCY_NEVER
-  }
 }

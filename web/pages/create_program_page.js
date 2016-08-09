@@ -3,6 +3,7 @@ CreateProgramPage = ClassUtils.defineClass(AbstractDataPage, function CreateProg
   
   this._deviceId;
   this._deviceInfo;
+  this._addToDevice;
   
   this._commandList;
   this._removeCommandButton;
@@ -85,15 +86,24 @@ CreateProgramPage.prototype.definePageContent = function(root) {
     
     Backend.addLibraryProgram(this._deviceId, program, function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
-        Application.goBack();
+        if (this._addToDevice) {
+          Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(program), function(status) {
+            if (status == Backend.OperationResult.SUCCESS) {
+              Application.goBack();
+            }
+          }.bind(this));
+        } else {
+          Application.goBack();
+        }
       }
-    });
+    }.bind(this));
   }.bind(this));
 }
 
 CreateProgramPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
+  this._addToDevice = bundle.addToDevice;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
   this._toy = Toy.createToy(this._deviceInfo.type, "Toy");
