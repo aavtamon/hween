@@ -23,7 +23,7 @@ public class DeviceManager {
 	private DeviceManager() {
 		readDeviceConfig();
 		
-		if (deviceType == STUMP_GHOST_TYPE) {
+		if (STUMP_GHOST_TYPE.equals(deviceType)) {
 			driver = new StumpGhostDriver();
 		}
 		
@@ -35,16 +35,18 @@ public class DeviceManager {
 	
 	
 	public void setMode(final String mode) {
-		if (this.mode == mode) {
+		System.out.println("DeviceManager: new mode was set: " + mode);
+		
+		if (mode.equals(this.mode)) {
 			return;
 		}
 		
 		this.mode = mode;
-		
+
 		if (schedule != null) {
-			if (mode == DEVICE_MODE_RUNNING) {
+			if (DEVICE_MODE_RUNNING.equals(mode)) {
 				schedule.execute();
-			} else if (mode == DEVICE_MODE_MANUAL || mode == DEVICE_MODE_IDLE) {
+			} else if (DEVICE_MODE_MANUAL.equals(mode) || DEVICE_MODE_IDLE.equals(mode)) {
 				schedule.interrupt();
 			}
 		}
@@ -52,15 +54,17 @@ public class DeviceManager {
 	
 	
 	public void setSchedule(final JSONObject cloudSchedule) {
+		System.out.println("DeviceManager: new schedule was set: " + cloudSchedule);
+		
 		if (this.schedule != null) {
 			this.schedule.interrupt();
 		}
 		
 		this.schedule = new Schedule(cloudSchedule, driver);
 		
-		if (mode == DEVICE_MODE_RUNNING) {
+		if (DEVICE_MODE_RUNNING.equals(mode)) {
 			schedule.execute();
-		} else if (mode == DEVICE_MODE_MANUAL || mode == DEVICE_MODE_IDLE) {
+		} else if (DEVICE_MODE_MANUAL.equals(mode) || DEVICE_MODE_IDLE.equals(mode)) {
 			schedule.interrupt();
 		}
 	}

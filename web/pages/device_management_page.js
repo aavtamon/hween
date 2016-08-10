@@ -45,6 +45,12 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   var scheduleControlPanel = UIUtils.appendBlock(programSelectionPanel, "ScheduleControlPanel");
   UIUtils.appendLabel(scheduleControlPanel, "ProgramSelectionLabel", this.getLocale().ProgramSelectionLabel);
   this._triggerList = UIUtils.appendDropList(scheduleControlPanel, "TriggersList");
+  this._triggerList.setChangeListener(function() {
+    var schedule = Backend.getDeviceSchedule(this._deviceId);
+    schedule.trigger = this._triggerList.getValue();
+    Backend.setDeviceSchedule(this._deviceId, schedule);
+  }.bind(this));
+  
   this._scheduleStatusPanel = UIUtils.appendBlock(scheduleControlPanel, "ScheduleStatusPanel");
   
   this._programList = UIUtils.appendList(programSelectionPanel, "ProgramSelectionList", null, true);
@@ -70,13 +76,16 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   this._removeSelectedButton = UIUtils.appendButton(programButtonsPanel, "RemoveSelectedButton", this.getLocale().RemoveSelectedButton);
   this._removeSelectedButton.setClickListener(function() {
     var items = this._programList.getItems();
+    var programsToRemove  = [];
     for (var i in items) {
       var item = items[i];
       if (item.element._selectionBox.isChecked()) {
         this._programList.removeItem(item);
-        Backend.removeDevicePrograms(this._deviceId, item._program);
+        programsToRemove.push(item.element._program);
       }
     }
+
+    Backend.removeDevicePrograms(this._deviceId, programsToRemove);
   }.bind(this));
 
   var addProgramButton = UIUtils.appendExpandableButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton, [
@@ -137,6 +146,9 @@ DeviceManagementPage.prototype.onShow = function(root, bundle) {
   Backend.getDeviceSettings(this._deviceType, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {
       this._triggerList.setChoices(deviceSettings.supportedProgramTriggers);
+      if (schedule != null) {
+        this._triggerList.selectData(schedule.trigger);
+      }
     }
   }.bind(this));
   

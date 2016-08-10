@@ -337,8 +337,8 @@ Backend.addDevicePrograms = function(deviceId, programs, operationCallback) {
 
 Backend.removeDevicePrograms = function(deviceId, programs, operationCallback) {
   var currentSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
+
   currentSchedule.programs = GeneralUtils.removeFromArray(currentSchedule.programs, programs);
-    
   Backend.setDeviceSchedule(deviceId, currentSchedule, operationCallback);
 }
 

@@ -23,6 +23,7 @@ public class CloudAccessor {
 	private int reportingInterval = NORMAL_REPORTING_INTERVAL;
 	
 	private String lastReportedSchedule = null;
+	private String lastReportedMode = null;
 	
 	private CloudAccessor() {
 		reportingThread = new Thread() {
@@ -114,6 +115,13 @@ public class CloudAccessor {
         	lastReportedSchedule = schedule.toString();
         	
         	DeviceManager.getInstance().setSchedule(schedule);        	
+        }
+        
+        String mode = resposeObject.getString("mode");
+        if (!mode.equals(lastReportedMode)) {
+        	lastReportedMode = mode;
+        	
+        	DeviceManager.getInstance().setMode(mode);
         }
 	}
 	

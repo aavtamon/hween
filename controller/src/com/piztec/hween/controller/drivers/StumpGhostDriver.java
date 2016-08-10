@@ -11,6 +11,7 @@ import com.pi4j.io.gpio.RaspiPin;
 
 public class StumpGhostDriver implements DeviceDriver {
 	private Map<String, Command> commands = new HashMap<String, Command>();
+	private Map<String, Trigger> triggers = new HashMap<String, Trigger>();
 
 	private GpioPinDigitalOutput pin1; 
 	private GpioPinDigitalOutput pin2; 
@@ -21,6 +22,7 @@ public class StumpGhostDriver implements DeviceDriver {
 	public StumpGhostDriver() {
 //		initPins();
 		initCommands();
+		initTriggers();
 	}
 	
 	private void initPins() {
@@ -43,54 +45,115 @@ public class StumpGhostDriver implements DeviceDriver {
 	private void initCommands() {
 		commands.put("reset", new Command("reset") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+				}
+				System.out.println("Stump Ghost: <reset> command");
 				return false;
 			}
 		});
 		commands.put("move_up", new Command("move_up") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <move up> command");
 				return false;
 			}
 		});
 		commands.put("move_down", new Command("move_down") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <move down> command");
 				return false;
 			}
 		});
 		commands.put("turn_left", new Command("turn_left") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <turn left> command");
 				return false;
 			}
 		});
 		commands.put("turn_right", new Command("turn_right") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <turn right> command");
 				return false;
 			}
 		});
 		commands.put("eyes_on", new Command("eyes_on") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <eyes on> command");
 				return false;
 			}
 		});
 		commands.put("eyes_off", new Command("eyes_off") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <eyes off> command");
 				return false;
 			}
 		});
 		commands.put("talk", new Command("talk") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <talk> command with param: " + param);
 				return false;
 			}
 		});
 		commands.put("pause", new Command("pause") {
 			public boolean execute(Object param) {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+				}
+				
+				System.out.println("Stump Ghost: <pause> command");
 				return false;
 			}
 		});	
 	}
 	
 	
+	private void initTriggers() {
+		triggers.put("motion", new Trigger("motion"));
+	}
+	
 	
 	public Command getCommand(final String commandName) {
 		return commands.get(commandName);
+	}
+
+	public Trigger getTrigger(String name) {
+		return triggers.get(name);
 	}
 }
