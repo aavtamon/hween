@@ -331,14 +331,17 @@ Backend.setDeviceSchedule = function(deviceId, schedule, operationCallback) {
 Backend.addDevicePrograms = function(deviceId, programs, operationCallback) {
   var currentSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
   currentSchedule.programs = currentSchedule.programs.concat(programs);
-  
+
   Backend.setDeviceSchedule(deviceId, currentSchedule, operationCallback);
 }
 
 Backend.removeDevicePrograms = function(deviceId, programs, operationCallback) {
   var currentSchedule = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId);
 
-  currentSchedule.programs = GeneralUtils.removeFromArray(currentSchedule.programs, programs);
+  for (var index in programs) {
+    GeneralUtils.removeFromArray(currentSchedule.programs, programs[index]);
+  }
+  
   Backend.setDeviceSchedule(deviceId, currentSchedule, operationCallback);
 }
 
@@ -636,7 +639,8 @@ Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
   return {
     title: libraryProgram.title,
     description: libraryProgram.description,
-    frequency: Backend.Program.FREQUENCY_NEVER
+    frequency: Backend.Program.FREQUENCY_NEVER,
+    commands: libraryProgram.commands
   }
 }
 
@@ -644,7 +648,8 @@ Backend.convertStockToDeviceProgram = function(stockProgram) {
   return {
     title: stockProgram.title,
     description: stockProgram.description,
-    frequency: Backend.Program.FREQUENCY_NEVER
+    frequency: Backend.Program.FREQUENCY_NEVER,
+    commands: stockProgram.commands
   }
 }
 

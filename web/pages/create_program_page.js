@@ -81,8 +81,16 @@ CreateProgramPage.prototype.definePageContent = function(root) {
     var program = {
       title: this._programNameInput.getValue(),
       description: this._descriptionInput.getValue(),
-      commands: this._commandList.getItems()
+      commands: []
     }
+    
+    var items = this._commandList.getItems();
+    for (var index in items) {
+      program.commands.push(items[index].element._command);
+    }
+    
+    
+    
     
     Backend.addLibraryProgram(this._deviceId, program, function(status) {
       if (status == Backend.OperationResult.SUCCESS) {

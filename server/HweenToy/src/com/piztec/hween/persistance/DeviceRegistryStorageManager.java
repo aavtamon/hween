@@ -58,8 +58,8 @@ public class DeviceRegistryStorageManager {
 		
 		String defaultSchedule = "{\"trigger\": \"motion\", \"programs\": []}";
 		
-		String stockPrograms = "{\"1\": {\"title\": \"Program 1\", \"description\": \"Program 1 Description\", \"category\": \"fun\"},";
-		       stockPrograms += "\"2\": {\"title\": \"Program 2\", \"description\": \"Program 2 Description\", \"category\": \"scary\"}}";
+		String stockPrograms = "{\"1\": {\"title\": \"Program 1\", \"description\": \"Program 1 Description\", \"category\": \"fun\", \"commands\": []},";
+		       stockPrograms += "\"2\": {\"title\": \"Program 2\", \"description\": \"Program 2 Description\", \"category\": \"scary\", \"commands\": []}}";
 		
 		try {
 			JSONObject deviceTypeObject = new JSONObject();

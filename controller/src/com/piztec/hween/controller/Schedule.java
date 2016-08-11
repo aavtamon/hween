@@ -60,13 +60,23 @@ public class Schedule {
 							try {
 								triggerLock.wait();
 							} catch (InterruptedException e) {
+								break;
 							}
 						}
 					}
 					
 					JSONObject program = getNextProgram();
-					executeProgram(program);
+					if (program == null) {
+						//Nothing to execute in this schedule
+						break;
+					}
 					
+					try {
+						executeProgram(program);
+					} catch (InterruptedException e) {
+						break;
+					}
+				  	
 					if (isInterrupted()) {
 						break;
 					}
@@ -78,6 +88,7 @@ public class Schedule {
 							try {
 								Thread.sleep(10000);
 							} catch (InterruptedException e) {
+								break;
 							}
 						}
 					}
@@ -87,6 +98,9 @@ public class Schedule {
 			private JSONObject getNextProgram() {
 				try {
 					JSONArray programs = cloudSchedule.getJSONArray("programs");
+					if (programs.length() == 0) {
+						return null;
+					}
 					
 					JSONObject nextProgram = null;
 					int initialProgramCounter = programCounter;
@@ -99,12 +113,12 @@ public class Schedule {
 						}
 						
 						programCounter++;
-						if (nextProgram != null) {
-							break;
-						}
-						
 						if (programCounter == programs.length()) {
 							programCounter = 0;
+						}
+
+						if (nextProgram != null) {
+							break;
 						}
 						if (programCounter == initialProgramCounter) {
 							break;
@@ -119,7 +133,7 @@ public class Schedule {
 				return null;
 			}
 			
-			private void executeProgram(JSONObject program) {
+			private void executeProgram(JSONObject program) throws InterruptedException {
 				System.out.println("Executing program: " + program);
 				try {
 					JSONArray cloudCommands = program.getJSONArray("commands");
@@ -136,8 +150,8 @@ public class Schedule {
 				}
 			}
 					
-			private void executeCommand(JSONObject cloudCommand) throws JSONException {
-				String commandName = cloudCommand.getString("name");
+			private void executeCommand(JSONObject cloudCommand) throws JSONException, InterruptedException {
+				String commandName = cloudCommand.getString("data");
 				
 				Command command = driver.getCommand(commandName);
 				if (command != null) {
@@ -152,7 +166,11 @@ public class Schedule {
 	void interrupt() {
 		if (executionThread != null) {
 			executionThread.interrupt();
+
+			try {
+				executionThread.join();
+			} catch (InterruptedException e) {
+			}
 		}
 	}
-	
 }

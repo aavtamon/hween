@@ -80,7 +80,6 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
     for (var i in items) {
       var item = items[i];
       if (item.element._selectionBox.isChecked()) {
-        this._programList.removeItem(item);
         programsToRemove.push(item.element._program);
       }
     }

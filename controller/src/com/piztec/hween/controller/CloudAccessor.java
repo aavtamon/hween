@@ -111,6 +111,7 @@ public class CloudAccessor {
 	private void handleCloudResponse(final String responseText) throws JSONException {
 		JSONObject resposeObject = new JSONObject(responseText);
         JSONObject schedule = resposeObject.getJSONObject("schedule");
+        
         if (!schedule.toString().equals(lastReportedSchedule)) {
         	lastReportedSchedule = schedule.toString();
         	
