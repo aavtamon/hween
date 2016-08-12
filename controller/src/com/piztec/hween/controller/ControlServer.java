@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -15,13 +14,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ControlServer {
-	private static final String COMMAND_CONNECT_TO_BACKEND = "connect_to_backend";
+	private static final String OPERATION_CONNECT_TO_BACKEND = "connect_to_backend";
+	private static final String OPERATION_MANUAL_COMMAND = "manual_command";
 	
 	static final int SERVER_PORT = 8888;
 	
 	private static ControlServer instance;
 	
 	private Thread socketThread;
+	
+	
+	private interface ControllerAction {
+		public void perform(String operation);
+	}
+	
 	
 	public static ControlServer getInstance() {
 		if (instance == null) {
@@ -42,10 +48,11 @@ public class ControlServer {
 					ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
 					
 					while (!isInterrupted()) {
-						String message = handleSocketConnection(serverSocket.accept());
-						if (message != null) {
-							handleMessage(message);
-						}
+						handleSocketConnection(serverSocket.accept(), new ControllerAction() {
+							public void perform(String operation) {
+								handleOperation(operation);
+							}
+						});
 					}
 					
 					serverSocket.close();
@@ -63,11 +70,9 @@ public class ControlServer {
 	}
 	
 	
-	private String handleSocketConnection(Socket clientSocket) throws IOException {
+	private void handleSocketConnection(final Socket clientSocket, final ControllerAction action) throws IOException {
 	    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 	    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-	    
-	    String result = null;
 	    
         String line = in.readLine();
         if (line.startsWith("OPTIONS ")) {
@@ -84,7 +89,7 @@ public class ControlServer {
             	char[] content = new char[contentLength];
             	in.read(content, 0, contentLength);
             	
-            	result = String.valueOf(content);
+            	action.perform(String.valueOf(content));
             }
             
             generateResponse(out, null);
@@ -94,8 +99,6 @@ public class ControlServer {
         out.close();
 	    
         clientSocket.close();
-        
-        return result;
 	}
 	
 	private void generateResponse(final PrintWriter output, final String content) {
@@ -119,12 +122,22 @@ public class ControlServer {
 	}
 	
 	
-	private void handleMessage(final String messageText) {
+	private void handleOperation(final String operationText) {
 		try {
-			JSONObject message = new JSONObject(messageText);
-			String command = message.getString("command");
-			if (COMMAND_CONNECT_TO_BACKEND.equals(command)) {
+			JSONObject message = new JSONObject(operationText);
+			String operation = message.getString("operation");
+			if (OPERATION_CONNECT_TO_BACKEND.equals(operation)) {
 				CloudAccessor.getInstance().enableOftenReporting();
+			} else if (OPERATION_MANUAL_COMMAND.equals(operation)) {
+				String command = message.getString("command");
+				
+				String arg = null;
+				try {
+					arg = message.getString("arg");
+				} catch (JSONException je) {					
+				}
+				
+				DeviceManager.getInstance().executeCommand(command, arg);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

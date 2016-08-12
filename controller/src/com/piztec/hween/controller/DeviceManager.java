@@ -1,9 +1,11 @@
 package com.piztec.hween.controller;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.piztec.hween.controller.drivers.DeviceDriver;
 import com.piztec.hween.controller.drivers.StumpGhostDriver;
+import com.piztec.hween.controller.drivers.DeviceDriver.Command;
 
 
 public class DeviceManager {
@@ -66,6 +68,18 @@ public class DeviceManager {
 			schedule.execute();
 		} else if (DEVICE_MODE_MANUAL.equals(mode) || DEVICE_MODE_IDLE.equals(mode)) {
 			schedule.interrupt();
+		}
+	}
+	
+	public void executeCommand(final String commandName, final String arg) {
+		setMode(DEVICE_MODE_MANUAL);
+		
+		Command command = driver.getCommand(commandName);
+		if (command != null) {
+			try {
+				command.execute(arg);
+			} catch (InterruptedException ie) {				
+			}
 		}
 	}
 	

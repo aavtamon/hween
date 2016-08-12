@@ -3,6 +3,7 @@ ManualModePage = ClassUtils.defineClass(AbstractDataPage, function ManualModePag
   
   this._deviceId;
   this._deviceInfo;
+  this._supportedCommands;
   
   this._deviceStatusLabel;
   this._resetButton;
@@ -59,7 +60,7 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._eyeControlButton = UIUtils.appendToggleButton(commandsPanel, "EyeControlButton", this.getLocale().EyeControlButtonOn, this.getLocale().EyeControlButtonOff);
   this._eyeControlButton.setClickListener(function() {
     this._disableActions();
-    Controller.sendCommand(this._deviceInfo, {data: Backend.DeviceCommand.EYES_ON}, function() {
+    Controller.sendCommand(this._deviceInfo, {data: (this._eyeControlButton.isSelected() ? Backend.DeviceCommand.EYES_OFF : Backend.DeviceCommand.EYES_ON)}, function() {
       this._enableActions();
       this._eyeControlButton.setSelected(!this._eyeControlButton.isSelected());
     }.bind(this));
@@ -100,7 +101,7 @@ ManualModePage.prototype.definePageContent = function(root) {
   this._resetButton = UIUtils.appendButton(buttonsPanel, "ResetButton", this.getLocale().ResetToInitialPositionButton);
   this._resetButton.setClickListener(function() {
     this._disableActions();
-    Controller.reset(this._deviceInfo, function() {
+    Controller.sendCommand(this._deviceInfo, {data: Backend.DeviceCommand.RESET}, function() {
       this._enableActions();
     }.bind(this));
   }.bind(this));
@@ -113,7 +114,8 @@ ManualModePage.prototype.onShow = function(root, bundle) {
   
   Backend.getDeviceSettings(this._deviceInfo.type, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {
-      this._enableActions(deviceSettings.supportedCommands);
+      this._supportedCommands = deviceSettings.supportedCommands;
+      this._enableActions();
     }
   }.bind(this));
 }
@@ -123,16 +125,16 @@ ManualModePage.prototype.onHide = function() {
 }
 
 
-ManualModePage.prototype._enableActions = function(deviceCommands) {
+ManualModePage.prototype._enableActions = function() {
   this._deviceStatusLabel.innerHTML = this.getLocale().DeviceReadyForCommandLabel;
-  
-  UIUtils.setEnabled(this._resetButton, true);
-  UIUtils.setEnabled(this._moveUpButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.MOVE_UP) != null);
-  UIUtils.setEnabled(this._moveDownButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.MOVE_DOWN) != null);
-  UIUtils.setEnabled(this._turnLeftButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.TURN_LEFT) != null);
-  UIUtils.setEnabled(this._turnRightButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.TURN_RIGHT) != null);
-  UIUtils.setEnabled(this._eyeControlButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.EYES_ON) != null);
-  UIUtils.setEnabled(this._talkButton, Application.Configuration.findConfigurationItem(deviceCommands, Backend.DeviceCommand.TALK) != null);
+
+  UIUtils.setEnabled(this._resetButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.RESET) != null);
+  UIUtils.setEnabled(this._moveUpButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.MOVE_UP) != null);
+  UIUtils.setEnabled(this._moveDownButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.MOVE_DOWN) != null);
+  UIUtils.setEnabled(this._turnLeftButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.TURN_LEFT) != null);
+  UIUtils.setEnabled(this._turnRightButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.TURN_RIGHT) != null);
+  UIUtils.setEnabled(this._eyeControlButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.EYES_ON) != null);
+  UIUtils.setEnabled(this._talkButton, Application.Configuration.findConfigurationItem(this._supportedCommands, Backend.DeviceCommand.TALK) != null);
 }
 ManualModePage.prototype._disableActions = function() {
   this._deviceStatusLabel.innerHTML = this.getLocale().DeviceProcessingCommandLabel;
