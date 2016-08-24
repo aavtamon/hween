@@ -19,7 +19,7 @@ public class StumpGhostDriver implements DeviceDriver {
 	
 	
 	public StumpGhostDriver() {
-//		initPins();
+		initPins();
 		initCommands();
 		initTriggers();
 	}
@@ -41,79 +41,88 @@ public class StumpGhostDriver implements DeviceDriver {
 	private void initCommands() {
 		commands.put("reset", new Command("reset") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <reset> command: pin1");
 				pin1.high();
 				Thread.sleep(5000);
 
-				System.out.println("Stump Ghost: <reset> command: pin1");
 				pin1.low();
+				System.out.println("Stump Ghost: <reset> command - completed");
 				return false;
 			}
 		});
 		commands.put("move_up", new Command("move_up") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <move up> command: pin2");
 				pin2.high();
 				Thread.sleep(5000);
 				
-				System.out.println("Stump Ghost: <move up> command: pin2");
 				pin2.low();
+				System.out.println("Stump Ghost: <move up> command - completed");
 				return false;
 			}
 		});
 		commands.put("move_down", new Command("move_down") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <move down> command: pin3");
 				pin3.high();
 				Thread.sleep(5000);
 				
-				System.out.println("Stump Ghost: <move down> command: pin3");
 				pin3.low();
+				System.out.println("Stump Ghost: <move down> command - completed");
 				return false;
 			}
 		});
 		commands.put("turn_left", new Command("turn_left") {
 			public boolean execute(Object param) throws InterruptedException {
-				Thread.sleep(2000);
-				
 				System.out.println("Stump Ghost: <turn left> command");
+				Thread.sleep(2000);
+				System.out.println("Stump Ghost: <turn left> command - completed");
+				
 				return false;
 			}
 		});
 		commands.put("turn_right", new Command("turn_right") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <turn right> command");
 				Thread.sleep(1000);
 				
-				System.out.println("Stump Ghost: <turn right> command");
+				System.out.println("Stump Ghost: <turn right> command - completed");
 				return false;
 			}
 		});
 		commands.put("eyes_on", new Command("eyes_on") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <eyes on> command");
 				Thread.sleep(100);
 				
-				System.out.println("Stump Ghost: <eyes on> command");
+				System.out.println("Stump Ghost: <eyes on> command - completed");
 				return false;
 			}
 		});
 		commands.put("eyes_off", new Command("eyes_off") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <eyes off> command");
 				Thread.sleep(100);
 				
-				System.out.println("Stump Ghost: <eyes off> command");
+				System.out.println("Stump Ghost: <eyes off> command - completed");
 				return false;
 			}
 		});
 		commands.put("talk", new Command("talk") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <talk> command with param: " + param);
 				Thread.sleep(100);
 				
-				System.out.println("Stump Ghost: <talk> command with param: " + param);
+				System.out.println("Stump Ghost: <talk> command - completed");
 				return false;
 			}
 		});
 		commands.put("pause", new Command("pause") {
 			public boolean execute(Object param) throws InterruptedException {
+				System.out.println("Stump Ghost: <pause> command");
 				Thread.sleep(3000);
 				
-				System.out.println("Stump Ghost: <pause> command");
+				System.out.println("Stump Ghost: <pause> command - completed");
 				return false;
 			}
 		});	
