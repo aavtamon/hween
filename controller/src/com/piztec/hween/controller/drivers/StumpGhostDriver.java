@@ -16,7 +16,6 @@ public class StumpGhostDriver implements DeviceDriver {
 	private GpioPinDigitalOutput pin1; 
 	private GpioPinDigitalOutput pin2; 
 	private GpioPinDigitalOutput pin3; 
-	private GpioPinDigitalOutput pin4;
 	
 	
 	public StumpGhostDriver() {
@@ -28,48 +27,51 @@ public class StumpGhostDriver implements DeviceDriver {
 	private void initPins() {
 		GpioController gpioController = GpioFactory.getInstance();
 		
-		pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, "pin1", PinState.LOW);
+		pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, "pin1", PinState.LOW);
 		pin1.setShutdownOptions(true, PinState.LOW);
 		
-		pin2 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_02, "pin2", PinState.LOW);
+		pin2 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_17, "pin2", PinState.LOW);
 		pin2.setShutdownOptions(true, PinState.LOW);
 
-		pin3 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "pin3", PinState.LOW);
+		pin3 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_22, "pin3", PinState.LOW);
 		pin3.setShutdownOptions(true, PinState.LOW);
-		
-		pin4 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_04, "pin4", PinState.LOW);
-		pin4.setShutdownOptions(true, PinState.LOW);
 	}
 	
 	
 	private void initCommands() {
 		commands.put("reset", new Command("reset") {
 			public boolean execute(Object param) throws InterruptedException {
+				pin1.high();
 				Thread.sleep(5000);
 
-				System.out.println("Stump Ghost: <reset> command");
+				System.out.println("Stump Ghost: <reset> command: pin1");
+				pin1.low();
 				return false;
 			}
 		});
 		commands.put("move_up", new Command("move_up") {
 			public boolean execute(Object param) throws InterruptedException {
-				Thread.sleep(2000);
+				pin2.high();
+				Thread.sleep(5000);
 				
-				System.out.println("Stump Ghost: <move up> command");
+				System.out.println("Stump Ghost: <move up> command: pin2");
+				pin2.low();
 				return false;
 			}
 		});
 		commands.put("move_down", new Command("move_down") {
 			public boolean execute(Object param) throws InterruptedException {
-				Thread.sleep(2000);
+				pin3.high();
+				Thread.sleep(5000);
 				
-				System.out.println("Stump Ghost: <move down> command");
+				System.out.println("Stump Ghost: <move down> command: pin3");
+				pin3.low();
 				return false;
 			}
 		});
 		commands.put("turn_left", new Command("turn_left") {
 			public boolean execute(Object param) throws InterruptedException {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 				
 				System.out.println("Stump Ghost: <turn left> command");
 				return false;

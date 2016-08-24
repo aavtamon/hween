@@ -6,10 +6,14 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Main {
-	private static final String CONFIG_FILE = "controller.properties";
+	private static final String DEFAULT_CONFIG_FILE = "controller.properties";
 	
 	public static void main(String[] args) throws Exception {
-		InputStream propFileStream = new FileInputStream(CONFIG_FILE);//Main.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+		String configFilePath = System.getProperty("config_file", DEFAULT_CONFIG_FILE);
+		System.out.println("Config file path = " + configFilePath);
+		
+		
+		InputStream propFileStream = new FileInputStream(configFilePath);
 		Properties props = new Properties();
 		try {
 			props.load(propFileStream);

@@ -69,6 +69,8 @@ public class ControlServer {
         String line = in.readLine();
         if (line.startsWith("OPTIONS ")) {
         	generateResponse(out, null);
+        } else if (line.startsWith("GET ")) {
+        	generateResponse(out, "alive!");
         } else if (line.startsWith("PUT ")) {
         	int contentLength = 0;
             while ((line = in.readLine()) != null && !line.isEmpty()) {

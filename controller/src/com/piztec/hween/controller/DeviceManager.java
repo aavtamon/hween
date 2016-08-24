@@ -1,11 +1,10 @@
 package com.piztec.hween.controller;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.piztec.hween.controller.drivers.DeviceDriver;
-import com.piztec.hween.controller.drivers.StumpGhostDriver;
 import com.piztec.hween.controller.drivers.DeviceDriver.Command;
+import com.piztec.hween.controller.drivers.StumpGhostDriver;
 
 
 public class DeviceManager {
