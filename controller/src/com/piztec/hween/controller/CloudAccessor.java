@@ -1,12 +1,13 @@
 package com.piztec.hween.controller;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +17,6 @@ public class CloudAccessor {
 	private static final int FAST_REPORTING_INTERVAL = 10 * 1000;
 	private static final int NORMAL_REPORTING_INTERVAL = 60 * 1000;
 	
-	private static CloudAccessor instance;
 	private final Thread reportingThread;
 	private int reportingCount;
 	private int reportingInterval = NORMAL_REPORTING_INTERVAL;
@@ -24,8 +24,18 @@ public class CloudAccessor {
 	private String lastReportedSchedule = null;
 	private String lastReportedMode = null;
 	private String serverUrl = null;
+	private DeviceDescriptor deviceDescriptor;
 	
-	private CloudAccessor() {
+	static class DeviceDescriptor {
+		String serialNumber;
+		String bssid;
+		String secret;
+	}
+	
+	public CloudAccessor(final String serverUrl, final DeviceDescriptor deviceDescriptor) {
+		this.deviceDescriptor = deviceDescriptor;
+		this.serverUrl = serverUrl;
+		
 		reportingThread = new Thread() {
 			public void run() {
 				while (!isInterrupted()) {
@@ -53,17 +63,8 @@ public class CloudAccessor {
 		};
 	}
 	
-	public static CloudAccessor getInstance() {
-		if (instance == null) {
-			instance = new CloudAccessor();
-		};
-		
-		return instance;
-	}
-	
-	public synchronized void start(final String serverUrl) {
+	public synchronized void start() {
 		reportingInterval = NORMAL_REPORTING_INTERVAL;
-		this.serverUrl = serverUrl;
 		
 		reportingThread.start();
 	}
@@ -129,11 +130,18 @@ public class CloudAccessor {
 	
 
 	private String getSerialNumber() {
-		return "0000000001";
+		return deviceDescriptor.serialNumber;
 	}
 	
 	private String getIPAddress() {
-		return "127.0.0.1";
+		try {
+			InetAddress ipAddress = InetAddress.getLocalHost();
+			return ipAddress.getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "127.0.0.1";
+		}
 	}
 
 	private int getPort() {
@@ -141,10 +149,10 @@ public class CloudAccessor {
 	}
 
 	private String getBssid() {
-		return "35a785cd456";
+		return deviceDescriptor.bssid;
 	}
 	
 	private String getDeviceSecret() {
-		return "secret-1";
+		return deviceDescriptor.secret;
 	}
 }

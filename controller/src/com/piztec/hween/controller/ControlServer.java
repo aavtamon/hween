@@ -19,9 +19,8 @@ public class ControlServer {
 	
 	static final int SERVER_PORT = 8888;
 	
-	private static ControlServer instance;
-	
 	private Thread socketThread;
+	private final CloudAccessor cloudAccessor;
 	
 	
 	private interface ControllerAction {
@@ -29,15 +28,8 @@ public class ControlServer {
 	}
 	
 	
-	public static ControlServer getInstance() {
-		if (instance == null) {
-			instance = new ControlServer();
-		};
-		
-		return instance;
-	}
-	
-	private ControlServer() {
+	public ControlServer(final CloudAccessor ca) {
+		cloudAccessor = ca;
 	}
 	
 	
@@ -127,7 +119,7 @@ public class ControlServer {
 			JSONObject message = new JSONObject(operationText);
 			String operation = message.getString("operation");
 			if (OPERATION_CONNECT_TO_BACKEND.equals(operation)) {
-				CloudAccessor.getInstance().enableOftenReporting();
+				cloudAccessor.enableOftenReporting();
 			} else if (OPERATION_MANUAL_COMMAND.equals(operation)) {
 				String command = message.getString("command");
 				

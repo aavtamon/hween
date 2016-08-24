@@ -19,8 +19,16 @@ public class Main {
 		}
 		
 		String url = props.getProperty("server_url");
+		
+		CloudAccessor.DeviceDescriptor dd = new CloudAccessor.DeviceDescriptor();
+		dd.serialNumber = props.getProperty("serial_number");
+		dd.bssid = props.getProperty("bssid");
+		dd.secret = props.getProperty("secret");
 
-		CloudAccessor.getInstance().start(url);
-		ControlServer.getInstance().start();
+		CloudAccessor ca = new CloudAccessor(url, dd);
+		ca.start();
+		
+		ControlServer cs = new ControlServer(ca);
+		cs.start();
 	}
 }
