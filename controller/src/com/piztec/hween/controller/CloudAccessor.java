@@ -1,6 +1,7 @@
 package com.piztec.hween.controller;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -11,8 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CloudAccessor {
-	private static final String SERVER_URL = "http://localhost:8080/HweenToy/";
-	
 	private static final int FAST_REPORTING_COUNT_LIMIT = 10;
 	private static final int FAST_REPORTING_INTERVAL = 10 * 1000;
 	private static final int NORMAL_REPORTING_INTERVAL = 60 * 1000;
@@ -24,6 +23,7 @@ public class CloudAccessor {
 	
 	private String lastReportedSchedule = null;
 	private String lastReportedMode = null;
+	private String serverUrl = null;
 	
 	private CloudAccessor() {
 		reportingThread = new Thread() {
@@ -61,8 +61,9 @@ public class CloudAccessor {
 		return instance;
 	}
 	
-	public synchronized void start() {
+	public synchronized void start(final String serverUrl) {
 		reportingInterval = NORMAL_REPORTING_INTERVAL;
+		this.serverUrl = serverUrl;
 		
 		reportingThread.start();
 	}
@@ -81,7 +82,7 @@ public class CloudAccessor {
 	
 	private void reportStatus() {
 		try {
-			HttpURLConnection connection = (HttpURLConnection)new URL(SERVER_URL + "device/" + getSerialNumber()).openConnection();
+			HttpURLConnection connection = (HttpURLConnection)new URL(serverUrl + "/device/" + getSerialNumber()).openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestMethod("PUT");
 			connection.setRequestProperty("Content-Type", "application/json");
