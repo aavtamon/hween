@@ -19,7 +19,7 @@ public interface DeviceDriver {
 			return name;
 		}
 		
-		public abstract boolean execute(final Object param) throws InterruptedException;
+		public abstract boolean execute(final Object param) throws Exception;
 	}
 	
 	public Command getCommand(final String commandName);

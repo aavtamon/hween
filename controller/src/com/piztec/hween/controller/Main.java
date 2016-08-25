@@ -28,6 +28,7 @@ public class Main {
 		dd.serialNumber = props.getProperty("serial_number");
 		dd.bssid = props.getProperty("bssid");
 		dd.secret = props.getProperty("secret");
+		dd.primaryNetworkInterface = props.getProperty("primary_network_interface");
 
 		CloudAccessor ca = new CloudAccessor(url, dd);
 		ca.start();

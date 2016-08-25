@@ -145,12 +145,12 @@ public class Schedule {
 							break;
 						}
 					}
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 					
-			private void executeCommand(JSONObject cloudCommand) throws JSONException, InterruptedException {
+			private void executeCommand(JSONObject cloudCommand) throws JSONException, Exception {
 				String commandName = cloudCommand.getString("data");
 				
 				Command command = driver.getCommand(commandName);

@@ -77,7 +77,8 @@ public class DeviceManager {
 		if (command != null) {
 			try {
 				command.execute(arg);
-			} catch (InterruptedException ie) {				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

@@ -6,8 +6,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +32,7 @@ public class CloudAccessor {
 		String serialNumber;
 		String bssid;
 		String secret;
+		String primaryNetworkInterface;
 	}
 	
 	public CloudAccessor(final String serverUrl, final DeviceDescriptor deviceDescriptor) {
@@ -90,8 +93,10 @@ public class CloudAccessor {
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("Secret", getDeviceSecret());
 			
+			String statusToReport = "{\"ip_address\": \"" + getIPAddress() + "\", \"port\": " + getPort() + ", \"bssid\": \"" + getBssid() + "\"}";
+			System.out.println("Reporting back to " + serverUrl + ": " + statusToReport);
 			OutputStream output = connection.getOutputStream();
-			output.write(("{\"ip_address\": \"" + getIPAddress() + "\", \"port\": " + getPort() + ", \"bssid\": \"" + getBssid() + "\"}").getBytes());
+			output.write(statusToReport.getBytes());
 			output.close();
 			
 			InputStream response = connection.getInputStream();
@@ -105,6 +110,7 @@ public class CloudAccessor {
 	        
 	        handleCloudResponse(responseText.toString());
 		} catch (Exception e) {
+			System.err.println("Problem accessing " + serverUrl);
 			e.printStackTrace();
 		}
 	}
@@ -135,13 +141,21 @@ public class CloudAccessor {
 	
 	private String getIPAddress() {
 		try {
-			InetAddress ipAddress = InetAddress.getLocalHost();
-			return ipAddress.getHostAddress();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
+			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+			while (nets.hasMoreElements()) {
+				NetworkInterface net = nets.nextElement();
+				if (deviceDescriptor.primaryNetworkInterface.equals(net.getName())) {
+					Enumeration<InetAddress> addresses = net.getInetAddresses();
+					if (addresses.hasMoreElements()) {
+						return addresses.nextElement().getHostAddress();
+					}
+				}
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
-			return "127.0.0.1";
 		}
+		
+		return "127.0.0.1";
 	}
 
 	private int getPort() {
