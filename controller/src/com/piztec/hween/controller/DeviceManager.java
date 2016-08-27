@@ -14,12 +14,25 @@ public class DeviceManager {
 	private static final String DEVICE_MODE_RUNNING = "running";
 	private static final String DEVICE_MODE_MANUAL = "manual";
 	
-	private static final DeviceManager instance = new DeviceManager();
+	private static DeviceManager instance;
+	
+	private static boolean deviceFeaturesDisabled;
 	
 	private String deviceType;
 	private DeviceDriver driver;
 	private Schedule schedule;
 	private String mode;
+	
+	public static void disableDeviceFeatures() {
+		System.out.println("WARNING: Target device features are disabled");
+	
+		deviceFeaturesDisabled = true;
+	}
+	
+	public static boolean deviceFeaturesDisabled() {
+		return deviceFeaturesDisabled;
+	}
+	
 	
 	private DeviceManager() {
 		readDeviceConfig();
@@ -31,6 +44,9 @@ public class DeviceManager {
 	}
 
 	public static DeviceManager getInstance() {
+		if (instance == null) {
+			 instance = new DeviceManager();
+		}
 		return instance;
 	}
 	

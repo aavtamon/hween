@@ -27,9 +27,14 @@ public class Main {
 		CloudAccessor.DeviceDescriptor dd = new CloudAccessor.DeviceDescriptor();
 		dd.serialNumber = props.getProperty("serial_number");
 		dd.bssid = props.getProperty("bssid");
-		dd.secret = props.getProperty("secret");
 		dd.primaryNetworkInterface = props.getProperty("primary_network_interface");
+		dd.secret = props.getProperty("secret");
 
+		if (!props.getProperty("pc", "no").equals("no")) {
+			DeviceManager.disableDeviceFeatures();
+		}
+
+		
 		CloudAccessor ca = new CloudAccessor(url, dd);
 		ca.start();
 		
