@@ -19,12 +19,16 @@ public class StumpGhostDriver implements DeviceDriver {
 	private Map<String, Trigger> triggers = new HashMap<String, Trigger>();
 
 	//http://pi4j.com/pins/model-b-rev1.html
-	private GpioPinDigitalOutput out0_pin11; 
-	private GpioPinDigitalOutput out3_pin15; 
+	private GpioPinDigitalOutput upPin; 
+	private GpioPinDigitalOutput downPin; 
 	private GpioPinDigitalInput in12_pin19; 
 	private GpioPinDigitalInput in13_pin21;
 	
-	private Object syncer = new Object();
+	private Object commandSyncer = new Object();
+	private Object triggerSyncer = new Object();
+	
+	private boolean highLimitTrigger;
+	private boolean lowLimitTrigger;
 	
 	
 	public StumpGhostDriver() {
@@ -40,15 +44,20 @@ public class StumpGhostDriver implements DeviceDriver {
 		
 		GpioController gpioController = GpioFactory.getInstance();
 		
-		out0_pin11 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, "Move Up", PinState.LOW);
-		out0_pin11.setShutdownOptions(true, PinState.LOW);
+		upPin = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, "Move Up", PinState.LOW);
+		upPin.setShutdownOptions(true, PinState.LOW);
 		
-		out3_pin15 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Move Down", PinState.LOW);
-		out3_pin15.setShutdownOptions(true, PinState.LOW);
+		downPin = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Move Down", PinState.LOW);
+		downPin.setShutdownOptions(true, PinState.LOW);
 
 		in12_pin19 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_12, "Down Limit", PinPullResistance.PULL_DOWN);
 		in12_pin19.addListener(new GpioPinListenerDigital() {
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+				synchronized (triggerSyncer) {
+					highLimitTrigger = event.getState() == PinState.HIGH;
+					triggerSyncer.notify();
+				}
+				
 				System.out.println("Pin 12 got an event");
 			}
 		});
@@ -57,6 +66,11 @@ public class StumpGhostDriver implements DeviceDriver {
 		in13_pin21.setShutdownOptions(true, PinState.LOW);
 		in13_pin21.addListener(new GpioPinListenerDigital() {
 			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+				synchronized (triggerSyncer) {
+					lowLimitTrigger = event.getState() == PinState.HIGH;
+					triggerSyncer.notify();
+				}
+
 				System.out.println("Pin 13 got an event");
 			}
 		});
@@ -66,40 +80,78 @@ public class StumpGhostDriver implements DeviceDriver {
 	private void initCommands() {
 		commands.put("reset", new Command("reset") {
 			public boolean execute(Object param) throws Exception {
-				System.out.println("Stump Ghost: <reset> command");
-				
-				Thread.sleep(5000);
+				synchronized (commandSyncer) {
+					synchronized (triggerSyncer) {
+						System.out.println("Stump Ghost: <reset> command");
+						
+						if (lowLimitTrigger) {
+							System.out.println("Stump Ghost: <reset> command cannot be executed - already low position");
+							return false;
+						}
+						
+						downPin.high();
+						
+						while (true) {
+							triggerSyncer.wait(10000);
+							if (lowLimitTrigger) {
+								break;
+							}
+						}
+						
+						downPin.low();
+						System.out.println("Stump Ghost: <reset> command - completed");
+					}							
+				}
 
-				System.out.println("Stump Ghost: <reset> command - completed");
-				return false;
+				return true;
 			}
 		});
 		commands.put("move_up", new Command("move_up") {
 			public boolean execute(Object param) throws Exception {
-				synchronized (syncer) {
-					System.out.println("Stump Ghost: <move up> command");
+				synchronized (commandSyncer) {
+					synchronized (triggerSyncer) {
+						System.out.println("Stump Ghost: <move up> command");
 					
-					out0_pin11.high();
-					Thread.sleep(5000);				
-					out0_pin11.low();
-					
-					System.out.println("Stump Ghost: <move up> command - completed");
+						if (highLimitTrigger) {
+							System.out.println("Stump Ghost: <move up> command cannot be executed - already uphigh position");
+							return false;
+						}
+						
+						upPin.high();
+						
+						triggerSyncer.wait(1000);
+						
+						upPin.low();
+						
+						System.out.println("Stump Ghost: <move up> command - completed");
+					}
 				}
-				return false;
+				
+				return true;
 			}
 		});
 		commands.put("move_down", new Command("move_down") {
 			public boolean execute(Object param) throws Exception {
-				synchronized (syncer) {
-					System.out.println("Stump Ghost: <move down> command");
+				synchronized (commandSyncer) {
+					synchronized (triggerSyncer) {
+						System.out.println("Stump Ghost: <move down> command");
 					
-					out3_pin15.high();
-					Thread.sleep(5000);				
-					out3_pin15.low();
-					
-					System.out.println("Stump Ghost: <move down> command - completed");
+						if (lowLimitTrigger) {
+							System.out.println("Stump Ghost: <move down> command cannot be executed - already uphigh position");
+							return false;
+						}
+						
+						downPin.high();
+						
+						triggerSyncer.wait(1000);
+						
+						downPin.low();
+						
+						System.out.println("Stump Ghost: <move down> command - completed");
+					}
 				}
-				return false;
+				
+				return true;
 			}
 		});
 		commands.put("turn_left", new Command("turn_left") {
