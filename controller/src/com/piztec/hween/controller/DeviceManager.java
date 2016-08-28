@@ -1,13 +1,22 @@
 package com.piztec.hween.controller;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import org.json.JSONObject;
 
 import com.piztec.hween.controller.drivers.DeviceDriver;
 import com.piztec.hween.controller.drivers.DeviceDriver.Command;
 import com.piztec.hween.controller.drivers.StumpGhostDriver;
+import com.piztec.hween.controller.network.ConnectionManager;
 
 
 public class DeviceManager {
+	private static final String DEFAULT_CONFIG_FILE = "controller.properties";
+
+	
 	private static final String STUMP_GHOST_TYPE = "stump_ghost";
 	
 	private static final String DEVICE_MODE_IDLE = "idle";
@@ -16,31 +25,39 @@ public class DeviceManager {
 	
 	private static DeviceManager instance;
 	
-	private static boolean deviceFeaturesDisabled;
+	private boolean deviceFeaturesDisabled;
 	
 	private String deviceType;
 	private DeviceDriver driver;
 	private Schedule schedule;
 	private String mode;
 	
-	public static void disableDeviceFeatures() {
-		System.out.println("WARNING: Target device features are disabled");
+	private DeviceDescriptor deviceDescriptor;
 	
-		deviceFeaturesDisabled = true;
+	
+	static class DeviceDescriptor {
+		String serialNumber;
+		String secret;
+		String deviceType;
 	}
 	
-	public static boolean deviceFeaturesDisabled() {
+	
+	public boolean deviceFeaturesDisabled() {
 		return deviceFeaturesDisabled;
 	}
 	
 	
 	private DeviceManager() {
-		readDeviceConfig();
+		try {
+			readDeviceConfig();
+		} catch (Exception e) {
+			System.err.println("Error reading device config file");
+			return;
+		}
 		
 		if (STUMP_GHOST_TYPE.equals(deviceType)) {
 			driver = new StumpGhostDriver();
-		}
-		
+		}		
 	}
 
 	public static DeviceManager getInstance() {
@@ -100,9 +117,40 @@ public class DeviceManager {
 	}
 	
 	
+	public String getSerialNumber() {
+		return deviceDescriptor.serialNumber;
+	}
 	
-	private void readDeviceConfig() {
-		//TODO
-		deviceType = STUMP_GHOST_TYPE;
+	public String getDeviceSecret() {
+		return deviceDescriptor.secret;
+	}
+	
+	
+	
+	
+	private void readDeviceConfig() throws Exception {
+		String configFilePath = System.getProperty("config_file", DEFAULT_CONFIG_FILE);
+		System.out.println("Config file path = " + configFilePath);
+		
+		
+		InputStream propFileStream = new FileInputStream(configFilePath);
+		Properties props = new Properties();
+		try {
+			props.load(propFileStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		if (!props.getProperty("pc", "no").equals("no")) {
+			System.out.println("WARNING: Target device features are disabled");
+			deviceFeaturesDisabled = true;
+		}
+		ConnectionManager.setPreferredInterface(props.getProperty("primary_network_interface"));
+
+		deviceDescriptor = new DeviceDescriptor();
+		deviceDescriptor.serialNumber = props.getProperty("serial_number");
+		deviceDescriptor.secret = props.getProperty("secret");		
+		deviceDescriptor.deviceType = props.getProperty("deviceType");		
 	}
 }

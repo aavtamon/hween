@@ -5,37 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.piztec.hween.controller.network.ConnectionManager;
+
 public class Main {
-	private static final String DEFAULT_CONFIG_FILE = "controller.properties";
-	
 	public static void main(String[] args) throws Exception {
-		String configFilePath = System.getProperty("config_file", DEFAULT_CONFIG_FILE);
-		System.out.println("Config file path = " + configFilePath);
-		
-		
-		InputStream propFileStream = new FileInputStream(configFilePath);
-		Properties props = new Properties();
-		try {
-			props.load(propFileStream);
-		} catch (IOException e) {
-			e.printStackTrace();
+		String url = System.getProperty("server_url");
+		if (url == null) {
+			System.err.println("URL is not specified");
 			return;
 		}
 		
-		String url = props.getProperty("server_url");
-		
-		CloudAccessor.DeviceDescriptor dd = new CloudAccessor.DeviceDescriptor();
-		dd.serialNumber = props.getProperty("serial_number");
-		dd.bssid = props.getProperty("bssid");
-		dd.primaryNetworkInterface = props.getProperty("primary_network_interface");
-		dd.secret = props.getProperty("secret");
-
-		if (!props.getProperty("pc", "no").equals("no")) {
-			DeviceManager.disableDeviceFeatures();
-		}
-
-		
-		CloudAccessor ca = new CloudAccessor(url, dd);
+		CloudAccessor ca = new CloudAccessor(url);
 		ca.start();
 		
 		ControlServer cs = new ControlServer(ca);

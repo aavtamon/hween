@@ -5,14 +5,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.piztec.hween.controller.network.ConnectionManager;
 
 public class CloudAccessor {
 	private static final int FAST_REPORTING_COUNT_LIMIT = 10;
@@ -26,17 +24,8 @@ public class CloudAccessor {
 	private String lastReportedSchedule = null;
 	private String lastReportedMode = null;
 	private String serverUrl = null;
-	private DeviceDescriptor deviceDescriptor;
 	
-	static class DeviceDescriptor {
-		String serialNumber;
-		String bssid;
-		String secret;
-		String primaryNetworkInterface;
-	}
-	
-	public CloudAccessor(final String serverUrl, final DeviceDescriptor deviceDescriptor) {
-		this.deviceDescriptor = deviceDescriptor;
+	public CloudAccessor(final String serverUrl) {
 		this.serverUrl = serverUrl;
 		
 		reportingThread = new Thread() {
@@ -86,14 +75,21 @@ public class CloudAccessor {
 	
 	private void reportStatus() {
 		try {
-			HttpURLConnection connection = (HttpURLConnection)new URL(serverUrl + "/device/" + getSerialNumber()).openConnection();
+			HttpURLConnection connection = (HttpURLConnection)new URL(serverUrl + "/device/" + DeviceManager.getInstance().getSerialNumber()).openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestMethod("PUT");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestProperty("Secret", getDeviceSecret());
+			connection.setRequestProperty("Secret", DeviceManager.getInstance().getDeviceSecret());
 			
-			String statusToReport = "{\"ip_address\": \"" + getIPAddress() + "\", \"port\": " + getPort() + ", \"bssid\": \"" + getBssid() + "\"}";
+			
+			ConnectionManager.AddressDescriptor address = ConnectionManager.getInstance().getIPAddress();
+			String bssid = null;
+			if (address.type == ConnectionManager.AddressDescriptor.TYPE_WIFI) {
+				bssid = ConnectionManager.getInstance().getAccessPoint().bssid;
+			} 
+			
+			String statusToReport = "{\"ip_address\": \"" + address.ipAddress + "\", \"port\": " + ControlServer.SERVER_PORT + (bssid != null ? ", \"bssid\": \"" + bssid + "\"" : "") + "}";
 			System.out.println("Reporting back to " + serverUrl + ": " + statusToReport);
 			OutputStream output = connection.getOutputStream();
 			output.write(statusToReport.getBytes());
@@ -132,41 +128,5 @@ public class CloudAccessor {
         	
         	DeviceManager.getInstance().setMode(mode);
         }
-	}
-	
-
-	private String getSerialNumber() {
-		return deviceDescriptor.serialNumber;
-	}
-	
-	private String getIPAddress() {
-		try {
-			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-			while (nets.hasMoreElements()) {
-				NetworkInterface net = nets.nextElement();
-				if (deviceDescriptor.primaryNetworkInterface.equals(net.getName())) {
-					Enumeration<InetAddress> addresses = net.getInetAddresses();
-					if (addresses.hasMoreElements()) {
-						return addresses.nextElement().getHostAddress();
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return "127.0.0.1";
-	}
-
-	private int getPort() {
-		return ControlServer.SERVER_PORT;
-	}
-
-	private String getBssid() {
-		return deviceDescriptor.bssid;
-	}
-	
-	private String getDeviceSecret() {
-		return deviceDescriptor.secret;
 	}
 }

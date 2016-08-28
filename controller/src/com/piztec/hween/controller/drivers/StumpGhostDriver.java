@@ -38,7 +38,7 @@ public class StumpGhostDriver implements DeviceDriver {
 	}
 	
 	private void initPins() {
-		if (DeviceManager.deviceFeaturesDisabled()) {
+		if (DeviceManager.getInstance().deviceFeaturesDisabled()) {
 			return;
 		}
 		
