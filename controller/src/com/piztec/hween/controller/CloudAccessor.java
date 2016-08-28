@@ -86,7 +86,7 @@ public class CloudAccessor {
 			ConnectionManager.AddressDescriptor address = ConnectionManager.getInstance().getIPAddress();
 			String bssid = null;
 			if (address.type == ConnectionManager.AddressDescriptor.TYPE_WIFI) {
-				bssid = ConnectionManager.getInstance().getAccessPoint().bssid;
+				bssid = ConnectionManager.getInstance().getConnectedAccessPoint().bssid;
 			} 
 			
 			String statusToReport = "{\"ip_address\": \"" + address.ipAddress + "\", \"port\": " + ControlServer.SERVER_PORT + (bssid != null ? ", \"bssid\": \"" + bssid + "\"" : "") + "}";

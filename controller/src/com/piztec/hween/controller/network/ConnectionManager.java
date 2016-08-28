@@ -1,5 +1,9 @@
 package com.piztec.hween.controller.network;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
@@ -18,6 +22,15 @@ public class ConnectionManager {
 	public static class AccessPointDescriptor {
 		public String name;
 		public String bssid;
+	}
+	
+	public interface ConnectionListener {
+		public static String STATUS_IN_PROGRESS = "in_progress";
+		public static String STATUS_ASSOCIATED = "accosiated";
+		public static String STATUS_COMPLETED = "completed";
+		public static String STATUS_FAILED = "failed";
+		
+		void onConnectionStatusChanged(final String status);
 	}
 	
 	
@@ -61,11 +74,37 @@ public class ConnectionManager {
 		}
 	}
 
-	public AccessPointDescriptor getAccessPoint() {
+	
+	// Wifi operations
+	
+	public AccessPointDescriptor getConnectedAccessPoint() {
+		//wpa_cli status
 		AccessPointDescriptor ap = new AccessPointDescriptor();
 		
 		return ap;
 	}
+	
+	public AccessPointDescriptor[] scan() {
+		//wpa_cli scan / wpa_cli scan_results 
+		AccessPointDescriptor[] detectedNetworks = new AccessPointDescriptor[] {};
+		
+		return detectedNetworks;
+	}
+	
+	
+	public void wpsConnect(final ConnectionListener listener) {
+		//wpa_cli wps_pbc
+		String output = executeSystemCommand("wpa_cli wps_pbc");
+		System.out.println("WPS Connect: " + output);
+	}
+	
+	public void disconnect(final ConnectionListener listener) {
+		//wpa_cli disconnect
+		String output = executeSystemCommand("wpa_cli disconnect");
+		System.out.println("Disconnect: " + output);
+	}
+	
+	
 	
 	private static String getInterfaceType(final String interfaceName) {
 		if (interfaceName.startsWith("eth")) {
@@ -77,5 +116,25 @@ public class ConnectionManager {
 		}
 		
 		return null;
+	}
+	
+	private static String executeSystemCommand(final String cmd) {
+		try {
+			Process cmdProcess = Runtime.getRuntime().exec(cmd);
+			InputStream cmdOutput = cmdProcess.getInputStream();
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(cmdOutput));
+	        StringBuilder out = new StringBuilder();
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            out.append(line);
+	        }
+	        reader.close();
+	        
+	        return out.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
