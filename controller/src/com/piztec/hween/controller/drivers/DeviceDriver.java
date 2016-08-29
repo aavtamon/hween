@@ -63,6 +63,9 @@ public abstract class DeviceDriver {
 	
 	
 	public interface DeviceEventListener {
+		public String WPS_CONNECT = "wps_connect";
+		public String DISCONNECT = "disconnect";
+		
 		public void onDeviceEvent(final String eventType);
 	}
 	
