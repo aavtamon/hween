@@ -3,7 +3,9 @@ package com.piztec.hween.controller.drivers;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface DeviceDriver {
+public abstract class DeviceDriver {
+	private List<DeviceEventListener> deviceListeners = new ArrayList<DeviceEventListener>();
+	
 	public abstract class Command {
 		private final String name;
 		
@@ -22,10 +24,10 @@ public interface DeviceDriver {
 		public abstract boolean execute(final Object param) throws Exception;
 	}
 	
-	public Command getCommand(final String commandName);
+	public abstract Command getCommand(final String commandName);
 	
 	
-	public class Trigger {
+	public static class Trigger {
 		public interface TriggerListener {
 			public void onTriggerEvent();
 		}
@@ -56,5 +58,25 @@ public interface DeviceDriver {
 		}
 	}
 	
-	public Trigger getTrigger(final String name);
+	public abstract Trigger getTrigger(final String name);
+	
+	
+	
+	public interface DeviceEventListener {
+		public void onDeviceEvent(final String eventType);
+	}
+	
+	public void addDviceEventListener(final DeviceEventListener listener) {
+		deviceListeners.add(listener);
+	}
+
+	public void removeDviceEventListener(final DeviceEventListener listener) {
+		deviceListeners.remove(listener);
+	}
+	
+	void notifyEventListener(final String eventType) {
+		for (DeviceEventListener listener: deviceListeners) {
+			listener.onDeviceEvent(eventType);
+		}
+	}
 }

@@ -6,7 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ConnectionManager {
 	//https://wiki.debian.org/WiFi/HowToUse
@@ -86,24 +90,132 @@ public class ConnectionManager {
 	
 	public AccessPointDescriptor[] scan() {
 		//wpa_cli scan / wpa_cli scan_results 
-		AccessPointDescriptor[] detectedNetworks = new AccessPointDescriptor[] {};
+		List<String> scanOutput = executeWpaCommand("scan");
+		if (scanOutput == null || scanOutput.size() != 1) {
+			System.err.println("Unexpected Scan comamnd output");
+			return null;
+		}
 		
-		return detectedNetworks;
+		if (!scanOutput.get(0).equals("OK")) {
+			return null;
+		}
+		
+
+		List<AccessPointDescriptor> detectedNetworks = new ArrayList<AccessPointDescriptor>();
+		
+		List<String> scanResultOutput = executeWpaCommand("scan_results");
+		for (String line: scanResultOutput) {
+			String[] network = line.split("\t");
+			
+			AccessPointDescriptor descriptor = new AccessPointDescriptor();
+			descriptor.name = network.length >= 5 ? network[4] : "";
+			descriptor.bssid = network[0];
+			
+			detectedNetworks.add(descriptor);
+		}
+		
+		return detectedNetworks.toArray(new AccessPointDescriptor[detectedNetworks.size()]);
 	}
 	
 	
-	public void wpsConnect(final ConnectionListener listener) {
+	public boolean wpsConnect(final ConnectionListener listener) {
 		//wpa_cli wps_pbc
-		String output = executeSystemCommand("wpa_cli wps_pbc");
-		System.out.println("WPS Connect: " + output);
+		List<String> wpsOutput = executeWpaCommand("wps_pbc");
+		if (wpsOutput == null || wpsOutput.size() != 1) {
+			System.err.println("Unexpected WPS comamnd output");
+			listener.onConnectionStatusChanged(ConnectionListener.STATUS_FAILED);
+			return false;
+		}
+		
+		if (!wpsOutput.get(0).equals("OK")) {
+			listener.onConnectionStatusChanged(ConnectionListener.STATUS_FAILED);
+			return false;
+		}
+		
+		Map<String, String> statusOutput = getWpaStatus();
+		String oldState = null;
+		
+		while (true) {
+			String state = (String)statusOutput.get("wpa_state");
+			System.out.println("WPS Connect: current state = " + state);
+			
+			if (oldState != state) {
+				oldState = state;
+
+				if (state == "SCANNING") {
+					listener.onConnectionStatusChanged(ConnectionListener.STATUS_IN_PROGRESS);
+				} else if (state == "COMPLETED") {
+					listener.onConnectionStatusChanged(ConnectionListener.STATUS_COMPLETED);
+					return true;
+				}
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}				
 	}
 	
 	public void disconnect(final ConnectionListener listener) {
 		//wpa_cli disconnect
-		String output = executeSystemCommand("wpa_cli disconnect");
-		System.out.println("Disconnect: " + output);
+		List<String> disconnectOutput = executeWpaCommand("disconnect");
+		if (disconnectOutput == null || disconnectOutput.size() != 1) {
+			System.err.println("Unexpected Disconnect comamnd output");
+			listener.onConnectionStatusChanged(ConnectionListener.STATUS_FAILED);
+		} else {
+			if (disconnectOutput.get(0).equals("OK")) {
+				listener.onConnectionStatusChanged(ConnectionListener.STATUS_IN_PROGRESS);
+				
+				Map<String, String> statusOutput = getWpaStatus();
+				String oldState = null;
+				
+				while (true) {
+					String state = (String)statusOutput.get("wpa_state");
+					
+					if (oldState != state) {
+						oldState = state;
+	
+						if (state == "DISCONNECTED") {
+							listener.onConnectionStatusChanged(ConnectionListener.STATUS_COMPLETED);
+							break;
+						}
+						
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}				
+			} else {
+				listener.onConnectionStatusChanged(ConnectionListener.STATUS_FAILED);
+			}
+		}
 	}
 	
+	
+	
+	
+	private static Map<String, String> getWpaStatus() {
+		List<String> statusOutput = executeWpaCommand("status");
+		if (statusOutput == null) {
+			return null;
+		}
+		
+		Map<String, String> result = new HashMap<String, String>();
+		for (String line: statusOutput) {
+			String[] pair = line.split("=");
+			if (pair.length != 2) {
+				System.err.println("Parsing status output. Line <" + line + "> has an unexpected format");
+			} else {
+				result.put(pair[0], pair[1]);
+			}
+		}
+		
+		return result;
+	}
 	
 	
 	private static String getInterfaceType(final String interfaceName) {
@@ -118,20 +230,25 @@ public class ConnectionManager {
 		return null;
 	}
 	
-	private static String executeSystemCommand(final String cmd) {
+	private static List<String> executeWpaCommand(final String cmd) {
 		try {
-			Process cmdProcess = Runtime.getRuntime().exec(cmd);
+			Process cmdProcess = Runtime.getRuntime().exec("wpa_cli " + cmd);
 			InputStream cmdOutput = cmdProcess.getInputStream();
 			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(cmdOutput));
-	        StringBuilder out = new StringBuilder();
-	        String line;
+	        
+			List<String> result = new ArrayList<String>();
+	        String line = reader.readLine();
+	        if (!line.startsWith("Selected interface")) {
+	        	System.err.println("Unexpected wpa_cli output format. First line is " + line);	        	
+	        }
+	        
 	        while ((line = reader.readLine()) != null) {
-	            out.append(line);
+	            result.add(line);
 	        }
 	        reader.close();
 	        
-	        return out.toString();
+	        return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

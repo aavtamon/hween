@@ -12,9 +12,8 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-import com.piztec.hween.controller.DeviceManager;
 
-public class StumpGhostDriver implements DeviceDriver {
+public class StumpGhostDriver extends DeviceDriver {
 	private Map<String, Command> commands = new HashMap<String, Command>();
 	private Map<String, Trigger> triggers = new HashMap<String, Trigger>();
 
@@ -30,15 +29,19 @@ public class StumpGhostDriver implements DeviceDriver {
 	private boolean highLimitTrigger;
 	private boolean lowLimitTrigger;
 	
+	private final boolean targetDeviceFeaturesEnabled;
 	
-	public StumpGhostDriver() {
+	
+	public StumpGhostDriver(final boolean targetDeviceFeaturesEnabled) {
+		this.targetDeviceFeaturesEnabled = targetDeviceFeaturesEnabled;
+		
 		initPins();
 		initCommands();
 		initTriggers();
 	}
 	
 	private void initPins() {
-		if (DeviceManager.getInstance().deviceFeaturesDisabled()) {
+		if (!targetDeviceFeaturesEnabled) {
 			return;
 		}
 		
@@ -74,6 +77,8 @@ public class StumpGhostDriver implements DeviceDriver {
 				System.out.println("Pin 13 got an event");
 			}
 		});
+		
+		// Add notifyDeviceEvent for WPS and LED controls
 	}
 	
 	

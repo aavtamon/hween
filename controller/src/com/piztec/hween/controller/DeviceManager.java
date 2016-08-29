@@ -27,7 +27,6 @@ public class DeviceManager {
 	
 	private boolean deviceFeaturesDisabled;
 	
-	private String deviceType;
 	private DeviceDriver driver;
 	private Schedule schedule;
 	private String mode;
@@ -42,10 +41,6 @@ public class DeviceManager {
 	}
 	
 	
-	public boolean deviceFeaturesDisabled() {
-		return deviceFeaturesDisabled;
-	}
-	
 	
 	private DeviceManager() {
 		try {
@@ -55,8 +50,8 @@ public class DeviceManager {
 			return;
 		}
 		
-		if (STUMP_GHOST_TYPE.equals(deviceType)) {
-			driver = new StumpGhostDriver();
+		if (STUMP_GHOST_TYPE.equals(deviceDescriptor.deviceType)) {
+			driver = new StumpGhostDriver(!deviceFeaturesDisabled);
 		}		
 	}
 
@@ -151,6 +146,6 @@ public class DeviceManager {
 		deviceDescriptor = new DeviceDescriptor();
 		deviceDescriptor.serialNumber = props.getProperty("serial_number");
 		deviceDescriptor.secret = props.getProperty("secret");		
-		deviceDescriptor.deviceType = props.getProperty("deviceType");		
+		deviceDescriptor.deviceType = props.getProperty("deviceType");	
 	}
 }
