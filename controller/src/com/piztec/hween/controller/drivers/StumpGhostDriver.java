@@ -218,7 +218,40 @@ public class StumpGhostDriver extends DeviceDriver {
 				System.out.println("Stump Ghost: <pause> command - completed");
 				return false;
 			}
+		});
+		
+		// Special commands
+		commands.put("wps_led", new Command("wps_led") {
+			public boolean execute(Object param) throws Exception {
+				System.out.println("Stump Ghost: <WPS LED> command");
+				
+				//param is Boolean to control on/off
+				
+				System.out.println("Stump Ghost: <WPS LED> command - completed");
+				return false;
+			}
 		});	
+		commands.put("network_led", new Command("network_led") {
+			public boolean execute(Object param) throws Exception {
+				System.out.println("Stump Ghost: <Network LED> command");
+				
+				//param is Boolean to control on/off
+				
+				System.out.println("Stump Ghost: <Network LED> command - completed");
+				return false;
+			}
+		});	
+		commands.put("status_led", new Command("status_led") {
+			public boolean execute(Object param) throws Exception {
+				System.out.println("Stump Ghost: <Status LED> command");
+				
+				//param is Boolean to control on/off
+				
+				System.out.println("Stump Ghost: <Status LED> command - completed");
+				return false;
+			}
+		});	
+		
 	}
 	
 	

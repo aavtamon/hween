@@ -52,7 +52,21 @@ public class DeviceManager {
 		
 		if (STUMP_GHOST_TYPE.equals(deviceDescriptor.deviceType)) {
 			driver = new StumpGhostDriver(!deviceFeaturesDisabled);
-		}		
+		}
+		
+		driver.addDviceEventListener(new DeviceDriver.DeviceEventListener() {
+			public void onDeviceEvent(final String eventType) {
+				if (eventType == DeviceDriver.DeviceEventListener.WPS_CONNECT) {
+					ConnectionManager.getInstance().wpsConnect(new ConnectionManager.ConnectionListener() {
+						public void onConnectionStatusChanged(final String status) {
+							// Use wps_led command to control blinking while connecting
+						}
+					});
+				} else if (eventType == DeviceDriver.DeviceEventListener.DISCONNECT) {
+					
+				}
+			}
+		});
 	}
 
 	public static DeviceManager getInstance() {
