@@ -16,6 +16,8 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 public class StumpGhostDriver extends DeviceDriver {
 	private Map<String, Command> commands = new HashMap<String, Command>();
 	private Map<String, Trigger> triggers = new HashMap<String, Trigger>();
+	private Map<String, Indicator> indicators = new HashMap<String, Indicator>();
+	private Map<String, Button> buttons = new HashMap<String, Button>();
 
 	//http://pi4j.com/pins/model-b-rev1.html
 	private GpioPinDigitalOutput upPin; 
@@ -38,6 +40,8 @@ public class StumpGhostDriver extends DeviceDriver {
 		initPins();
 		initCommands();
 		initTriggers();
+		initIndicators();
+		initButtons();
 	}
 	
 	private void initPins() {
@@ -219,39 +223,6 @@ public class StumpGhostDriver extends DeviceDriver {
 				return false;
 			}
 		});
-		
-		// Special commands
-		commands.put("wps_led", new Command("wps_led") {
-			public boolean execute(Object param) throws Exception {
-				System.out.println("Stump Ghost: <WPS LED> command");
-				
-				//param is Boolean to control on/off
-				
-				System.out.println("Stump Ghost: <WPS LED> command - completed");
-				return false;
-			}
-		});	
-		commands.put("network_led", new Command("network_led") {
-			public boolean execute(Object param) throws Exception {
-				System.out.println("Stump Ghost: <Network LED> command");
-				
-				//param is Boolean to control on/off
-				
-				System.out.println("Stump Ghost: <Network LED> command - completed");
-				return false;
-			}
-		});	
-		commands.put("status_led", new Command("status_led") {
-			public boolean execute(Object param) throws Exception {
-				System.out.println("Stump Ghost: <Status LED> command");
-				
-				//param is Boolean to control on/off
-				
-				System.out.println("Stump Ghost: <Status LED> command - completed");
-				return false;
-			}
-		});	
-		
 	}
 	
 	
@@ -260,11 +231,50 @@ public class StumpGhostDriver extends DeviceDriver {
 	}
 	
 	
+	private void initIndicators() {
+		indicators.put(DeviceDriver.INDICATOR_WPS, new Indicator(DeviceDriver.INDICATOR_WPS) {
+			protected void setOnState(final boolean on) {
+				System.out.println("Stump Ghost: <WPS LED>: " + on);
+			}
+		});
+	}
+	
+	private void initButtons() {
+		buttons.put(DeviceDriver.BUTTON_WPS, new Button(DeviceDriver.BUTTON_WPS) {
+			public void register() {
+				final Button b = this;
+				new Thread() {
+					public void run() {
+						try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						System.out.println("Stump Ghost: <WPS Button>");
+						b.notifyListeners();
+					}
+				}.start();
+				
+			}
+		});
+	}
+
+	
+	
+	
 	public Command getCommand(final String commandName) {
 		return commands.get(commandName);
 	}
 
 	public Trigger getTrigger(String name) {
 		return triggers.get(name);
+	}
+	
+	public Indicator getIndicator(String name) {
+		return indicators.get(name);
+	}
+	
+	public Button getButton(String name) {
+		return buttons.get(name);
 	}
 }

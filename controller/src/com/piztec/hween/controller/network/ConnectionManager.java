@@ -132,28 +132,27 @@ public class ConnectionManager {
 			return false;
 		}
 		
-		Map<String, String> statusOutput = getWpaStatus();
 		String oldState = null;
-		
 		while (true) {
+			Map<String, String> statusOutput = getWpaStatus();
 			String state = (String)statusOutput.get("wpa_state");
 			System.out.println("WPS Connect: current state = " + state);
 			
 			if (oldState != state) {
 				oldState = state;
 
-				if (state == "SCANNING") {
+				if ("SCANNING".equals(state)) {
 					listener.onConnectionStatusChanged(ConnectionListener.STATUS_IN_PROGRESS);
-				} else if (state == "COMPLETED") {
+				} else if ("COMPLETED".equals(state)) {
 					listener.onConnectionStatusChanged(ConnectionListener.STATUS_COMPLETED);
 					return true;
 				}
-				
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			}
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}				
 	}
@@ -168,25 +167,24 @@ public class ConnectionManager {
 			if (disconnectOutput.get(0).equals("OK")) {
 				listener.onConnectionStatusChanged(ConnectionListener.STATUS_IN_PROGRESS);
 				
-				Map<String, String> statusOutput = getWpaStatus();
 				String oldState = null;
-				
 				while (true) {
+					Map<String, String> statusOutput = getWpaStatus();
 					String state = (String)statusOutput.get("wpa_state");
 					
 					if (oldState != state) {
 						oldState = state;
 	
-						if (state == "DISCONNECTED") {
+						if ("DISCONNECTED".equals(state)) {
 							listener.onConnectionStatusChanged(ConnectionListener.STATUS_COMPLETED);
 							break;
 						}
-						
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+					}
+					
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}				
 			} else {
@@ -232,7 +230,7 @@ public class ConnectionManager {
 	
 	private static List<String> executeWpaCommand(final String cmd) {
 		try {
-			Process cmdProcess = Runtime.getRuntime().exec("wpa_cli " + cmd);
+			Process cmdProcess = Runtime.getRuntime().exec("/Users/aavtamonov/project/other/hween/wpa_cli " + cmd);
 			InputStream cmdOutput = cmdProcess.getInputStream();
 			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(cmdOutput));

@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DeviceDriver {
-	private List<DeviceEventListener> deviceListeners = new ArrayList<DeviceEventListener>();
+	public static String INDICATOR_WPS = "wps";
+	public static String INDICATOR_NETWORK = "network";
+	public static String INDICATOR_STATUS = "status";
 	
-	public abstract class Command {
+	public static String BUTTON_WPS = "wps";
+	
+
+	public static abstract class Command {
 		private final String name;
 		
 		Command(final String name) {
@@ -62,24 +67,110 @@ public abstract class DeviceDriver {
 	
 	
 	
-	public interface DeviceEventListener {
-		public String WPS_CONNECT = "wps_connect";
-		public String DISCONNECT = "disconnect";
+	// Device Controls
+	
+	public static abstract class Indicator {
+		private String name;
+		private Thread blinkingThread;
 		
-		public void onDeviceEvent(final String eventType);
-	}
-	
-	public void addDviceEventListener(final DeviceEventListener listener) {
-		deviceListeners.add(listener);
-	}
+		Indicator(final String name) {
+			this.name = name;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void turnOn() {
+			stopBlinkingThread();
 
-	public void removeDviceEventListener(final DeviceEventListener listener) {
-		deviceListeners.remove(listener);
-	}
-	
-	void notifyEventListener(final String eventType) {
-		for (DeviceEventListener listener: deviceListeners) {
-			listener.onDeviceEvent(eventType);
+			setOnState(true);
+		}
+		
+		public void turnOff() {
+			stopBlinkingThread();
+
+			setOnState(false);
+		}
+		
+		public void blink(final int period) {
+			stopBlinkingThread();
+			
+			blinkingThread = new Thread() {
+				private boolean state = true;
+				
+				public void run() {
+					while (!isInterrupted()) {
+						setOnState(state);
+
+						try {
+							Thread.sleep(period);
+						} catch (InterruptedException e) {
+							break;
+						}
+						
+						state = !state;
+					}
+					
+					blinkingThread = null;
+				}
+			};
+			blinkingThread.start();
+		}
+		
+		
+		protected abstract void setOnState(final boolean on);
+		
+		private void stopBlinkingThread() {
+			if (blinkingThread != null) {
+				blinkingThread.interrupt();
+				try {
+					blinkingThread.join();
+				} catch (InterruptedException e) {
+				}
+				blinkingThread = null;
+			}
 		}
 	}
+	
+	
+	public abstract Indicator getIndicator(String name);
+	
+	
+	public static abstract class Button {
+		public interface ButtonListener {
+			public void onPressed();
+		}
+		
+		private List<ButtonListener> buttonListeners = new ArrayList<ButtonListener>();
+		private String name;
+		
+		Button(final String name) {
+			this.name = name;
+			register();
+		}
+		
+		public String getName() {
+			return name;
+		}
+
+		public void addListener(final ButtonListener listener) {
+			buttonListeners.add(listener);
+		}
+
+		public void removeListener(final ButtonListener listener) {
+			buttonListeners.remove(listener);
+		}
+		
+		protected void notifyListeners() {
+			for (ButtonListener listener: buttonListeners) {
+				listener.onPressed();
+			}
+		}
+		
+		public abstract void register();
+	}
+	
+	
+	public abstract Button getButton(String name);
 }

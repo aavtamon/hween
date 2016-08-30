@@ -8,7 +8,9 @@ import java.util.Properties;
 import org.json.JSONObject;
 
 import com.piztec.hween.controller.drivers.DeviceDriver;
+import com.piztec.hween.controller.drivers.DeviceDriver.Button;
 import com.piztec.hween.controller.drivers.DeviceDriver.Command;
+import com.piztec.hween.controller.drivers.DeviceDriver.Indicator;
 import com.piztec.hween.controller.drivers.StumpGhostDriver;
 import com.piztec.hween.controller.network.ConnectionManager;
 
@@ -54,19 +56,28 @@ public class DeviceManager {
 			driver = new StumpGhostDriver(!deviceFeaturesDisabled);
 		}
 		
-		driver.addDviceEventListener(new DeviceDriver.DeviceEventListener() {
-			public void onDeviceEvent(final String eventType) {
-				if (eventType == DeviceDriver.DeviceEventListener.WPS_CONNECT) {
+		
+		Button wpsButton = driver.getButton(DeviceDriver.BUTTON_WPS);
+		if (wpsButton != null) {
+			wpsButton.addListener(new Button.ButtonListener() {
+				public void onPressed() {
+					final Indicator wpsIndicator = driver.getIndicator(DeviceDriver.INDICATOR_WPS);
+					if (wpsIndicator != null) {
+						wpsIndicator.blink(1000);
+					}
+					
 					ConnectionManager.getInstance().wpsConnect(new ConnectionManager.ConnectionListener() {
 						public void onConnectionStatusChanged(final String status) {
-							// Use wps_led command to control blinking while connecting
+							if (status == ConnectionManager.ConnectionListener.STATUS_FAILED) {
+								wpsIndicator.turnOff();
+							} else if (status == ConnectionManager.ConnectionListener.STATUS_COMPLETED) {
+								wpsIndicator.turnOn();
+							}
 						}
 					});
-				} else if (eventType == DeviceDriver.DeviceEventListener.DISCONNECT) {
-					
 				}
-			}
-		});
+			});
+		}
 	}
 
 	public static DeviceManager getInstance() {
