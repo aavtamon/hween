@@ -4,13 +4,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.piztec.hween.controller.ControlServer;
+import com.piztec.hween.controller.ControllerContext;
+import com.piztec.hween.controller.DeviceManager;
 
 public class ConnectionManager {
 	//https://wiki.debian.org/WiFi/HowToUse
@@ -54,7 +61,11 @@ public class ConnectionManager {
 	}
 	
 	public AddressDescriptor getIPAddress() {
-		AddressDescriptor result = new AddressDescriptor();
+		return getIPAddress(null);
+	}
+	
+	public AddressDescriptor getIPAddress(final String type) {
+		AddressDescriptor result = null;
 
 		try {
 			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
@@ -62,11 +73,21 @@ public class ConnectionManager {
 				NetworkInterface net = nets.nextElement();
 				Enumeration<InetAddress> addresses = net.getInetAddresses();
 				if (addresses.hasMoreElements()) {
-					result.ipAddress = addresses.nextElement().getHostAddress();
-					result.type = getInterfaceType(net.getName());
+					String netIpAddress = addresses.nextElement().getHostAddress();
+					String netType = getInterfaceType(net.getName());
 					
-					if (preferredInterfaceName == null || preferredInterfaceName.equals(net.getName())) {
-						return result;
+					if (isValidIpAddress(netIpAddress)) {
+						result = new AddressDescriptor();
+						result.ipAddress = netIpAddress;
+						result.type = netType;
+						
+						if (type != null && type.equals(netType)) {
+							return result;
+						}
+						
+						if (preferredInterfaceName == null || preferredInterfaceName.equals(net.getName())) {
+							return result;
+						}
 					}
 				}
 			}
@@ -194,6 +215,19 @@ public class ConnectionManager {
 	}
 	
 	
+	public boolean ensureConnectivity() {
+		try {
+			HttpURLConnection connection = (HttpURLConnection)new URL(ControllerContext.getServerUrl()).openConnection();
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Accept", "text/plain");
+			
+
+			return connection.getResponseCode() == 200;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 	
 	
 	private static Map<String, String> getWpaStatus() {
@@ -216,13 +250,40 @@ public class ConnectionManager {
 	}
 	
 	
+	private boolean isValidIpAddress(final String address) {
+	    try {
+	        if (address == null || address.isEmpty()) {
+	            return false;
+	        }
+
+	        String[] parts = address.split( "\\." );
+	        if (parts.length != 4) {
+	            return false;
+	        }
+
+	        for (String s : parts) {
+	            int i = Integer.parseInt(s);
+	            if (i < 0 || i > 255) {
+	                return false;
+	            }
+	        }
+	        if (address.endsWith(".")) {
+	            return false;
+	        }
+
+	        return true;
+	    } catch (NumberFormatException nfe) {
+	        return false;
+	    }
+	}
+	
 	private static String getInterfaceType(final String interfaceName) {
 		if (interfaceName.startsWith("eth")) {
 			return AddressDescriptor.TYPE_ETHERNET;
 		} else if (interfaceName.startsWith("wlan")) {
 			return AddressDescriptor.TYPE_WIFI;
 		} else {
-			System.err.println("Unrecognized netwrok interface type: " + interfaceName);
+			//System.err.println("Unrecognized network interface type: " + interfaceName);
 		}
 		
 		return null;

@@ -14,8 +14,9 @@ public class Main {
 			System.err.println("URL is not specified");
 			return;
 		}
+		ControllerContext.setServerUrl(url);
 		
-		CloudAccessor ca = new CloudAccessor(url);
+		CloudAccessor ca = new CloudAccessor();
 		ca.start();
 		
 		ControlServer cs = new ControlServer(ca);

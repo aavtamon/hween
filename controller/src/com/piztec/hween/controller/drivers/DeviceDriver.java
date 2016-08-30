@@ -84,13 +84,13 @@ public abstract class DeviceDriver {
 		public void turnOn() {
 			stopBlinkingThread();
 
-			setOnState(true);
+			set(true);
 		}
 		
 		public void turnOff() {
 			stopBlinkingThread();
 
-			setOnState(false);
+			set(false);
 		}
 		
 		public void blink(final int period) {
@@ -101,7 +101,7 @@ public abstract class DeviceDriver {
 				
 				public void run() {
 					while (!isInterrupted()) {
-						setOnState(state);
+						set(state);
 
 						try {
 							Thread.sleep(period);
@@ -119,7 +119,14 @@ public abstract class DeviceDriver {
 		}
 		
 		
-		protected abstract void setOnState(final boolean on);
+		protected abstract void setState(final boolean on);
+		protected abstract boolean getState();
+		
+		private void set(final boolean on) {
+			if (getState() != on) {
+				setState(on);
+			}
+		}
 		
 		private void stopBlinkingThread() {
 			if (blinkingThread != null) {

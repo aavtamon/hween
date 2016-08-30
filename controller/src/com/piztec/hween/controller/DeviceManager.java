@@ -13,6 +13,7 @@ import com.piztec.hween.controller.drivers.DeviceDriver.Command;
 import com.piztec.hween.controller.drivers.DeviceDriver.Indicator;
 import com.piztec.hween.controller.drivers.StumpGhostDriver;
 import com.piztec.hween.controller.network.ConnectionManager;
+import com.piztec.hween.controller.network.ConnectionManager.AddressDescriptor;
 
 
 public class DeviceManager {
@@ -78,6 +79,8 @@ public class DeviceManager {
 				}
 			});
 		}
+		
+		startNetworkMonitoringThread();
 	}
 
 	public static DeviceManager getInstance() {
@@ -146,6 +149,39 @@ public class DeviceManager {
 	}
 	
 	
+	
+	
+	private void startNetworkMonitoringThread() {
+		new Thread() {
+			public void run() {
+				Indicator networkIndicator = driver.getIndicator(DeviceDriver.INDICATOR_NETWORK);
+				if (networkIndicator == null) {
+					return;
+				}
+				
+				while (true) {
+					boolean connected = false;
+					AddressDescriptor address = ConnectionManager.getInstance().getIPAddress();
+					if (address != null) {
+						if (ConnectionManager.getInstance().ensureConnectivity()) {
+							connected = true;
+						}
+					}
+					
+					if (connected) {
+						networkIndicator.turnOn();
+					} else {
+						networkIndicator.turnOff();
+					}
+					
+					try {
+						Thread.sleep(1000);
+					} catch (Exception e) {
+					}
+				}
+			}
+		}.start();
+	}
 	
 	
 	private void readDeviceConfig() throws Exception {

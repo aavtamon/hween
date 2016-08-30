@@ -233,8 +233,27 @@ public class StumpGhostDriver extends DeviceDriver {
 	
 	private void initIndicators() {
 		indicators.put(DeviceDriver.INDICATOR_WPS, new Indicator(DeviceDriver.INDICATOR_WPS) {
-			protected void setOnState(final boolean on) {
+			private boolean state;
+			
+			protected void setState(final boolean on) {
 				System.out.println("Stump Ghost: <WPS LED>: " + on);
+				state = on;
+			}
+			
+			protected boolean getState() {
+				return state;
+			}
+		});
+		indicators.put(DeviceDriver.INDICATOR_NETWORK, new Indicator(DeviceDriver.INDICATOR_NETWORK) {
+			private boolean state;
+			
+			protected void setState(final boolean on) {
+				System.out.println("Stump Ghost: <Network LED>: " + on);
+				state = on;
+			}
+
+			protected boolean getState() {
+				return state;
 			}
 		});
 	}

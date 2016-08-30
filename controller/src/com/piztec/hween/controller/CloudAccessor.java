@@ -23,11 +23,8 @@ public class CloudAccessor {
 	
 	private String lastReportedSchedule = null;
 	private String lastReportedMode = null;
-	private String serverUrl = null;
 	
-	public CloudAccessor(final String serverUrl) {
-		this.serverUrl = serverUrl;
-		
+	public CloudAccessor() {
 		reportingThread = new Thread() {
 			public void run() {
 				while (!isInterrupted()) {
@@ -75,7 +72,7 @@ public class CloudAccessor {
 	
 	private void reportStatus() {
 		try {
-			HttpURLConnection connection = (HttpURLConnection)new URL(serverUrl + "/device/" + DeviceManager.getInstance().getSerialNumber()).openConnection();
+			HttpURLConnection connection = (HttpURLConnection)new URL(ControllerContext.getServerUrl() + "/device/" + DeviceManager.getInstance().getSerialNumber()).openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestMethod("PUT");
 			connection.setRequestProperty("Content-Type", "application/json");
@@ -90,7 +87,7 @@ public class CloudAccessor {
 			} 
 			
 			String statusToReport = "{\"ip_address\": \"" + address.ipAddress + "\", \"port\": " + ControlServer.SERVER_PORT + (bssid != null ? ", \"bssid\": \"" + bssid + "\"" : "") + "}";
-			System.out.println("Reporting back to " + serverUrl + ": " + statusToReport);
+			System.out.println("Reporting back to " + ControllerContext.getServerUrl() + ": " + statusToReport);
 			OutputStream output = connection.getOutputStream();
 			output.write(statusToReport.getBytes());
 			output.close();
@@ -106,7 +103,7 @@ public class CloudAccessor {
 	        
 	        handleCloudResponse(responseText.toString());
 		} catch (Exception e) {
-			System.err.println("Problem accessing " + serverUrl);
+			System.err.println("Problem accessing " + ControllerContext.getServerUrl());
 			e.printStackTrace();
 		}
 	}

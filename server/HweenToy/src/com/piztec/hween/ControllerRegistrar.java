@@ -13,6 +13,7 @@ import com.piztec.hween.device.DeviceController;
 public class ControllerRegistrar extends Application {
 	public Set<Class<?>> getClasses() {
 		Set<Class<?>> classes = new HashSet<Class<?>>();
+		classes.add(DiagController.class);
 		classes.add(DeviceController.class);
 		classes.add(UserAccountController.class);
 		classes.add(DeviceSettingsController.class);
