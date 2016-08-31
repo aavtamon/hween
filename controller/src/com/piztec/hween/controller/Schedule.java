@@ -134,7 +134,11 @@ public class Schedule {
 			}
 			
 			private void executeProgram(JSONObject program) throws InterruptedException {
-				System.out.println("Executing program: " + program);
+				try {
+					System.out.println("Executing program: " + program.getString("title"));
+				} catch (JSONException e1) {
+				}
+				
 				try {
 					JSONArray cloudCommands = program.getJSONArray("commands");
 					for (int i = 0; i < cloudCommands.length(); i++) {
@@ -145,6 +149,8 @@ public class Schedule {
 							break;
 						}
 					}
+				} catch (InterruptedException ie) {
+					throw ie;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -155,7 +161,12 @@ public class Schedule {
 				
 				Command command = driver.getCommand(commandName);
 				if (command != null) {
-					command.execute(null);
+					Object arg = null;
+					try {
+						arg = cloudCommand.get("arg");
+					} catch (Exception e) {
+					}
+					command.execute(arg);
 				}
 			}
  		};

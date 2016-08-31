@@ -72,7 +72,7 @@ public class ConnectionManager {
 	
 	public AddressDescriptor getIPAddress(final String type) {
 		AddressDescriptor result = null;
-
+		
 		try {
 			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 			while (nets.hasMoreElements()) {
