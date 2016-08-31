@@ -36,7 +36,14 @@ public class DevicesStorageManager {
 
 			info.put("ip_address", reportedInfo.get("ip_address"));
 			info.put("port", reportedInfo.get("port"));
-			info.put("bssid", reportedInfo.get("bssid"));
+			
+			Object bssid = null;
+			try {
+				bssid = reportedInfo.get("bssid");
+			} catch (Exception e) {
+			}
+			info.put("bssid", bssid);
+			
 			info.put("status", "connected");
 			info.put("status_update_timestamp", System.currentTimeMillis());
 			

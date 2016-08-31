@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -15,9 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.piztec.hween.controller.ControlServer;
 import com.piztec.hween.controller.ControllerContext;
-import com.piztec.hween.controller.DeviceManager;
 
 public class ConnectionManager {
 	//https://wiki.debian.org/WiFi/HowToUse
@@ -28,11 +25,20 @@ public class ConnectionManager {
 		
 		public String ipAddress;
 		public String type;
+		
+		public String toString() {
+			return "AddressDescriptor: ip address " + ipAddress + " of type " + type;
+		}
 	}
 	
 	public static class AccessPointDescriptor {
-		public String name;
+		public String ssid;
 		public String bssid;
+		public String ipAddress;
+
+		public String toString() {
+			return "AccessPointDescriptor: ssid " + ssid + " (bssid " + bssid + "), ip address " + ipAddress;
+		}
 	}
 	
 	public interface ConnectionListener {
@@ -129,7 +135,7 @@ public class ConnectionManager {
 			String[] network = line.split("\t");
 			
 			AccessPointDescriptor descriptor = new AccessPointDescriptor();
-			descriptor.name = network.length >= 5 ? network[4] : "";
+			descriptor.ssid = network.length >= 5 ? network[4] : "";
 			descriptor.bssid = network[0];
 			
 			detectedNetworks.add(descriptor);
@@ -214,17 +220,30 @@ public class ConnectionManager {
 		}
 	}
 	
+	public AccessPointDescriptor getConnectedNetwork() {
+		Map<String, String> statusOutput = getWpaStatus();
+		String state = (String)statusOutput.get("wpa_state");
+		if (!"COMPLETED".equals(state)) {
+			return null;
+		}
+		
+		AccessPointDescriptor result = new AccessPointDescriptor();
+		result.ssid = (String)statusOutput.get("ssid");
+		result.bssid = (String)statusOutput.get("bssid");
+		result.ipAddress = (String)statusOutput.get("ip_address");
+		
+		return result;
+	}
+	
 	
 	public boolean ensureConnectivity() {
 		try {
 			HttpURLConnection connection = (HttpURLConnection)new URL(ControllerContext.getServerUrl()).openConnection();
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Accept", "text/plain");
-			
 
 			return connection.getResponseCode() == 200;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 	}
@@ -270,6 +289,13 @@ public class ConnectionManager {
 	        if (address.endsWith(".")) {
 	            return false;
 	        }
+	        
+	        if (address.startsWith("127.0.")) {
+	        	return false;
+	        }
+	        if (address.startsWith("169.254.")) {
+	        	return false;
+	        }
 
 	        return true;
 	    } catch (NumberFormatException nfe) {
@@ -303,7 +329,9 @@ public class ConnectionManager {
 	        }
 	        
 	        while ((line = reader.readLine()) != null) {
-	            result.add(line);
+	        	if (!line.trim().isEmpty()) {
+	        		result.add(line);
+	        	}	            
 	        }
 	        reader.close();
 	        

@@ -160,22 +160,19 @@ public class DeviceManager {
 				}
 				
 				while (true) {
-					boolean connected = false;
 					AddressDescriptor address = ConnectionManager.getInstance().getIPAddress();
 					if (address != null) {
 						if (ConnectionManager.getInstance().ensureConnectivity()) {
-							connected = true;
+							networkIndicator.turnOn();
+						} else {
+							networkIndicator.blink(1000);
 						}
-					}
-					
-					if (connected) {
-						networkIndicator.turnOn();
 					} else {
 						networkIndicator.turnOff();
 					}
 					
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(5000);
 					} catch (Exception e) {
 					}
 				}
