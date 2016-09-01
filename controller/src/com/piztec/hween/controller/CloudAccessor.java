@@ -10,7 +10,7 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.piztec.hween.controller.network.ConnectionManager;
+import com.piztec.hween.controller.media.NetworkManager;
 
 public class CloudAccessor {
 	private static final int FAST_REPORTING_COUNT_LIMIT = 10;
@@ -80,10 +80,10 @@ public class CloudAccessor {
 			connection.setRequestProperty("Secret", DeviceManager.getInstance().getDeviceSecret());
 			
 			
-			ConnectionManager.AddressDescriptor address = ConnectionManager.getInstance().getIPAddress();
+			NetworkManager.AddressDescriptor address = NetworkManager.getInstance().getIPAddress();
 			String bssid = null;
-			if (address.type == ConnectionManager.AddressDescriptor.TYPE_WIFI) {
-				bssid = ConnectionManager.getInstance().getConnectedAccessPoint().bssid;
+			if (address.type == NetworkManager.AddressDescriptor.TYPE_WIFI) {
+				bssid = NetworkManager.getInstance().getConnectedAccessPoint().bssid;
 			} 
 			
 			String statusToReport = "{\"ip_address\": \"" + address.ipAddress + "\", \"port\": " + ControlServer.SERVER_PORT + (bssid != null ? ", \"bssid\": \"" + bssid + "\"" : "") + "}";

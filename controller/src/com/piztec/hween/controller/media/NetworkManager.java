@@ -1,4 +1,4 @@
-package com.piztec.hween.controller.network;
+package com.piztec.hween.controller.media;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 import com.piztec.hween.controller.ControllerContext;
 
-public class ConnectionManager {
+public class NetworkManager {
 	//https://wiki.debian.org/WiFi/HowToUse
 	
 	public static class AddressDescriptor {
@@ -51,16 +51,16 @@ public class ConnectionManager {
 	}
 	
 	
-	private static ConnectionManager instance;
+	private static NetworkManager instance;
 	private static String preferredInterfaceName;
 	
 	public static void setPreferredInterface(final String name) {
 		preferredInterfaceName = name;
 	}
 	
-	public static ConnectionManager getInstance() {
+	public static NetworkManager getInstance() {
 		if (instance == null) {
-			instance = new ConnectionManager();
+			instance = new NetworkManager();
 		}
 		
 		return instance;

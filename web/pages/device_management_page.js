@@ -47,6 +47,9 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   this._triggerList = UIUtils.appendDropList(scheduleControlPanel, "TriggersList");
   this._triggerList.setChangeListener(function() {
     var schedule = Backend.getDeviceSchedule(this._deviceId);
+    if (schedule == null) {
+      return;
+    }
     schedule.trigger = this._triggerList.getValue();
     Backend.setDeviceSchedule(this._deviceId, schedule);
   }.bind(this));

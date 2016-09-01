@@ -8,10 +8,14 @@ import com.piztec.hween.controller.drivers.DeviceDriver;
 import com.piztec.hween.controller.drivers.DeviceDriver.Command;
 import com.piztec.hween.controller.drivers.DeviceDriver.Trigger;
 import com.piztec.hween.controller.drivers.DeviceDriver.Trigger.TriggerListener;
+import com.piztec.hween.controller.media.AudioManager;
 
 public class Schedule {
 	private static final String TRIGGER_IMMEDIATELY = "immediately";
 	private static final String TRIGGER_DELAY = "delay";
+	
+	private static final String COMMAND_PAUSE = "pause";
+	private static final String COMMAND_TALK = "talk";
 	
 	private final JSONObject cloudSchedule;
 	private final DeviceDriver driver;
@@ -149,7 +153,11 @@ public class Schedule {
 							break;
 						}
 					}
+					
+					// We interrupt any playback left over from the previous program
+					AudioManager.getInstance().stop();
 				} catch (InterruptedException ie) {
+					AudioManager.getInstance().stop();
 					throw ie;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -158,15 +166,33 @@ public class Schedule {
 					
 			private void executeCommand(JSONObject cloudCommand) throws JSONException, Exception {
 				String commandName = cloudCommand.getString("data");
+				Object arg = null;
+				try {
+					arg = cloudCommand.get("arg");
+				} catch (Exception e) {
+				}
 				
-				Command command = driver.getCommand(commandName);
-				if (command != null) {
-					Object arg = null;
-					try {
-						arg = cloudCommand.get("arg");
-					} catch (Exception e) {
+				System.out.println("Executing command " + commandName);
+				
+				// Special commands first
+				if (COMMAND_PAUSE.equals(commandName)) {
+					int delay = 3;
+					if (arg != null) {
+						try {
+							delay = Integer.parseInt(arg.toString());
+						} catch (Exception e) {
+						}
 					}
-					command.execute(arg);
+					Thread.sleep(delay * 1000);
+				} else if (COMMAND_TALK.equals(commandName)) {
+					int duration = AudioManager.getInstance().play(arg.toString());
+					int delay = duration > 0 ? Math.min(duration, 1000) : 1000;
+					Thread.sleep(delay);
+				} else {
+					Command command = driver.getCommand(commandName);
+					if (command != null) {
+						command.execute(arg);
+					}
 				}
 			}
  		};

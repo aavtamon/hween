@@ -209,47 +209,6 @@ public class StumpGhostDriver extends DeviceDriver {
 				return false;
 			}
 		});
-		commands.put("talk", new Command("talk") {
-			public boolean execute(Object param) throws Exception {
-				System.out.println("Stump Ghost: <talk> command with a param");
-				
-				if (param == null) {
-					return false;
-				}
-				String audioDesriptor = (String)param;
-				
-				int mimeSeparator = audioDesriptor.indexOf(";");
-				if (mimeSeparator == -1) {
-					return false;
-				}
-				String mimeType = audioDesriptor.substring(5,  mimeSeparator);
-				if (!mimeType.startsWith("audio")) {
-					return false;
-				}
-				
-				String audioData = audioDesriptor.substring(mimeSeparator + 8);
-				byte[] audioBytes = DatatypeConverter.parseBase64Binary(audioData);
-
-	        	AudioInputStream audioIn = AudioSystem.getAudioInputStream(new ByteArrayInputStream(audioBytes));
-	            Clip clip = AudioSystem.getClip();
-	            clip.open(audioIn);
-	            clip.start();
-	            Thread.sleep(clip.getMicrosecondLength() / 1000);
-				
-				System.out.println("Stump Ghost: <talk> command - completed");
-				return true;
-			}
-		});
-		commands.put("pause", new Command("pause") {
-			public boolean execute(Object param) throws Exception {
-				System.out.println("Stump Ghost: <pause> command");
-				
-				Thread.sleep(3000);
-				
-				System.out.println("Stump Ghost: <pause> command - completed");
-				return false;
-			}
-		});
 	}
 	
 	

@@ -12,8 +12,8 @@ import com.piztec.hween.controller.drivers.DeviceDriver.Button;
 import com.piztec.hween.controller.drivers.DeviceDriver.Command;
 import com.piztec.hween.controller.drivers.DeviceDriver.Indicator;
 import com.piztec.hween.controller.drivers.StumpGhostDriver;
-import com.piztec.hween.controller.network.ConnectionManager;
-import com.piztec.hween.controller.network.ConnectionManager.AddressDescriptor;
+import com.piztec.hween.controller.media.NetworkManager;
+import com.piztec.hween.controller.media.NetworkManager.AddressDescriptor;
 
 
 public class DeviceManager {
@@ -67,11 +67,11 @@ public class DeviceManager {
 						wpsIndicator.blink(1000);
 					}
 					
-					ConnectionManager.getInstance().wpsConnect(new ConnectionManager.ConnectionListener() {
+					NetworkManager.getInstance().wpsConnect(new NetworkManager.ConnectionListener() {
 						public void onConnectionStatusChanged(final String status) {
-							if (status == ConnectionManager.ConnectionListener.STATUS_FAILED) {
+							if (status == NetworkManager.ConnectionListener.STATUS_FAILED) {
 								wpsIndicator.turnOff();
-							} else if (status == ConnectionManager.ConnectionListener.STATUS_COMPLETED) {
+							} else if (status == NetworkManager.ConnectionListener.STATUS_COMPLETED) {
 								wpsIndicator.turnOn();
 							}
 						}
@@ -160,9 +160,9 @@ public class DeviceManager {
 				}
 				
 				while (true) {
-					AddressDescriptor address = ConnectionManager.getInstance().getIPAddress();
+					AddressDescriptor address = NetworkManager.getInstance().getIPAddress();
 					if (address != null) {
-						if (ConnectionManager.getInstance().ensureConnectivity()) {
+						if (NetworkManager.getInstance().ensureConnectivity()) {
 							networkIndicator.turnOn();
 						} else {
 							networkIndicator.blink(1000);
@@ -199,7 +199,7 @@ public class DeviceManager {
 			System.out.println("WARNING: Target device features are disabled");
 			deviceFeaturesDisabled = true;
 		}
-		ConnectionManager.setPreferredInterface(props.getProperty("primary_network_interface"));
+		NetworkManager.setPreferredInterface(props.getProperty("primary_network_interface"));
 
 		deviceDescriptor = new DeviceDescriptor();
 		deviceDescriptor.serialNumber = props.getProperty("serial_number");

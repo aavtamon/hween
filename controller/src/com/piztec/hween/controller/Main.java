@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.piztec.hween.controller.network.ConnectionManager;
+import com.piztec.hween.controller.media.NetworkManager;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
