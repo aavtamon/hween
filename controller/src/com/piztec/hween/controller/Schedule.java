@@ -34,6 +34,7 @@ public class Schedule {
 			e.printStackTrace();
 			triggerName = TRIGGER_IMMEDIATELY;
 		}
+		System.out.println("Schedule trigger is " + triggerName);
 		
 		trigger = driver.getTrigger(triggerName);
 	}
