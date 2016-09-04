@@ -40,7 +40,9 @@ public class Schedule {
 	}
 	
 	void execute() {
+		System.out.println("Starting schedule execution");		
 		if (executionThread != null && !executionThread.isInterrupted()) {
+			System.err.println("WARNING: Scheudle execution is in progress. Must interrupt first");
 			return;
 		}
 		
@@ -69,9 +71,11 @@ public class Schedule {
 							}
 						}
 					}
+					System.out.println("Trigger kicked off. Picking next program");
 					
 					JSONObject program = getNextProgram();
 					if (program == null) {
+						System.err.println("No program found - exiting");
 						//Nothing to execute in this schedule
 						break;
 					}

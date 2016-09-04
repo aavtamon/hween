@@ -111,8 +111,6 @@ public abstract class DeviceDriver {
 						
 						state = !state;
 					}
-					
-					blinkingThread = null;
 				}
 			};
 			blinkingThread.start();

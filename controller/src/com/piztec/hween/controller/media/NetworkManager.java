@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
@@ -77,12 +78,13 @@ public class NetworkManager {
 			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 			while (nets.hasMoreElements()) {
 				NetworkInterface net = nets.nextElement();
+
 				Enumeration<InetAddress> addresses = net.getInetAddresses();
-				if (addresses.hasMoreElements()) {
-					String netIpAddress = addresses.nextElement().getHostAddress();
-					String netType = getInterfaceType(net.getName());
-					
-					if (isValidIpAddress(netIpAddress)) {
+				while (addresses.hasMoreElements()) {
+					InetAddress address = addresses.nextElement();
+					if (isValidIpAddress(address)) {
+						String netIpAddress = address.getHostAddress();
+						String netType = getInterfaceType(net.getName());
 						result = new AddressDescriptor();
 						result.ipAddress = netIpAddress;
 						result.type = netType;
@@ -269,38 +271,42 @@ public class NetworkManager {
 	}
 	
 	
-	private boolean isValidIpAddress(final String address) {
-	    try {
-	        if (address == null || address.isEmpty()) {
-	            return false;
-	        }
-
-	        String[] parts = address.split( "\\." );
-	        if (parts.length != 4) {
-	            return false;
-	        }
-
-	        for (String s : parts) {
-	            int i = Integer.parseInt(s);
-	            if (i < 0 || i > 255) {
-	                return false;
-	            }
-	        }
-	        if (address.endsWith(".")) {
-	            return false;
-	        }
-	        
-	        if (address.startsWith("127.0.")) {
-	        	return false;
-	        }
-	        if (address.startsWith("169.254.")) {
-	        	return false;
-	        }
-
-	        return true;
-	    } catch (NumberFormatException nfe) {
-	        return false;
-	    }
+	private boolean isValidIpAddress(final InetAddress address) {
+		return address instanceof Inet4Address 
+				&& !address.isLoopbackAddress();
+		
+//		
+//	    try {
+//	        if (address == null || address.isEmpty()) {
+//	            return false;
+//	        }
+//
+//	        String[] parts = address.split( "\\." );
+//	        if (parts.length != 4) {
+//	            return false;
+//	        }
+//
+//	        for (String s : parts) {
+//	            int i = Integer.parseInt(s);
+//	            if (i < 0 || i > 255) {
+//	                return false;
+//	            }
+//	        }
+//	        if (address.endsWith(".")) {
+//	            return false;
+//	        }
+//	        
+//	        if (address.startsWith("127.0.")) {
+//	        	return false;
+//	        }
+//	        if (address.startsWith("169.254.")) {
+//	        	return false;
+//	        }
+//
+//	        return true;
+//	    } catch (NumberFormatException nfe) {
+//	        return false;
+//	    }
 	}
 	
 	private static String getInterfaceType(final String interfaceName) {
@@ -316,15 +322,16 @@ public class NetworkManager {
 	}
 	
 	private static List<String> executeWpaCommand(final String cmd) {
+		System.out.println("Executing wpa_cli command " + cmd);
 		try {
-			Process cmdProcess = Runtime.getRuntime().exec("/Users/aavtamonov/project/other/hween/wpa_cli " + cmd);
+			Process cmdProcess = Runtime.getRuntime().exec("wpa_cli " + cmd);
 			InputStream cmdOutput = cmdProcess.getInputStream();
 			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(cmdOutput));
 	        
 			List<String> result = new ArrayList<String>();
 	        String line = reader.readLine();
-	        if (!line.startsWith("Selected interface")) {
+	        if (line == null || !line.startsWith("Selected interface")) {
 	        	System.err.println("Unexpected wpa_cli output format. First line is " + line);	        	
 	        }
 	        

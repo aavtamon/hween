@@ -71,6 +71,12 @@ public class CloudAccessor {
 		
 	
 	private void reportStatus() {
+		NetworkManager.AddressDescriptor address = NetworkManager.getInstance().getIPAddress();
+		if (address == null) {
+			System.err.println("Cannot determine self ip address. Report to the server cannot be sent");
+			return;
+		}
+		
 		try {
 			HttpURLConnection connection = (HttpURLConnection)new URL(ControllerContext.getServerUrl() + "/device/" + DeviceManager.getInstance().getSerialNumber()).openConnection();
 			connection.setDoOutput(true);
@@ -79,8 +85,6 @@ public class CloudAccessor {
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("Secret", DeviceManager.getInstance().getDeviceSecret());
 			
-			
-			NetworkManager.AddressDescriptor address = NetworkManager.getInstance().getIPAddress();
 			String bssid = null;
 			if (address.type == NetworkManager.AddressDescriptor.TYPE_WIFI) {
 				bssid = NetworkManager.getInstance().getConnectedAccessPoint().bssid;

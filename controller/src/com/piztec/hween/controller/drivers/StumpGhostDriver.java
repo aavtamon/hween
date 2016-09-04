@@ -247,19 +247,18 @@ public class StumpGhostDriver extends DeviceDriver {
 	private void initButtons() {
 		buttons.put(DeviceDriver.BUTTON_WPS, new Button(DeviceDriver.BUTTON_WPS) {
 			public void register() {
-				final Button b = this;
-				new Thread() {
-					public void run() {
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						System.out.println("Stump Ghost: <WPS Button>");
-						b.notifyListeners();
-					}
-				}.start();
-				
+//				final Button b = this;
+//				new Thread() {
+//					public void run() {
+//						try {
+//							Thread.sleep(10000);
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
+//						System.out.println("Stump Ghost: <WPS Button>");
+//						b.notifyListeners();
+//					}
+//				}.start();
 			}
 		});
 	}

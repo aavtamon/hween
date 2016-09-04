@@ -41,6 +41,8 @@ public class AudioManager {
 		
 		String audioData = audioDesriptor.substring(mimeSeparator + 8);
 		byte[] audioBytes = DatatypeConverter.parseBase64Binary(audioData);
+		
+		stop(); // attempt to stop if some other playback is still in progress
 
 		try {
 	    	AudioInputStream audioIn = AudioSystem.getAudioInputStream(new ByteArrayInputStream(audioBytes));
@@ -56,8 +58,10 @@ public class AudioManager {
 	}
 	
 	public void stop() {
-		if (currentClip != null && currentClip.isRunning()) {
+		if (currentClip != null) {
 			currentClip.stop();
+			currentClip.close();
+			currentClip = null;
 		}
 	}
 }
