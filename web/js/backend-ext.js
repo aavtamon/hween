@@ -496,7 +496,13 @@ Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
 
       if (operationCallback) {
-        operationCallback(Backend.OperationResult.SUCCESS);
+        var programId = xhr.getResponseHeader("Location");
+        for (id in data) {
+          if (id == programId) {
+            operationCallback(Backend.OperationResult.SUCCESS, data[id]);
+            break;
+          }
+        }
       }
     },
     error: function(xhr, status, error) {
@@ -589,7 +595,14 @@ Backend.addStockProgram = function(deviceType, program, operationCallback) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, data);
 
       if (operationCallback) {
-        operationCallback(Backend.OperationResult.SUCCESS);
+        var programId = xhr.getResponseHeader("Location");
+
+        for (p in data) {
+          if (p.id == programId) {
+            operationCallback(Backend.OperationResult.SUCCESS, p);
+            break;
+          }
+        }
       }
     },
     error: function(xhr, status, error) {
@@ -637,6 +650,7 @@ Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
 
 Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
   return {
+    id: libraryProgram.id,
     title: libraryProgram.title,
     description: libraryProgram.description,
     frequency: Backend.Program.FREQUENCY_NEVER,
@@ -646,6 +660,7 @@ Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
 
 Backend.convertStockToDeviceProgram = function(stockProgram) {
   return {
+    id: stockProgram.id,
     title: stockProgram.title,
     description: stockProgram.description,
     frequency: Backend.Program.FREQUENCY_NEVER,

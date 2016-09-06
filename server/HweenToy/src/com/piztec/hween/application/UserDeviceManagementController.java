@@ -245,9 +245,10 @@ public class UserDeviceManagementController {
 		
 		try {
 			JSONObject libraryProgram = new JSONObject(body);
-			JSONObject library = StorageManager.getInstance().getDevicesManager().addLibraryProgram(deviceId, libraryProgram);
-			if (library != null) {
-				return ControllerUtils.buildResponse(Response.Status.OK, library);
+			int programId = StorageManager.getInstance().getDevicesManager().addLibraryProgram(deviceId, libraryProgram);
+			if (programId != -1) {
+				JSONObject library = StorageManager.getInstance().getDevicesManager().getDeviceProgramLibrary(deviceId);
+				return ControllerUtils.buildResponse(Response.Status.OK, library, programId + "");
 			} else {
 				return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 			}

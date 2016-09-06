@@ -129,21 +129,21 @@ public class DeviceRegistryStorageManager {
 		}
 	}
 	
-	public JSONObject addStockProgram(final String deviceType, final JSONObject program) {
+	public int addStockProgram(final String deviceType, final JSONObject program) {
 		try {
 			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
 			JSONObject programs = typeObject.getJSONObject("stockPrograms");
 			
-			int id = (int)System.currentTimeMillis();
+			int id = PersistanceUtils.generateUniqueId();
 			programs.put(id + "", program);
 			
 			typeObject.put("stockPrograms", programs);
 			
 			StorageManager.getInstance().commit();
 			
-			return programs;
+			return id;
 		} catch (JSONException e) {
-			return null;
+			return -1;
 		}
 	}	
 	

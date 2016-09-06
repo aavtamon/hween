@@ -96,7 +96,7 @@ public class UserAccountStorageManager {
 		try {
 			JSONObject userAccount = new JSONObject();
 			
-			int userId = (int)System.currentTimeMillis();
+			int userId = PersistanceUtils.generateUniqueId();
 			profile.put("user_id", userId);
 			
 			userAccount.put("profile", profile);

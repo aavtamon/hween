@@ -6,6 +6,7 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
   
   this._programList;
   this._removeSelectedButton;
+  this._editSelectedButton;
   this._triggerList;
   this._runButton;
   this._stopButton;
@@ -89,10 +90,17 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
 
     Backend.removeDevicePrograms(this._deviceId, programsToRemove);
   }.bind(this));
+  
+  this._editSelectedButton = UIUtils.appendButton(programButtonsPanel, "EditProgramButton", this.getLocale().EditProgramButton);
+  this._editSelectedButton.setClickListener(function() {
+    var selectedProgram = this._getSelectedPrograms()[0];
+    Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId, addToDevice: true, deviceProgramId: selectedProgram.id, addToLibrary: false});
+  }.bind(this));
+  
 
   var addProgramButton = UIUtils.appendExpandableButton(programButtonsPanel, "AddProgramButton", this.getLocale().AddProgramButton, [
     {display: this.getLocale().AddNewProgramButton, clickListener: function() {
-      Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId, addToDevice: true});
+      Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId, addToDevice: true, addToLibrary: true});
     }.bind(this)},
     {display: this.getLocale().AddLibraryProgramButton, clickListener: function() {
       Application.showPage(ManageLibraryProgramsPage.name, {deviceId: this._deviceId});
@@ -171,6 +179,7 @@ DeviceManagementPage.prototype._refreshProgramList = function() {
   var selectedItem = this._programList.getSelectedItem();
   this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
+  UIUtils.setEnabled(this._editSelectedButton, false);
 
   var schedule = Backend.getDeviceSchedule(this._deviceId);
   if (schedule == null) {
@@ -197,6 +206,7 @@ DeviceManagementPage.prototype._addProgramToList = function(program) {
   programItem._selectionBox = selectionBox;
   selectionBox.setChangeListener(function() {
     UIUtils.setEnabled(this._removeSelectedButton, this._getSelectedPrograms().length > 0);
+    UIUtils.setEnabled(this._editSelectedButton, this._getSelectedPrograms().length == 1);
   }.bind(this));
   
   var itemTitle = UIUtils.appendLabel(programItem, "Title", program.title);

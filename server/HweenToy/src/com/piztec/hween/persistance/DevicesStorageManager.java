@@ -233,7 +233,7 @@ public class DevicesStorageManager {
 	public JSONObject getDeviceSchedule(final String serialNumber) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
-			if (deviceInfo != null) {
+			if (deviceInfo != null) {				
 				return deviceInfo.getJSONObject("schedule");
 			}
 		} catch (Exception e) {
@@ -326,11 +326,11 @@ public class DevicesStorageManager {
 		}		
 	}
 	
-	public JSONObject addLibraryProgram(final String serialNumber, final JSONObject program) {
+	public int addLibraryProgram(final String serialNumber, final JSONObject program) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
 			if (deviceInfo == null) {
-				return null;
+				return -1;
 			}
 			
 			JSONObject library = null;
@@ -344,7 +344,7 @@ public class DevicesStorageManager {
 			}
 			
 			
-			int id = (int)System.currentTimeMillis();
+			int id = PersistanceUtils.generateUniqueId();
 			program.put("id", id);
 			library.put(id + "", program);
 			
@@ -352,9 +352,9 @@ public class DevicesStorageManager {
 			
 			StorageManager.getInstance().commit();
 
-			return library;
+			return id;
 		} catch (JSONException e) {
-			return null;
+			return -1;
 		}
 	}	
 	

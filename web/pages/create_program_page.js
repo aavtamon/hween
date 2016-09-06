@@ -3,7 +3,11 @@ CreateProgramPage = ClassUtils.defineClass(AbstractDataPage, function CreateProg
   
   this._deviceId;
   this._deviceInfo;
+  this._program;
   this._addToDevice;
+  this._deviceProgramId;
+  this._addToLibrary;
+  this._libraryProgramId;
   
   this._commandList;
   this._removeCommandButton;
@@ -78,48 +82,100 @@ CreateProgramPage.prototype.definePageContent = function(root) {
   
   this._saveButton = UIUtils.appendButton(buttonsPanel, "SaveButton", this.getLocale().SaveButton);
   this._saveButton.setClickListener(function() {
-    var program = {
-      title: this._programNameInput.getValue(),
-      description: this._descriptionInput.getValue(),
-      commands: []
-    }
-    
+    this._program.title = this._programNameInput.getValue();
+    this._program.description = this._descriptionInput.getValue();
+    this._program.commands = [];
+
     var items = this._commandList.getItems();
     for (var index in items) {
-      program.commands.push(items[index].element._command);
+      this._program.commands.push(items[index].element._command);
     }
     
-    
-    
-    
-    Backend.addLibraryProgram(this._deviceId, program, function(status) {
-      if (status == Backend.OperationResult.SUCCESS) {
-        if (this._addToDevice) {
-          Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(program), function(status) {
-            if (status == Backend.OperationResult.SUCCESS) {
+    if (this._addToLibrary) {
+      if (this._libraryProgramId != null) {
+        //TODO: Not yet supported. Requires to add updateLibraryProgram to Backend apis
+      } else {
+        Backend.addLibraryProgram(this._deviceId, this._program, function(status, libProgram) {
+          if (status == Backend.OperationResult.SUCCESS) {
+            if (this._addToDevice) {
+              Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(libProgram), function(status) {
+                if (status == Backend.OperationResult.SUCCESS) {
+                  Application.goBack();
+                }
+              }.bind(this));
+            } else {
               Application.goBack();
             }
-          }.bind(this));
-        } else {
-          Application.goBack();
-        }
+          }
+        }.bind(this));
       }
-    }.bind(this));
+    } else if (this._addToDevice) {
+      if (this._deviceProgramId != null) {
+        Backend.updateDevicePrograms(this._deviceId, this._program, function(status) {
+          if (status == Backend.OperationResult.SUCCESS) {
+            Application.goBack();
+          }
+        }.bind(this));
+      } else {
+        Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(this._program), function(status) {
+          if (status == Backend.OperationResult.SUCCESS) {
+            Application.goBack();
+          }
+        }.bind(this));
+      }
+    }
   }.bind(this));
 }
 
 CreateProgramPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
-  this._addToDevice = bundle.addToDevice;
+  this._deviceProgramId = bundle.deviceProgramId;
+  this._addToDevice = this._deviceProgramId != null || bundle.addToDevice || false;
+  this._addToLibrary = bundle.addToLibrary || false;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
   this._toy = Toy.createToy(this._deviceInfo.type, "Toy");
   this._toy.append(this._toyPanel);
+
   
   this._commandList.clear();
   this._programNameInput.setValue("");
   this._descriptionInput.setValue("");
+  
+  this._program = null;
+  if (this._deviceProgramId != null) {
+    var schedule = Backend.getDeviceSchedule(this._deviceId);
+    if (schedule != null && schedule.programs != null) {
+      for (var index in schedule.programs) {
+        var program = schedule.programs[index]
+        if (program.id == this._deviceProgramId) {
+          this._program = program;
+          break;
+        }
+      }
+    } else {
+      console.error("Incorrect situation: provided device program id " + this._deviceProgramId + " is out of sync")
+    }
+  } else if (this._libraryProgramId != null) {
+    var libraryPrograms = Backend.getLibraryPrograms(this._deviceId); 
+    if (libraryPrograms != null && libraryPrograms.length > this._libraryProgramId) {
+      this._program = libraryPrograms[this._libraryProgramId];
+    } else {
+      console.error("Incorrect situation: provided library program id " + this._libraryProgramId + " is out of sync")
+    }
+  }
+
+  if (this._program != null) {
+    for (var command in program.commands) {
+      this._addCommandToList(command);
+    }
+    this._programNameInput.setValue(program.title);
+    this._descriptionInput.setValue(program.description);
+  } else {
+    this._program = {};
+  }
+  
   
   Backend.getDeviceSettings(this._deviceInfo.type, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {

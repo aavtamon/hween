@@ -72,9 +72,10 @@ public class DeviceSettingsController {
 		try {
 			JSONObject program = new JSONObject(body);
 			
-			JSONObject stockPrograms = StorageManager.getInstance().getDeviceRegistryManager().addStockProgram(deviceType, program);
-			if (stockPrograms != null) {
-				return ControllerUtils.buildResponse(Response.Status.OK, stockPrograms);
+			int programId = StorageManager.getInstance().getDeviceRegistryManager().addStockProgram(deviceType, program);
+			if (programId != -1) {
+				JSONObject stockPrograms = StorageManager.getInstance().getDeviceRegistryManager().getStockPrograms(deviceType);
+				return ControllerUtils.buildResponse(Response.Status.OK, stockPrograms, programId + "");
 			} else {
 				return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 			}

@@ -58,6 +58,9 @@
   text-align: left;
 }
 #DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-RemoveSelectedButton {
+  margin-right: 30px;
+}
+#DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-EditProgramButton {
   margin-right: 50px;
 }
 #DeviceManagementPage-ContentPanel-ProgramSelectionPanel-ProgramButtonsPanel-AddProgramButton {

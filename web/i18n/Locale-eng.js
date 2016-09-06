@@ -131,6 +131,7 @@ var Locale_eng = {
       "AddStockProgramButton": "Stock",
       "UpdatingListOfProgramsLabel": "Please wait while we are retrieving your programs",
       "NoProgramsAvailableLabel": "You have no programs added. Click 'Add program' button to add some",
+      "EditProgramButton": "Edit selected",
       "ManageProgramsButton": "Manage Program Library",
       "RunButton": "Run On Device",
       "StopButton": "Stop",
