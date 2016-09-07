@@ -1,13 +1,7 @@
 package com.piztec.hween.controller.drivers;
 
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.xml.bind.DatatypeConverter;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -26,94 +20,58 @@ public class StumpGhostDriver extends DeviceDriver {
 	private Map<String, Button> buttons = new HashMap<String, Button>();
 
 	//http://pi4j.com/pins/model-b-rev1.html
-	private GpioPinDigitalOutput upPin; 
-	private GpioPinDigitalOutput downPin; 
-	private GpioPinDigitalInput in12_pin19; 
-	private GpioPinDigitalInput in13_pin21;
+	private GpioPinDigitalOutput upMotorOut; 
+	private GpioPinDigitalOutput downMotorOut;
+	private GpioPinDigitalOutput wpsLedOut;
+	private GpioPinDigitalInput downMotorSwitchIn; 
+	private GpioPinDigitalInput upMotorSwitchIn;
+	private GpioPinDigitalInput wpsButtonIn;
 	
 	private Object commandSyncer = new Object();
 	private Object triggerSyncer = new Object();
 	
-	private boolean highLimitTrigger;
-	private boolean lowLimitTrigger;
+	private boolean upLimitTrigger;
+	private boolean downLimitTrigger;
 	
-	private final boolean targetDeviceFeaturesEnabled;
-	
+	private GpioController gpioController;
 	
 	public StumpGhostDriver(final boolean targetDeviceFeaturesEnabled) {
-		this.targetDeviceFeaturesEnabled = targetDeviceFeaturesEnabled;
+		if (targetDeviceFeaturesEnabled) {
+			gpioController = GpioFactory.getInstance();
+		}
 		
-		initPins();
 		initCommands();
 		initTriggers();
 		initIndicators();
 		initButtons();
 	}
 	
-	private void initPins() {
-		if (!targetDeviceFeaturesEnabled) {
-			return;
-		}
-		
-		GpioController gpioController = GpioFactory.getInstance();
-		
-		upPin = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, "Move Up", PinState.LOW);
-		upPin.setShutdownOptions(true, PinState.LOW);
-		
-		downPin = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Move Down", PinState.LOW);
-		downPin.setShutdownOptions(true, PinState.LOW);
-
-		in12_pin19 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_12, "Down Limit", PinPullResistance.PULL_DOWN);
-		in12_pin19.addListener(new GpioPinListenerDigital() {
-			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-				synchronized (triggerSyncer) {
-					highLimitTrigger = event.getState() == PinState.HIGH;
-					triggerSyncer.notify();
-				}
-				
-				System.out.println("Pin 12 got an event");
-			}
-		});
-
-		in13_pin21 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_13, "Up Limit", PinPullResistance.PULL_DOWN);
-		in13_pin21.setShutdownOptions(true, PinState.LOW);
-		in13_pin21.addListener(new GpioPinListenerDigital() {
-			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-				synchronized (triggerSyncer) {
-					lowLimitTrigger = event.getState() == PinState.HIGH;
-					triggerSyncer.notify();
-				}
-
-				System.out.println("Pin 13 got an event");
-			}
-		});
-		
-		// Add notifyDeviceEvent for WPS and LED controls
-	}
-	
 	
 	private void initCommands() {
 		commands.put("reset", new Command("reset") {
+			protected void register() {
+			}
+			
 			public boolean execute(Object param) throws Exception {
 				synchronized (commandSyncer) {
 					synchronized (triggerSyncer) {
 						System.out.println("Stump Ghost: <reset> command");
 						
-						if (lowLimitTrigger) {
+						if (downLimitTrigger) {
 							System.out.println("Stump Ghost: <reset> command cannot be executed - already low position");
 							return false;
 						}
 						
-						downPin.high();
+						downMotorOut.high();
 						
 						while (true) {
 							triggerSyncer.wait(10000);
-							if (lowLimitTrigger) {
+							if (downLimitTrigger) {
 								break;
 							}
 						}
 						
-						downPin.low();
+						downMotorOut.low();
 						System.out.println("Stump Ghost: <reset> command - completed");
 					}							
 				}
@@ -122,21 +80,44 @@ public class StumpGhostDriver extends DeviceDriver {
 			}
 		});
 		commands.put("move_up", new Command("move_up") {
+			protected void register() {
+				if (gpioController == null) {
+					return;
+				}
+				
+				upMotorOut = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, "Move Up", PinState.LOW);
+				upMotorOut.setShutdownOptions(true, PinState.LOW);
+
+				upMotorSwitchIn = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_13, "Up Limit", PinPullResistance.PULL_DOWN);
+				upMotorSwitchIn.setShutdownOptions(true, PinState.LOW);
+				upLimitTrigger = upMotorSwitchIn.getState() == PinState.HIGH;
+				upMotorSwitchIn.addListener(new GpioPinListenerDigital() {
+					public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+						System.out.println("Up Motor Switch got an event. State = " + event.getState());
+						
+						synchronized (triggerSyncer) {
+							upLimitTrigger = event.getState() == PinState.HIGH;
+							triggerSyncer.notify();
+						}
+					}
+				});
+			}			
+			
 			public boolean execute(Object param) throws Exception {
 				synchronized (commandSyncer) {
 					synchronized (triggerSyncer) {
 						System.out.println("Stump Ghost: <move up> command");
 					
-						if (highLimitTrigger) {
+						if (upLimitTrigger) {
 							System.out.println("Stump Ghost: <move up> command cannot be executed - already uphigh position");
 							return false;
 						}
 						
-						upPin.high();
+						upMotorOut.high();
 						
 						triggerSyncer.wait(1000);
 						
-						upPin.low();
+						upMotorOut.low();
 						
 						System.out.println("Stump Ghost: <move up> command - completed");
 					}
@@ -146,21 +127,43 @@ public class StumpGhostDriver extends DeviceDriver {
 			}
 		});
 		commands.put("move_down", new Command("move_down") {
+			protected void register() {
+				if (gpioController == null) {
+					return;
+				}
+				
+				downMotorOut = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Move Down", PinState.LOW);
+				downMotorOut.setShutdownOptions(true, PinState.LOW);
+				downLimitTrigger = downMotorOut.getState() == PinState.HIGH;
+				
+				downMotorSwitchIn = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_12, "Down Limit", PinPullResistance.PULL_DOWN);
+				downMotorSwitchIn.addListener(new GpioPinListenerDigital() {
+					public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+						System.out.println("Down Motor Switch got an event. State = " + event.getState());
+						
+						synchronized (triggerSyncer) {
+							downLimitTrigger = event.getState() == PinState.HIGH;
+							triggerSyncer.notify();
+						}
+					}
+				});
+			}
+			
 			public boolean execute(Object param) throws Exception {
 				synchronized (commandSyncer) {
 					synchronized (triggerSyncer) {
 						System.out.println("Stump Ghost: <move down> command");
 					
-						if (lowLimitTrigger) {
-							System.out.println("Stump Ghost: <move down> command cannot be executed - already uphigh position");
+						if (downLimitTrigger) {
+							System.out.println("Stump Ghost: <move down> command cannot be executed - already lowest down position");
 							return false;
 						}
 						
-						downPin.high();
+						downMotorOut.high();
 						
 						triggerSyncer.wait(1000);
 						
-						downPin.low();
+						downMotorOut.low();
 						
 						System.out.println("Stump Ghost: <move down> command - completed");
 					}
@@ -170,6 +173,9 @@ public class StumpGhostDriver extends DeviceDriver {
 			}
 		});
 		commands.put("turn_left", new Command("turn_left") {
+			protected void register() {				
+			}
+			
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <turn left> command");
 				
@@ -180,6 +186,9 @@ public class StumpGhostDriver extends DeviceDriver {
 			}
 		});
 		commands.put("turn_right", new Command("turn_right") {
+			protected void register() {				
+			}
+			
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <turn right> command");
 
@@ -190,6 +199,9 @@ public class StumpGhostDriver extends DeviceDriver {
 			}
 		});
 		commands.put("eyes_on", new Command("eyes_on") {
+			protected void register() {				
+			}
+			
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <eyes on> command");
 				
@@ -200,6 +212,9 @@ public class StumpGhostDriver extends DeviceDriver {
 			}
 		});
 		commands.put("eyes_off", new Command("eyes_off") {
+			protected void register() {				
+			}
+			
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <eyes off> command");
 				
@@ -219,19 +234,30 @@ public class StumpGhostDriver extends DeviceDriver {
 	
 	private void initIndicators() {
 		indicators.put(DeviceDriver.INDICATOR_WPS, new Indicator(DeviceDriver.INDICATOR_WPS) {
-			private boolean state;
+			protected void register() {
+				if (gpioController == null) {
+					return;
+				}
+				
+				wpsLedOut = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_11, "WPS LED", PinState.LOW);
+				wpsLedOut.setShutdownOptions(true, PinState.LOW);
+			}
 			
 			protected void setState(final boolean on) {
 				System.out.println("Stump Ghost: <WPS LED>: " + on);
-				state = on;
+				
+				wpsLedOut.setState(on);
 			}
 			
 			protected boolean getState() {
-				return state;
+				return wpsLedOut.getState() == PinState.HIGH;
 			}
 		});
 		indicators.put(DeviceDriver.INDICATOR_NETWORK, new Indicator(DeviceDriver.INDICATOR_NETWORK) {
 			private boolean state;
+			
+			protected void register() {				
+			}
 			
 			protected void setState(final boolean on) {
 				System.out.println("Stump Ghost: <Network LED>: " + on);
@@ -246,19 +272,32 @@ public class StumpGhostDriver extends DeviceDriver {
 	
 	private void initButtons() {
 		buttons.put(DeviceDriver.BUTTON_WPS, new Button(DeviceDriver.BUTTON_WPS) {
+			private long buttonPressTimestamp = -1;
+			
 			public void register() {
-//				final Button b = this;
-//				new Thread() {
-//					public void run() {
-//						try {
-//							Thread.sleep(10000);
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//						}
-//						System.out.println("Stump Ghost: <WPS Button>");
-//						b.notifyListeners();
-//					}
-//				}.start();
+				if (gpioController == null) {
+					return;
+				}
+				
+				wpsButtonIn = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_06, "WPS Button", PinPullResistance.PULL_DOWN);
+				wpsButtonIn.setShutdownOptions(true, PinState.LOW);
+				wpsButtonIn.addListener(new GpioPinListenerDigital() {
+					public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+						System.out.println("WPS Button got an event. State = " + event.getState());
+
+						if (buttonPressTimestamp == -1) {
+							buttonPressTimestamp = System.currentTimeMillis();
+						} else {
+							long holdDuration = System.currentTimeMillis() - buttonPressTimestamp;
+							if (holdDuration > 2000) {
+								System.out.println("WPS Button was hold for more than 2 seconds - starting the sequence");
+								notifyListeners();
+							}
+							
+							buttonPressTimestamp = -1;
+						}
+					}
+				});
 			}
 		});
 	}

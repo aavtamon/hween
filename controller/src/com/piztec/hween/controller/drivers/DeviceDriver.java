@@ -16,6 +16,7 @@ public abstract class DeviceDriver {
 		
 		Command(final String name) {
 			this.name = name;
+			register();
 		}
 		
 		public String getName() {
@@ -26,6 +27,7 @@ public abstract class DeviceDriver {
 			return name;
 		}
 		
+		protected abstract void register();		
 		public abstract boolean execute(final Object param) throws Exception;
 	}
 	
@@ -75,6 +77,7 @@ public abstract class DeviceDriver {
 		
 		Indicator(final String name) {
 			this.name = name;
+			register();
 		}
 		
 		public String getName() {
@@ -116,7 +119,7 @@ public abstract class DeviceDriver {
 			blinkingThread.start();
 		}
 		
-		
+		protected abstract void register();		
 		protected abstract void setState(final boolean on);
 		protected abstract boolean getState();
 		
@@ -173,7 +176,7 @@ public abstract class DeviceDriver {
 			}
 		}
 		
-		public abstract void register();
+		protected abstract void register();
 	}
 	
 	
