@@ -167,8 +167,8 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   }
 
   if (this._program != null) {
-    for (var command in program.commands) {
-      this._addCommandToList(command);
+    for (var index in program.commands) {
+      this._addCommandToList(program.commands[index]);
     }
     this._programNameInput.setValue(program.title);
     this._descriptionInput.setValue(program.description);
@@ -181,13 +181,6 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
     if (status == Backend.OperationResult.SUCCESS) {
       var commands = deviceSettings.supportedCommands;
       this._addCommandButton.setExpandableActions(this._getCommandActions(deviceSettings.supportedCommands));
-      
-      for (var i in commands) {
-        if (commands[i].data == Backend.DeviceCommand.RESET) {
-          this._addCommandToList(commands[i]);
-          break;
-        }
-      }
     }
   }.bind(this));
   
@@ -280,6 +273,7 @@ CreateProgramPage.prototype._playProgram = function() {
   
   if (this._currentCommandIndex == null) {
     this._currentCommandIndex = 0;
+    this._toy.reset();
   } else {
     this._stopCommandExecution(this._currentCommandIndex);
     this._currentCommandIndex++;

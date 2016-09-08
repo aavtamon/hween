@@ -16,6 +16,7 @@ public class Schedule {
 	
 	private static final String COMMAND_PAUSE = "pause";
 	private static final String COMMAND_TALK = "talk";
+	private static final String COMMAND_RESET = "reset";
 	
 	private final JSONObject cloudSchedule;
 	private final DeviceDriver driver;
@@ -148,11 +149,28 @@ public class Schedule {
 				} catch (JSONException e1) {
 				}
 				
+				// We reset the device back to the initial position
+				Command resetCommand = driver.getCommand(COMMAND_RESET);
+				if (resetCommand != null) {
+					try {
+						resetCommand.execute(null);
+					} catch (Exception e) {
+					}
+				}
+				
+				AudioManager.getInstance().stop();
+				
 				try {
 					JSONArray cloudCommands = program.getJSONArray("commands");
 					for (int i = 0; i < cloudCommands.length(); i++) {
 						JSONObject cloudCommand = cloudCommands.getJSONObject(i);
-						executeCommand(cloudCommand);
+						try {
+							executeCommand(cloudCommand);
+						} catch (InterruptedException ie) {
+							break;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						
 						if (isInterrupted()) {
 							break;
@@ -161,9 +179,6 @@ public class Schedule {
 					
 					// We interrupt any playback left over from the previous program
 					AudioManager.getInstance().stop();
-				} catch (InterruptedException ie) {
-					AudioManager.getInstance().stop();
-					throw ie;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

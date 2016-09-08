@@ -11,7 +11,7 @@ public class Main {
 			System.err.println("URL is not specified");
 			return;
 		}
-		System.err.println("Server URL: " + url);
+		System.out.println("Server URL: " + url);
 		
 		ControllerContext.setServerUrl(url);
 		
