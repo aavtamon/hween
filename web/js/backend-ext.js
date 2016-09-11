@@ -435,7 +435,7 @@ Backend.setDeviceMode = function(deviceId, mode, operationCallback) {
 
 Backend.getLibraryPrograms = function(deviceId, operationCallback) {
   var libraryPrograms = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
-  
+
   if (libraryPrograms == null) {
     this._pullLibraryPrograms(deviceId, operationCallback);
   } else if (operationCallback) {
@@ -452,7 +452,7 @@ Backend._pullLibraryPrograms = function(deviceId, operationCallback) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
 
       if (operationCallback) {
-        operationCallback(Backend.OperationResult.SUCCESS);
+        operationCallback(Backend.OperationResult.SUCCESS, data);
       }
     },
     error: function(xhr, status, error) {
@@ -488,6 +488,42 @@ Backend._pullLibraryPrograms = function(deviceId, operationCallback) {
 //  }, 1000);
 }
 
+Backend.getLibraryProgram = function(deviceId, programId, operationCallback) {
+  var getProgram = function(programs, programId) {
+    for (var index in programs) {
+      if (programs[index].id == programId) {
+        return programs[index];
+      }
+    }
+    
+    return null;
+  }
+  
+  var libraryPrograms = Backend.getLibraryPrograms(deviceId, function(status, libPrograms) {
+    if (status != Backend.OperationResult.SUCCESS) {
+      if (operationCallback != null) {
+        operationCallback(status);
+      }
+    } else {
+      var program = getProgram(libPrograms, programId);
+      if (program != null) {
+        if (operationCallback != null) {
+          operationCallback(Backend.OperationResult.SUCCESS, program);
+        }
+      } else {
+        operationCallback(Backend.OperationResult.FAILURE);
+      }
+    }
+  });
+  
+  if (libraryPrograms == null) {
+    return null;
+  } else {
+    return getProgram(libraryPrograms, programId);
+  }
+}
+
+
 Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
   
@@ -518,6 +554,32 @@ Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
   }
   
   this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library", "POST", program, true, this._getAuthenticationHeader(), communicationCallback);
+}
+
+Backend.updateLibraryProgram = function(deviceId, program, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
+  
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
+
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
+    }
+  }
+  
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library", "PUT", program, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
 Backend.removeLibraryProgram = function(deviceId, programId, operationCallback) {
@@ -620,6 +682,32 @@ Backend.addStockProgram = function(deviceType, program, operationCallback) {
   this._communicate("settings/device/" + deviceType + "/programs", "POST", program, true, this._getAuthenticationHeader(), communicationCallback);  
 }
 
+Backend.updateStockProgram = function(deviceType, program, operationCallback) {
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType);
+  
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, data);
+
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceType, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
+    }
+  }
+  
+  this._communicate("settings/device/" + deviceType + "/programs", "PUT", program, true, this._getAuthenticationHeader(), communicationCallback);  
+}
+
 Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS, deviceId);
   
@@ -651,20 +739,14 @@ Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
 Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
   return {
     id: libraryProgram.id,
-    title: libraryProgram.title,
-    description: libraryProgram.description,
     frequency: Backend.Program.FREQUENCY_NEVER,
-    commands: libraryProgram.commands
   }
 }
 
 Backend.convertStockToDeviceProgram = function(stockProgram) {
   return {
     id: stockProgram.id,
-    title: stockProgram.title,
-    description: stockProgram.description,
     frequency: Backend.Program.FREQUENCY_NEVER,
-    commands: stockProgram.commands
   }
 }
 

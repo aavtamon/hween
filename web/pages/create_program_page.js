@@ -5,9 +5,7 @@ CreateProgramPage = ClassUtils.defineClass(AbstractDataPage, function CreateProg
   this._deviceInfo;
   this._program;
   this._addToDevice;
-  this._deviceProgramId;
-  this._addToLibrary;
-  this._libraryProgramId;
+  this._edittingProgramId;
   
   this._commandList;
   this._removeCommandButton;
@@ -91,38 +89,35 @@ CreateProgramPage.prototype.definePageContent = function(root) {
       this._program.commands.push(items[index].element._command);
     }
     
-    if (this._addToLibrary) {
-      if (this._libraryProgramId != null) {
-        //TODO: Not yet supported. Requires to add updateLibraryProgram to Backend apis
-      } else {
-        Backend.addLibraryProgram(this._deviceId, this._program, function(status, libProgram) {
-          if (status == Backend.OperationResult.SUCCESS) {
-            if (this._addToDevice) {
-              Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(libProgram), function(status) {
-                if (status == Backend.OperationResult.SUCCESS) {
-                  Application.goBack();
-                }
-              }.bind(this));
-            } else {
-              Application.goBack();
-            }
-          }
-        }.bind(this));
-      }
-    } else if (this._addToDevice) {
-      if (this._deviceProgramId != null) {
-        Backend.updateDevicePrograms(this._deviceId, this._program, function(status) {
-          if (status == Backend.OperationResult.SUCCESS) {
+    
+    if (this._edittingProgramId != null) {
+      Backend.updateLibraryProgram(this._deviceId, this._program, function(status) {
+        if (status == Backend.OperationResult.SUCCESS) {
+          if (this._addToDevice) {
+            Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(this._program), function(status) {
+              if (status == Backend.OperationResult.SUCCESS) {
+                Application.goBack();
+              }
+            }.bind(this));
+          } else {
             Application.goBack();
           }
-        }.bind(this));
-      } else {
-        Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(this._program), function(status) {
-          if (status == Backend.OperationResult.SUCCESS) {
+        }
+      }.bind(this));
+    } else {
+      Backend.addLibraryProgram(this._deviceId, this._program, function(status, libraryProgram) {
+        if (status == Backend.OperationResult.SUCCESS) {
+          if (this._addToDevice) {
+            Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(libraryProgram), function(status) {
+              if (status == Backend.OperationResult.SUCCESS) {
+                Application.goBack();
+              }
+            }.bind(this));
+          } else {
             Application.goBack();
           }
-        }.bind(this));
-      }
+        }
+      }.bind(this));
     }
   }.bind(this));
 }
@@ -130,9 +125,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
 CreateProgramPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
-  this._deviceProgramId = bundle.deviceProgramId;
-  this._addToDevice = this._deviceProgramId != null || bundle.addToDevice || false;
-  this._addToLibrary = bundle.addToLibrary || false;
+  this._addToDevice = bundle.addToDevice;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
   this._toy = Toy.createToy(this._deviceInfo.type, "Toy");
@@ -144,25 +137,20 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._descriptionInput.setValue("");
   
   this._program = null;
-  if (this._deviceProgramId != null) {
-    var schedule = Backend.getDeviceSchedule(this._deviceId);
-    if (schedule != null && schedule.programs != null) {
-      for (var index in schedule.programs) {
-        var program = schedule.programs[index]
-        if (program.id == this._deviceProgramId) {
-          this._program = program;
+  if (this._edittingProgramId != null) {
+    var libraryPrograms = Backend.getLibraryPrograms(this._deviceId); 
+    if (libraryPrograms != null) {
+      for (var index in libraryPrograms) {
+        var libraryProgram = libraryPrograms[index];
+        if (libraryProgram.id == this._edittingProgramId) {
+          this._program = libraryProgram;
           break;
         }
       }
-    } else {
-      console.error("Incorrect situation: provided device program id " + this._deviceProgramId + " is out of sync")
     }
-  } else if (this._libraryProgramId != null) {
-    var libraryPrograms = Backend.getLibraryPrograms(this._deviceId); 
-    if (libraryPrograms != null && libraryPrograms.length > this._libraryProgramId) {
-      this._program = libraryPrograms[this._libraryProgramId];
-    } else {
-      console.error("Incorrect situation: provided library program id " + this._libraryProgramId + " is out of sync")
+    
+    if (this._program == null) {
+      console.error("Incorrect situation: provided library program id " + this._edittingProgramId + " does not match any library program")
     }
   }
 
