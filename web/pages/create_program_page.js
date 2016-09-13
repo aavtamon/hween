@@ -140,8 +140,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   if (this._edittingProgramId != null) {
     var libraryPrograms = Backend.getLibraryPrograms(this._deviceId); 
     if (libraryPrograms != null) {
-      for (var index in libraryPrograms) {
-        var libraryProgram = libraryPrograms[index];
+      for (var id in libraryPrograms) {
         if (libraryProgram.id == this._edittingProgramId) {
           this._program = libraryProgram;
           break;

@@ -1,5 +1,7 @@
 package com.piztec.hween.application;
 
+import java.util.Iterator;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -217,20 +219,31 @@ public class UserDeviceManagementController {
 	
 	@OPTIONS
 	@Path("{userId}/devices/{deviceId}/library")
-	public Response getDeviceProgramLibraryOptions() {
+	public Response getDeviceLibraryProgramsOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
 	}
 	@GET
 	@Path("{userId}/devices/{deviceId}/library")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDeviceProgramLibrary(@PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @HeaderParam("Token") String authHeader) {
+	public Response getDeviceLibraryPrograms(@PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @HeaderParam("Token") String authHeader) {
 		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
-		JSONObject deviceLibrary = StorageManager.getInstance().getDevicesManager().getDeviceProgramLibrary(deviceId);
+		JSONObject deviceLibrary = StorageManager.getInstance().getDevicesManager().getDeviceLibraryPrograms(deviceId);
 		if (deviceLibrary != null) {
-			return ControllerUtils.buildResponse(Response.Status.OK, deviceLibrary);
+			JSONObject libraryPrograms = new JSONObject(deviceLibrary);
+			for (Iterator<String> it = libraryPrograms.keys(); it.hasNext(); ) {
+				final String programId = it.next();
+				try {
+					JSONObject program = libraryPrograms.getJSONObject(programId);
+					program.remove("commands");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		
+			return ControllerUtils.buildResponse(Response.Status.OK, libraryPrograms);
 		} else {
 			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 		}
@@ -238,7 +251,7 @@ public class UserDeviceManagementController {
 	@POST
 	@Path("{userId}/devices/{deviceId}/library")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addDeviceProgramLibrary(String body, @PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @HeaderParam("Token") String authHeader) {
+	public Response addDeviceLibraryProgram(String body, @PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @HeaderParam("Token") String authHeader) {
 		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
@@ -247,7 +260,7 @@ public class UserDeviceManagementController {
 			JSONObject libraryProgram = new JSONObject(body);
 			int programId = StorageManager.getInstance().getDevicesManager().addLibraryProgram(deviceId, libraryProgram);
 			if (programId != -1) {
-				JSONObject library = StorageManager.getInstance().getDevicesManager().getDeviceProgramLibrary(deviceId);
+				JSONObject library = StorageManager.getInstance().getDevicesManager().getDeviceLibraryPrograms(deviceId);
 				return ControllerUtils.buildResponse(Response.Status.OK, library, programId + "");
 			} else {
 				return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
@@ -259,8 +272,50 @@ public class UserDeviceManagementController {
 	
 	@OPTIONS
 	@Path("{userId}/devices/{deviceId}/library/{programId}")
-	public Response deleteDeviceProgramLibraryOptions() {
+	public Response getDeviceLibraryProgramOptions() {
 		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+	@GET
+	@Path("{userId}/devices/{deviceId}/library/{programId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceLibraryProgram(@PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @PathParam("programId") int programId, @HeaderParam("Token") String authHeader) {
+		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject libraryProgram = StorageManager.getInstance().getDevicesManager().getDeviceLibraryProgram(deviceId, programId);
+		if (libraryProgram != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, libraryProgram);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+		}
+	}
+	@PUT
+	@Path("{userId}/devices/{deviceId}/library/{programId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateDeviceLibraryProgram(String body, @PathParam("userId") int userId, @PathParam("deviceId") String deviceId, @PathParam("programId") int programId, @HeaderParam("Token") String authHeader) {
+		if (!ApplicationUtils.isAuthenticated(userId, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		if (body != null) {
+			try {
+				JSONObject bodyObject = new JSONObject(body);
+				
+				JSONObject libraryProgram = StorageManager.getInstance().getDevicesManager().updateLibraryProgram(deviceId, programId, bodyObject);
+				if (libraryProgram != null) {
+					return ControllerUtils.buildResponse(Response.Status.OK, libraryProgram);
+				} else {
+					return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST, e.getMessage());
+			}
+		}
+
+		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
 	}
 	@DELETE
 	@Path("{userId}/devices/{deviceId}/library/{programId}")

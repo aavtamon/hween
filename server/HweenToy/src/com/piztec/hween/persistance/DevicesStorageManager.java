@@ -10,6 +10,43 @@ import org.json.JSONObject;
 
 /**
  * {
+ *   <serial number>: {
+ *     ip_address: <string>,
+ *     port: <int>
+ *     bssid: <string>,
+ *     status: <stirng>,
+ *     status_update_timestamp: <long>,
+ *     user_id: <int>,
+ *     
+ *     schedule: {
+ *       revision: <long>,
+ *     
+ *       trigger: <string>,
+ *       programs: [
+ *         {
+ *           id: <long>,
+ *           frequency: <string>,
+ *         },
+ *         ...
+ *       ]
+ *     },
+ *     mode: <string>,
+ *     
+ *     library: {
+ *       <id>: {
+ *         revision: <long>,
+ *       
+ *         id: <long>,
+ *         title: <string>,
+ *         description: <string>,
+ *         commands: [
+ *           <string>,
+ *           ...
+ *         ]
+ *       }
+ *     }
+ *   },
+ *   ...
  * }
  */
 
@@ -71,7 +108,7 @@ public class DevicesStorageManager {
 				userDevicesStorage.put(serialNumber, new JSONObject());
 			}
 
-			info.put("userId", userId);
+			info.put("user_id", userId);
 			
 			userDevicesStorage.put(serialNumber, info);
 			
@@ -92,7 +129,7 @@ public class DevicesStorageManager {
 				return false;
 			}
 	
-			info.remove("userId");
+			info.remove("user_id");
 			
 			userDevicesStorage.put(serialNumber, info);
 	
@@ -120,7 +157,7 @@ public class DevicesStorageManager {
 				
 				int recordUserId = -1;
 				try {
-					recordUserId = info.getInt("userId");
+					recordUserId = info.getInt("user_id");
 				} catch (Exception e) {					
 				}
 				
@@ -147,7 +184,7 @@ public class DevicesStorageManager {
 				
 				int recordUserId = -1;
 				try {
-					recordUserId = info.getInt("userId");
+					recordUserId = info.getInt("user_id");
 				} catch (Exception e) {					
 				}
 
@@ -230,6 +267,7 @@ public class DevicesStorageManager {
 		}		
 	}
 	
+	
 	public JSONObject getDeviceSchedule(final String serialNumber) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
@@ -241,7 +279,10 @@ public class DevicesStorageManager {
 		
 		try {
 			String deviceType = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber).getString("type");
-			return StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType);			
+			JSONObject schedule = StorageManager.getInstance().getDeviceRegistryManager().getDeviceSchedule(deviceType);
+			setDeviceSchedule(serialNumber, schedule);
+			
+			return schedule;
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
@@ -254,7 +295,8 @@ public class DevicesStorageManager {
 			if (deviceInfo == null) {
 				return null;
 			}
-			
+
+			schedule.put("revision", PersistanceUtils.generateRevision());
 			deviceInfo.put("schedule", schedule);
 			
 			StorageManager.getInstance().commit();
@@ -304,7 +346,7 @@ public class DevicesStorageManager {
 	
 	
 	
-	public JSONObject getDeviceProgramLibrary(final String serialNumber) {
+	public JSONObject getDeviceLibraryPrograms(final String serialNumber) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
 			if (deviceInfo == null) {
@@ -322,6 +364,24 @@ public class DevicesStorageManager {
 			return new JSONObject();
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
+		}		
+	}
+	
+	public JSONObject getDeviceLibraryProgram(final String serialNumber, final int programId) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			JSONObject library = deviceInfo.getJSONObject("library");
+			if (library != null) {
+				return library.getJSONObject(programId + "");
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
 			return null;
 		}		
 	}
@@ -346,6 +406,7 @@ public class DevicesStorageManager {
 			
 			int id = PersistanceUtils.generateUniqueId();
 			program.put("id", id);
+			program.put("revision", PersistanceUtils.generateRevision());
 			library.put(id + "", program);
 			
 			deviceInfo.put("library", library);
@@ -358,6 +419,46 @@ public class DevicesStorageManager {
 		}
 	}	
 	
+	public JSONObject updateLibraryProgram(final String serialNumber, int id, final JSONObject program) {
+		try {
+			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
+			if (deviceInfo == null) {
+				return null;
+			}
+			
+			JSONObject library = null;
+			try {
+				library = deviceInfo.getJSONObject("library");
+			} catch (Exception e) {				
+			}
+			
+			if (library == null) {
+				return null;
+			}
+			
+			
+//			JSONObject oldProgram = null;
+//			try {
+//				oldProgram = library.getJSONObject(id + "");
+//				
+//				
+//			} catch (Exception e) {
+//				oldProgram = program;
+//			}
+			
+			program.put("revision", PersistanceUtils.generateRevision());
+			library.put(id + "", program);
+			
+			deviceInfo.put("library", library);
+			
+			StorageManager.getInstance().commit();
+
+			return program;
+		} catch (JSONException e) {
+			return null;
+		}
+	}	
+
 	public JSONObject removeLibraryProgram(final String serialNumber, final int programId) {
 		try {
 			JSONObject deviceInfo = userDevicesStorage.getJSONObject(serialNumber);
