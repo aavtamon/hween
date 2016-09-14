@@ -57,7 +57,7 @@ ManageLibraryProgramsPage.prototype.definePageContent = function(root) {
     var selectedPrograms = this._getSelectedPrograms();
     for (var id in selectedPrograms) {
       var program = selectedPrograms[id];
-      programs.push(Backend.convertLibraryToDeviceProgram(program));
+      programs.push(Backend.convertToDeviceProgram(program));
     }
     
     Backend.addDevicePrograms(this._deviceId, programs, function(status) {

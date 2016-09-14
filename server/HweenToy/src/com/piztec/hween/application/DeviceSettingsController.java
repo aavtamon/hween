@@ -1,5 +1,7 @@
 package com.piztec.hween.application;
 
+import java.util.Iterator;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -55,6 +57,16 @@ public class DeviceSettingsController {
 		}
 		
 		JSONObject stockPrograms = StorageManager.getInstance().getDeviceRegistryManager().getStockPrograms(deviceType);
+		for (Iterator<String> it = stockPrograms.keys(); it.hasNext(); ) {
+			final String programId = it.next();
+			try {
+				JSONObject program = stockPrograms.getJSONObject(programId);
+				program.remove("commands");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		if (stockPrograms != null) {
 			return ControllerUtils.buildResponse(Response.Status.OK, stockPrograms);
 		} else {
@@ -81,6 +93,26 @@ public class DeviceSettingsController {
 			}
 		} catch (JSONException e) {
 			return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+		}
+	}
+	@OPTIONS
+	@Path("{deviceType}/programs/{programId}")
+	public Response getStockProgramOptions() {
+		return ControllerUtils.buildResponse(Response.Status.OK);
+	}
+	@GET
+	@Path("{deviceType}/programs/{programId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStockProgram(@PathParam("deviceType") String deviceType, @PathParam("programId") int programId, @HeaderParam("Token") String authHeader) {
+		if (!ApplicationUtils.isAuthenticated(authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject stockProgram = StorageManager.getInstance().getDeviceRegistryManager().getStockProgram(deviceType, programId);
+		if (stockProgram != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, stockProgram);
+		} else {
+			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 		}
 	}
 	@DELETE

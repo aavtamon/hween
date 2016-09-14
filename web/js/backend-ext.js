@@ -579,7 +579,7 @@ Backend.updateLibraryProgram = function(deviceId, program, operationCallback) {
     }
   }
   
-  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library", "PUT", program, true, this._getAuthenticationHeader(), communicationCallback);
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library/" + program.id, "PUT", program, true, this._getAuthenticationHeader(), communicationCallback);
 }
 
 Backend.removeLibraryProgram = function(deviceId, programId, operationCallback) {
@@ -705,7 +705,7 @@ Backend.updateStockProgram = function(deviceType, program, operationCallback) {
     }
   }
   
-  this._communicate("settings/device/" + deviceType + "/programs", "PUT", program, true, this._getAuthenticationHeader(), communicationCallback);  
+  this._communicate("settings/device/" + deviceType + "/programs/" + program.id, "PUT", program, true, this._getAuthenticationHeader(), communicationCallback);  
 }
 
 Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
@@ -736,16 +736,9 @@ Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
 
 
 
-Backend.convertLibraryToDeviceProgram = function(libraryProgram) {
+Backend.convertToDeviceProgram = function(libraryProgram) {
   return {
     id: libraryProgram.id,
-    frequency: Backend.Program.FREQUENCY_NEVER,
-  }
-}
-
-Backend.convertStockToDeviceProgram = function(stockProgram) {
-  return {
-    id: stockProgram.id,
     frequency: Backend.Program.FREQUENCY_NEVER,
   }
 }

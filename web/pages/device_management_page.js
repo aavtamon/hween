@@ -19,7 +19,7 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
     }
 
     if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE) {
-      this._refreshProgramList();
+      this._refreshProgramList(Backend.getDeviceSchedule(this._deviceId).programs);
     } else if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_MODE) {
       this._updateModeButtons();
     }
@@ -175,19 +175,14 @@ DeviceManagementPage.prototype.onHide = function() {
   Backend.removeCacheChangeListener(this._cacheChangeListener);
 }
 
-DeviceManagementPage.prototype._refreshProgramList = function() {
+DeviceManagementPage.prototype._refreshProgramList = function(programs) {
   var selectedItem = this._programList.getSelectedItem();
   this._programList.clear();
   UIUtils.setEnabled(this._removeSelectedButton, false);
   UIUtils.setEnabled(this._editSelectedButton, false);
 
-  var schedule = Backend.getDeviceSchedule(this._deviceId);
-  if (schedule == null) {
-    return;
-  }
-
-  for (var i = 0; i < schedule.programs.length; i++) {
-    this._addProgramToList(schedule.programs[i]);
+  for (var i = 0; i < programs.length; i++) {
+    this._addProgramToList(programs[i]);
   }
   
   this._programList.setSelectedItem(selectedItem);

@@ -43,7 +43,7 @@ StockProgramsPage.prototype.definePageContent = function(root) {
     var selectedPrograms = this._getSelectedPrograms();
     for (var i in selectedPrograms) {
       var program = selectedPrograms[i];
-      programs.push(Backend.convertStockToDeviceProgram(program));
+      programs.push(Backend.convertToDeviceProgram(program));
     }
     
     Backend.addDevicePrograms(this._deviceId, programs, function(status) {

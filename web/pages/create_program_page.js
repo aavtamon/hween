@@ -94,7 +94,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
       Backend.updateLibraryProgram(this._deviceId, this._program, function(status) {
         if (status == Backend.OperationResult.SUCCESS) {
           if (this._addToDevice) {
-            Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(this._program), function(status) {
+            Backend.addDevicePrograms(this._deviceId, Backend.convertToDeviceProgram(this._program), function(status) {
               if (status == Backend.OperationResult.SUCCESS) {
                 Application.goBack();
               }
@@ -108,7 +108,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
       Backend.addLibraryProgram(this._deviceId, this._program, function(status, libraryProgram) {
         if (status == Backend.OperationResult.SUCCESS) {
           if (this._addToDevice) {
-            Backend.addDevicePrograms(this._deviceId, Backend.convertLibraryToDeviceProgram(libraryProgram), function(status) {
+            Backend.addDevicePrograms(this._deviceId, Backend.convertToDeviceProgram(libraryProgram), function(status) {
               if (status == Backend.OperationResult.SUCCESS) {
                 Application.goBack();
               }
@@ -141,6 +141,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
     var libraryPrograms = Backend.getLibraryPrograms(this._deviceId); 
     if (libraryPrograms != null) {
       for (var id in libraryPrograms) {
+        var libraryProgram = libraryPrograms[id];
         if (libraryProgram.id == this._edittingProgramId) {
           this._program = libraryProgram;
           break;

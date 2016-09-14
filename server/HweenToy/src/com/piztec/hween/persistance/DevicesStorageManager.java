@@ -105,7 +105,7 @@ public class DevicesStorageManager {
 			} catch (Exception e) {
 			}
 			if (info == null) {
-				userDevicesStorage.put(serialNumber, new JSONObject());
+				info = new JSONObject();
 			}
 
 			info.put("user_id", userId);

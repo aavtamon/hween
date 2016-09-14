@@ -147,6 +147,17 @@ public class DeviceRegistryStorageManager {
 		}
 	}	
 	
+	public JSONObject getStockProgram(final String deviceType, final int programId) {
+		try {
+			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
+			JSONObject programs = typeObject.getJSONObject("stockPrograms");
+			
+			return programs.getJSONObject(programId + "");
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
 	public JSONObject removeStockProgram(final String deviceType, final int programId) {
 		try {
 			JSONObject typeObject = deviceRegistryStorage.getJSONObject(deviceType);
