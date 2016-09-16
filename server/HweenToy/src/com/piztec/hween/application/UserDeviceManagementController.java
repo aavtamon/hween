@@ -240,12 +240,11 @@ public class UserDeviceManagementController {
 					JSONObject libraryProgram = deviceLibrary.getJSONObject(programId);
 					for (Iterator<String> programIt = libraryProgram.keys(); programIt.hasNext(); ) {
 						final String propertyId = programIt.next();
-						if ("commands".equals(propertyId)) {
+						if (!"commands".equals(propertyId)) {
 							program.put(propertyId, libraryProgram.get(propertyId));
 						}
 					}
 					
-					program.remove("commands");
 					libraryPrograms.put(programId, program);
 				} catch (JSONException e) {
 					e.printStackTrace();

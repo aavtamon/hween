@@ -298,7 +298,7 @@ public class DevicesStorageManager {
 
 			schedule.put("revision", PersistanceUtils.generateRevision());
 			deviceInfo.put("schedule", schedule);
-			
+
 			StorageManager.getInstance().commit();
 			
 			return schedule;
@@ -470,6 +470,22 @@ public class DevicesStorageManager {
 			library.remove(programId + "");
 			
 			deviceInfo.put("library", library);
+			
+			JSONObject schedule = getDeviceSchedule(serialNumber);
+			if (schedule != null) {
+				JSONArray updatedPrograms = new JSONArray();
+				JSONArray programs = schedule.getJSONArray("programs");
+				for (int i = 0; i < programs.length(); i++) {
+					JSONObject program = programs.getJSONObject(i);
+					long deviceProgramId = program.getLong("id");
+					if (deviceProgramId != programId) {
+						updatedPrograms.put(program);
+					}
+				}
+				schedule.put("programs", updatedPrograms);
+				
+				setDeviceSchedule(serialNumber, schedule);
+			}
 
 			StorageManager.getInstance().commit();
 

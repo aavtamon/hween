@@ -574,6 +574,9 @@ Backend.removeLibraryProgram = function(deviceId, programId, operationCallback) 
   var communicationCallback = {
     success: function(data, status, xhr) {
       Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, data);
+      
+      // This is needed to get the affected program removed from the schedule
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE, deviceId, null);
 
       if (operationCallback) {
         operationCallback(Backend.OperationResult.SUCCESS);
