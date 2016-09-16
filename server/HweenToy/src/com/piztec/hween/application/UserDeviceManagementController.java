@@ -232,17 +232,26 @@ public class UserDeviceManagementController {
 		
 		JSONObject deviceLibrary = StorageManager.getInstance().getDevicesManager().getDeviceLibraryPrograms(deviceId);
 		if (deviceLibrary != null) {
-			JSONObject libraryPrograms = new JSONObject(deviceLibrary);
-			for (Iterator<String> it = libraryPrograms.keys(); it.hasNext(); ) {
-				final String programId = it.next();
+			JSONObject libraryPrograms = new JSONObject();
+			for (Iterator<String> libraryIt = deviceLibrary.keys(); libraryIt.hasNext(); ) {
+				final String programId = libraryIt.next();
 				try {
-					JSONObject program = libraryPrograms.getJSONObject(programId);
+					JSONObject program = new JSONObject();
+					JSONObject libraryProgram = deviceLibrary.getJSONObject(programId);
+					for (Iterator<String> programIt = libraryProgram.keys(); programIt.hasNext(); ) {
+						final String propertyId = programIt.next();
+						if ("commands".equals(propertyId)) {
+							program.put(propertyId, libraryProgram.get(propertyId));
+						}
+					}
+					
 					program.remove("commands");
+					libraryPrograms.put(programId, program);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
-		
+			
 			return ControllerUtils.buildResponse(Response.Status.OK, libraryPrograms);
 		} else {
 			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);

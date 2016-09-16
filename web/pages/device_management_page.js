@@ -94,7 +94,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
   this._editSelectedButton = UIUtils.appendButton(programButtonsPanel, "EditProgramButton", this.getLocale().EditProgramButton);
   this._editSelectedButton.setClickListener(function() {
     var selectedProgram = this._getSelectedPrograms()[0];
-    Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId, addToDevice: true, deviceProgramId: selectedProgram.id, addToLibrary: false});
+    Application.showPage(CreateProgramPage.name, {deviceId: this._deviceId, addToDevice: true, deviceProgramId: selectedProgram.id});
   }.bind(this));
   
 

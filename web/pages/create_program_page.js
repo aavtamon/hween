@@ -126,6 +126,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
   this._addToDevice = bundle.addToDevice;
+  this._edittingProgramId = bundle.deviceProgramId;
   this._deviceInfo = Backend.getDeviceInfo(this._deviceId);
   
   this._toy = Toy.createToy(this._deviceInfo.type, "Toy");
@@ -136,34 +137,22 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._programNameInput.setValue("");
   this._descriptionInput.setValue("");
   
-  this._program = null;
+  this._program = {};
   if (this._edittingProgramId != null) {
-    var libraryPrograms = Backend.getLibraryPrograms(this._deviceId); 
-    if (libraryPrograms != null) {
-      for (var id in libraryPrograms) {
-        var libraryProgram = libraryPrograms[id];
-        if (libraryProgram.id == this._edittingProgramId) {
-          this._program = libraryProgram;
-          break;
-        }
-      }
-    }
-    
-    if (this._program == null) {
-      console.error("Incorrect situation: provided library program id " + this._edittingProgramId + " does not match any library program")
-    }
-  }
+    Backend.getLibraryProgram(this._deviceId, this._edittingProgramId, function(status, program) {
+      if (status == Backend.OperationResult.SUCCESS) {
+        this._program = program;
 
-  if (this._program != null) {
-    for (var index in program.commands) {
-      this._addCommandToList(program.commands[index]);
-    }
-    this._programNameInput.setValue(program.title);
-    this._descriptionInput.setValue(program.description);
-  } else {
-    this._program = {};
+        for (var index in program.commands) {
+          this._addCommandToList(program.commands[index]);
+        }
+        this._programNameInput.setValue(program.title);
+        this._descriptionInput.setValue(program.description);
+      } else {
+        console.error("Incorrect situation: provided library program id " + this._edittingProgramId + " does not match any library program")
+      }
+    }.bind(this));
   }
-  
   
   Backend.getDeviceSettings(this._deviceInfo.type, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {

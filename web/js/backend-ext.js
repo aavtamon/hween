@@ -11,6 +11,7 @@ Backend.CacheChangeEvent.TYPE_DEVICE_INFO = "device_info";
 
 Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE = "device_schedule";
 Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS = "library_programs";
+Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAM = "library_program";
 Backend.CacheChangeEvent.TYPE_STOCK_PROGRAMS = "stock_programs";
 Backend.CacheChangeEvent.TYPE_DEVICE_MODE = "device_mode";
 
@@ -468,61 +469,46 @@ Backend._pullLibraryPrograms = function(deviceId, operationCallback) {
   }
   
   this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library", "GET", null, true, this._getAuthenticationHeader(), communicationCallback);
-//  
-//  //TODO
-//  setTimeout(function() {
-//    var libraryPrograms = [{
-//      id: 1,
-//      title: "Giiii",
-//      description: "Just giiii"
-//    }, {
-//      id: 2,
-//      title: "Loud Giiii",
-//      description: "Very loud giii"
-//    }]
-//    Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId, libraryPrograms);
-//
-//    if (operationCallback) {
-//      operationCallback(Backend.OperationResult.SUCCESS, libraryPrograms);
-//    }
-//  }, 1000);
 }
 
 Backend.getLibraryProgram = function(deviceId, programId, operationCallback) {
-  var getProgram = function(programs, programId) {
-    for (var index in programs) {
-      if (programs[index].id == programId) {
-        return programs[index];
-      }
-    }
-    
-    return null;
-  }
-  
-  var libraryPrograms = Backend.getLibraryPrograms(deviceId, function(status, libPrograms) {
-    if (status != Backend.OperationResult.SUCCESS) {
-      if (operationCallback != null) {
-        operationCallback(status);
-      }
-    } else {
-      var program = getProgram(libPrograms, programId);
-      if (program != null) {
-        if (operationCallback != null) {
-          operationCallback(Backend.OperationResult.SUCCESS, program);
-        }
-      } else {
-        operationCallback(Backend.OperationResult.FAILURE);
-      }
-    }
-  });
-  
-  if (libraryPrograms == null) {
-    return null;
-  } else {
-    return getProgram(libraryPrograms, programId);
-  }
-}
+  var libraryProgram = Backend.Cache.getObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAM, deviceId + "-" + programId);
 
+  if (libraryProgram == null) {
+    this._pullLibraryProgram(deviceId, programId, operationCallback);
+  } else if (operationCallback) {
+    operationCallback(Backend.OperationResult.SUCCESS, libraryProgram);
+  }
+  
+  return libraryProgram;
+}
+Backend._pullLibraryProgram = function(deviceId, programId, operationCallback) {
+  var deviceProgramId = deviceId + "-" + programId;
+  
+  Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAM, deviceProgramId);
+    
+  var communicationCallback = {
+    success: function(data, status, xhr) {
+      Backend.Cache.setObject(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAM, deviceProgramId, data);
+
+      if (operationCallback) {
+        operationCallback(Backend.OperationResult.SUCCESS, data);
+      }
+    },
+    error: function(xhr, status, error) {
+      Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAM, deviceProgramId, false);
+      if (operationCallback) {
+        if (xhr.status == 401 || xhr.status == 403 || xhr.status == 404) {
+          operationCallback(Backend.OperationResult.FAILURE);
+        } else {
+          operationCallback(Backend.OperationResult.ERROR);
+        }
+      }
+    }
+  }
+  
+  this._communicate("devices/user/" + Backend.getUserProfile().user_id + "/devices/" + deviceId + "/library/" + programId, "GET", null, true, this._getAuthenticationHeader(), communicationCallback);
+}
 
 Backend.addLibraryProgram = function(deviceId, program, operationCallback) {
   Backend.Cache.markObjectInUpdate(Backend.CacheChangeEvent.TYPE_LIBRARY_PROGRAMS, deviceId);
