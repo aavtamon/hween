@@ -89,7 +89,6 @@ CreateProgramPage.prototype.definePageContent = function(root) {
       this._program.commands.push(items[index].element._command);
     }
     
-    
     if (this._edittingProgramId != null) {
       Backend.updateLibraryProgram(this._deviceId, this._program, function(status) {
         if (status == Backend.OperationResult.SUCCESS) {
@@ -137,7 +136,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   this._programNameInput.setValue("");
   this._descriptionInput.setValue("");
   
-  this._program = {};
+  this._program = null;
   if (this._edittingProgramId != null) {
     Backend.getLibraryProgram(this._deviceId, this._edittingProgramId, function(status, program) {
       if (status == Backend.OperationResult.SUCCESS) {
@@ -148,6 +147,8 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
         }
         this._programNameInput.setValue(program.title);
         this._descriptionInput.setValue(program.description);
+        
+        UIUtils.setEnabled(this._saveButton, true);
       } else {
         console.error("Incorrect situation: provided library program id " + this._edittingProgramId + " does not match any library program")
       }
@@ -162,7 +163,10 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
   }.bind(this));
   
   UIUtils.setEnabled(this._removeCommandButton, false);
-  UIUtils.setEnabled(this._saveButton, false);
+  if (this._program == null) {
+    this._program = {};
+    UIUtils.setEnabled(this._saveButton, false);
+  }
   
   this._stopProgram();
   this._toy.reset();
