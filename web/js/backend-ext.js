@@ -728,7 +728,7 @@ Backend.removeStockProgram = function(deviceId, programId, operationCallback) {
 Backend.convertToDeviceProgram = function(libraryProgram) {
   return {
     id: libraryProgram.id,
-    frequency: Backend.Program.FREQUENCY_NEVER,
+    frequency: Backend.Program.FREQUENCY_ALWAYS,
   }
 }
 

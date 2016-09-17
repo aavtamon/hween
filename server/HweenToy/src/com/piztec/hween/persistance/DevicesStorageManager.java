@@ -257,7 +257,9 @@ public class DevicesStorageManager {
 			}
 			result.put("port", port);
 			
-			result.put("schedule", getDeviceSchedule(serialNumber));
+			JSONObject schedule = getDeviceSchedule(serialNumber);
+			long scheduleRevision = schedule.getLong("revision");
+			result.put("schedule_revision", scheduleRevision);
 			result.put("mode", getDeviceMode(serialNumber));
 
 			return result;

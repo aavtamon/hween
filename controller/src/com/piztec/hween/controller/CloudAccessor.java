@@ -21,7 +21,7 @@ public class CloudAccessor {
 	private int reportingCount;
 	private int reportingInterval = NORMAL_REPORTING_INTERVAL;
 	
-	private String lastReportedSchedule = null;
+	private long lastReportedScheduleRevision = -1;
 	private String lastReportedMode = null;
 	
 	public CloudAccessor() {
@@ -77,24 +77,62 @@ public class CloudAccessor {
 			return;
 		}
 		
+		String bssid = null;
+		if (address.type == NetworkManager.AddressDescriptor.TYPE_WIFI) {
+			bssid = NetworkManager.getInstance().getConnectedAccessPoint().bssid;
+		} 
+		
+		String statusToReport = "{\"ip_address\": \"" + address.ipAddress + "\", \"port\": " + ControlServer.SERVER_PORT + (bssid != null ? ", \"bssid\": \"" + bssid + "\"" : "") + "}";
+		System.out.println("Reporting back to " + ControllerContext.getServerUrl() + ": " + statusToReport);
+
+		String response = connectToCloudServer("PUT", "", statusToReport);
+		if (response != null) {
+			handleCloudResponse(response);
+		}
+	}
+	
+	private void handleCloudResponse(final String responseText) {
 		try {
-			HttpURLConnection connection = (HttpURLConnection)new URL(ControllerContext.getServerUrl() + "/device/" + DeviceManager.getInstance().getSerialNumber()).openConnection();
-			connection.setDoOutput(true);
-			connection.setRequestMethod("PUT");
+			JSONObject resposeObject = new JSONObject(responseText);
+	        long scheduleRevision = resposeObject.getLong("schedule_revision");
+	        
+	        if (scheduleRevision != lastReportedScheduleRevision) {
+	        	lastReportedScheduleRevision = scheduleRevision;
+	        	
+	        	String scheduleText = connectToCloudServer("GET", "schedule", null);
+	        	if (scheduleText != null) {
+	            	DeviceManager.getInstance().setSchedule(new JSONObject(scheduleText));        	
+	        	}
+	        }
+	        
+	        String mode = resposeObject.getString("mode");
+	        if (!mode.equals(lastReportedMode)) {
+	        	lastReportedMode = mode;
+	        	
+	        	DeviceManager.getInstance().setMode(mode);
+	        }
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	private String connectToCloudServer(final String httpMethod, final String resource, final String body) {
+		try {
+			HttpURLConnection connection = (HttpURLConnection)new URL(ControllerContext.getServerUrl() + "/device/" + DeviceManager.getInstance().getSerialNumber() + "/" + resource).openConnection();
+			if ("PUT".equalsIgnoreCase(httpMethod)) {
+				connection.setDoOutput(true);
+			}
+			connection.setRequestMethod(httpMethod);
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("Secret", DeviceManager.getInstance().getDeviceSecret());
 			
-			String bssid = null;
-			if (address.type == NetworkManager.AddressDescriptor.TYPE_WIFI) {
-				bssid = NetworkManager.getInstance().getConnectedAccessPoint().bssid;
-			} 
-			
-			String statusToReport = "{\"ip_address\": \"" + address.ipAddress + "\", \"port\": " + ControlServer.SERVER_PORT + (bssid != null ? ", \"bssid\": \"" + bssid + "\"" : "") + "}";
-			System.out.println("Reporting back to " + ControllerContext.getServerUrl() + ": " + statusToReport);
-			OutputStream output = connection.getOutputStream();
-			output.write(statusToReport.getBytes());
-			output.close();
+			if (body != null) {
+				OutputStream output = connection.getOutputStream();
+				output.write(body.getBytes());
+				output.close();
+			}
 			
 			InputStream response = connection.getInputStream();
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(response));
@@ -105,29 +143,12 @@ public class CloudAccessor {
 	        }
 	        reader.close();
 	        
-	        handleCloudResponse(responseText.toString());
+	        return responseText.toString();
 		} catch (Exception e) {
 			System.err.println("Problem accessing " + ControllerContext.getServerUrl());
 			e.printStackTrace();
+			
+			return null;
 		}
-	}
-	
-	
-	private void handleCloudResponse(final String responseText) throws JSONException {
-		JSONObject resposeObject = new JSONObject(responseText);
-        JSONObject schedule = resposeObject.getJSONObject("schedule");
-        
-        if (!schedule.toString().equals(lastReportedSchedule)) {
-        	lastReportedSchedule = schedule.toString();
-        	
-        	DeviceManager.getInstance().setSchedule(schedule);        	
-        }
-        
-        String mode = resposeObject.getString("mode");
-        if (!mode.equals(lastReportedMode)) {
-        	lastReportedMode = mode;
-        	
-        	DeviceManager.getInstance().setMode(mode);
-        }
 	}
 }
