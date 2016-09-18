@@ -135,7 +135,6 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
 DeviceManagementPage.prototype.onShow = function(root, bundle) {
   AbstractDataPage.prototype.onShow.call(this);
   this._deviceId = bundle.deviceId;
-  
   var deviceInfo = Backend.getDeviceInfo(this._deviceId);
   this._deviceType = deviceInfo.type;
   
@@ -200,16 +199,38 @@ DeviceManagementPage.prototype._addProgramToList = function(deviceProgram) {
   UIUtils.addClass(selectionBox, "program-selection");
   programItem._selectionBox = selectionBox;
   selectionBox.setChangeListener(function() {
-    UIUtils.setEnabled(this._removeSelectedButton, this._getSelectedPrograms().length > 0);
-    UIUtils.setEnabled(this._editSelectedButton, this._getSelectedPrograms().length == 1);
+    var selectedPrograms = this._getSelectedPrograms();
+    UIUtils.setEnabled(this._removeSelectedButton, selectedPrograms.length > 0);
+    UIUtils.setEnabled(this._editSelectedButton, selectedPrograms.length == 1 && selectedPrograms[0].type == Backend.Program.TYPE_LIBRARY);
   }.bind(this));
   
-  Backend.getLibraryProgram(this._deviceId, deviceProgram.id, function(status, referencedProgram) {
-    if (status == Backend.OperationResult.SUCCESS) {
-      var itemTitle = UIUtils.appendLabel(programItem, "Title", referencedProgram.title);
-      UIUtils.addClass(itemTitle, "program-title");
-    }
-  });
+  if (deviceProgram.type == Backend.Program.TYPE_LIBRARY) {
+    Backend.getLibraryPrograms(this._deviceId, function(status, libraryPrograms) {
+      if (status == Backend.OperationResult.SUCCESS) {
+        var referencedProgram = libraryPrograms[deviceProgram.id];
+        if (referencedProgram != null) {
+          var itemTitle = UIUtils.appendLabel(programItem, "Title", referencedProgram.title);
+          UIUtils.addClass(itemTitle, "program-title");
+        } else {
+          console.error("Library program with id " + deviceProgram.id + " does not exist");
+        }
+      }
+    });
+  } else if (deviceProgram.type == Backend.Program.TYPE_STOCK) {
+    Backend.getStockPrograms(this._deviceType, function(status, stockPrograms) {
+      if (status == Backend.OperationResult.SUCCESS) {
+        var referencedProgram = stockPrograms[deviceProgram.id];
+        if (referencedProgram != null) {
+          var itemTitle = UIUtils.appendLabel(programItem, "Title", referencedProgram.title);
+          UIUtils.addClass(itemTitle, "program-title");
+        } else {
+          console.error("Stock program with id " + deviceProgram.id + " does not exist");
+        }
+      }
+    });
+  } else {
+    console.error("Incorrect device program type: " + deviceProgram.type);
+  }
 
   var freqChooser = UIUtils.appendDropList(programItem, "FrequencyChooser", Application.Configuration.PROGRAM_FREQUENCIES);
   freqChooser.selectData(deviceProgram.frequency);

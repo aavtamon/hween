@@ -56,19 +56,22 @@ public class DeviceSettingsController {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
+		JSONObject programs = new JSONObject();
 		JSONObject stockPrograms = StorageManager.getInstance().getDeviceRegistryManager().getStockPrograms(deviceType);
 		for (Iterator<String> it = stockPrograms.keys(); it.hasNext(); ) {
 			final String programId = it.next();
 			try {
-				JSONObject program = stockPrograms.getJSONObject(programId);
+				JSONObject stockProgram = stockPrograms.getJSONObject(programId);
+				JSONObject program = new JSONObject(stockProgram.toString());
 				program.remove("commands");
+				programs.put(programId, program);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 		
 		if (stockPrograms != null) {
-			return ControllerUtils.buildResponse(Response.Status.OK, stockPrograms);
+			return ControllerUtils.buildResponse(Response.Status.OK, programs);
 		} else {
 			return ControllerUtils.buildResponse(Response.Status.NOT_FOUND);
 		}

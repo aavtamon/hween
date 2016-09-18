@@ -58,8 +58,10 @@ public class DeviceRegistryStorageManager {
 		
 		String defaultSchedule = "{\"trigger\": \"motion\", \"programs\": []}";
 		
-		String stockPrograms = "{\"1\": {\"title\": \"Program 1\", \"description\": \"Program 1 Description\", \"category\": \"fun\", \"commands\": []},";
-		       stockPrograms += "\"2\": {\"title\": \"Program 2\", \"description\": \"Program 2 Description\", \"category\": \"scary\", \"commands\": []}}";
+		int id = PersistanceUtils.generateUniqueId();
+		String stockPrograms = "{\"" + id + "\": {\"id\": \"" + id + "\", \"title\": \"Program 1\", \"description\": \"Program 1 Description\", \"category\": \"fun\", \"commands\": []},";
+		id = PersistanceUtils.generateUniqueId();
+		stockPrograms += "\"" + id + "\": {\"id\": \"" + id + "\", \"title\": \"Program 2\", \"description\": \"Program 2 Description\", \"category\": \"scary\", \"commands\": []}}";
 		
 		try {
 			JSONObject deviceTypeObject = new JSONObject();
@@ -135,6 +137,7 @@ public class DeviceRegistryStorageManager {
 			JSONObject programs = typeObject.getJSONObject("stockPrograms");
 			
 			int id = PersistanceUtils.generateUniqueId();
+			program.put("id", id);
 			programs.put(id + "", program);
 			
 			typeObject.put("stockPrograms", programs);

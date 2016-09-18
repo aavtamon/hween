@@ -93,7 +93,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
       Backend.updateLibraryProgram(this._deviceId, this._program, function(status) {
         if (status == Backend.OperationResult.SUCCESS) {
           if (this._addToDevice) {
-            Backend.addDevicePrograms(this._deviceId, Backend.convertToDeviceProgram(this._program), function(status) {
+            Backend.addDevicePrograms(this._deviceId, Backend.convertToDeviceProgram(this._program, Backend.Program.TYPE_LIBRARY), function(status) {
               if (status == Backend.OperationResult.SUCCESS) {
                 Application.goBack();
               }
@@ -107,7 +107,7 @@ CreateProgramPage.prototype.definePageContent = function(root) {
       Backend.addLibraryProgram(this._deviceId, this._program, function(status, libraryProgram) {
         if (status == Backend.OperationResult.SUCCESS) {
           if (this._addToDevice) {
-            Backend.addDevicePrograms(this._deviceId, Backend.convertToDeviceProgram(libraryProgram), function(status) {
+            Backend.addDevicePrograms(this._deviceId, Backend.convertToDeviceProgram(libraryProgram, Backend.Program.TYPE_LIBRARY), function(status) {
               if (status == Backend.OperationResult.SUCCESS) {
                 Application.goBack();
               }

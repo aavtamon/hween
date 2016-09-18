@@ -68,10 +68,18 @@ public class DeviceController {
 				for (int programIndex = 0; programIndex < programs.length(); programIndex++) {
 					JSONObject program = programs.getJSONObject(programIndex);
 					int programId = program.getInt("id");
-					JSONObject libraryProgram = StorageManager.getInstance().getDevicesManager().getDeviceLibraryProgram(serialNumber, programId);
-					for (Iterator<String> programIt = libraryProgram.keys(); programIt.hasNext(); ) {
-						String propName = programIt.next();
-						program.put(propName, libraryProgram.get(propName));
+					JSONObject referenceProgram = StorageManager.getInstance().getDevicesManager().getDeviceLibraryProgram(serialNumber, programId);
+					if (referenceProgram == null) {
+						JSONObject registryInfo = StorageManager.getInstance().getDeviceRegistryManager().getDeviceInfo(serialNumber);
+						String deviceType = registryInfo.getString("type");
+						referenceProgram = StorageManager.getInstance().getDeviceRegistryManager().getStockProgram(deviceType, programId);
+					}
+					
+					if (referenceProgram != null) {
+						for (Iterator<String> programIt = referenceProgram.keys(); programIt.hasNext(); ) {
+							String propName = programIt.next();
+							program.put(propName, referenceProgram.get(propName));
+						}
 					}
 				}
 		

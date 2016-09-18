@@ -11,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -236,15 +237,9 @@ public class UserDeviceManagementController {
 			for (Iterator<String> libraryIt = deviceLibrary.keys(); libraryIt.hasNext(); ) {
 				final String programId = libraryIt.next();
 				try {
-					JSONObject program = new JSONObject();
 					JSONObject libraryProgram = deviceLibrary.getJSONObject(programId);
-					for (Iterator<String> programIt = libraryProgram.keys(); programIt.hasNext(); ) {
-						final String propertyId = programIt.next();
-						if (!"commands".equals(propertyId)) {
-							program.put(propertyId, libraryProgram.get(propertyId));
-						}
-					}
-					
+					JSONObject program = new JSONObject(libraryProgram.toString());
+					program.remove("commands");
 					libraryPrograms.put(programId, program);
 				} catch (JSONException e) {
 					e.printStackTrace();

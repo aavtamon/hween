@@ -117,9 +117,11 @@ public class Schedule {
 					while (true) {
 						JSONObject program = programs.getJSONObject(programCounter);
 						String frequency = program.getString("frequency");
-						if (frequency.equals("never")) {
-						} else {
-							nextProgram = program;
+						if (!frequency.equals("never")) {
+							JSONArray commands = program.getJSONArray("commands");
+							if (commands.length() > 0) {
+								nextProgram = program;
+							}
 						}
 						
 						programCounter++;

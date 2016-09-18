@@ -43,14 +43,14 @@ StockProgramsPage.prototype.definePageContent = function(root) {
     var selectedPrograms = this._getSelectedPrograms();
     for (var i in selectedPrograms) {
       var program = selectedPrograms[i];
-      programs.push(Backend.convertToDeviceProgram(program));
+      programs.push(Backend.convertToDeviceProgram(program, Backend.Program.TYPE_STOCK));
     }
-    
+
     Backend.addDevicePrograms(this._deviceId, programs, function(status) {
       if (status == Backend.OperationResult.SUCCESS) {
         Application.showPage(DeviceManagementPage.name, {deviceId: this._deviceId});
       }
-    });
+    }.bind(this));
   }.bind(this));
 }
 

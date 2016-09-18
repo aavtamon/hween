@@ -112,7 +112,7 @@ public class DeviceManager {
 	
 	public void setSchedule(final JSONObject cloudSchedule) {
 		System.out.println("DeviceManager: new schedule was set");
-		
+System.out.println("SCHEDULE: " + cloudSchedule);		
 		if (this.schedule != null) {
 			this.schedule.interrupt();
 		}
