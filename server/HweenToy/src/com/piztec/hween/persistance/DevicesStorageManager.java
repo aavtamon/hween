@@ -232,6 +232,7 @@ public class DevicesStorageManager {
 			result.put("version", registryInfo.getString("version"));
 			result.put("serial_number", serialNumber);
 			
+			result.put("code_version", registryInfo.getString("code_version"));
 			
 			String status = "offline";
 			try {

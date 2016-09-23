@@ -16,6 +16,7 @@ import org.json.JSONObject;
 public class ControlServer {
 	private static final String OPERATION_CONNECT_TO_BACKEND = "connect_to_backend";
 	private static final String OPERATION_MANUAL_COMMAND = "manual_command";
+	private static final String OPERATION_CODE_DOWNLOAD = "code_download";
 	
 	static final int SERVER_PORT = 8888;
 	
@@ -122,6 +123,13 @@ public class ControlServer {
 			String operation = message.getString("operation");
 			if (OPERATION_CONNECT_TO_BACKEND.equals(operation)) {
 				cloudAccessor.enableOftenReporting();
+			} else if (OPERATION_CODE_DOWNLOAD.equals(operation)) {
+				CodeUpgrader.Upgrade upgrade = new CodeUpgrader.Upgrade();
+				upgrade.schedule = message.getString("schedule");
+				upgrade.version = message.getString("version");
+				upgrade.image = message.getString("image");
+				
+				CodeUpgrader.getInstance().upgrade(upgrade);
 			} else if (OPERATION_MANUAL_COMMAND.equals(operation)) {
 				String command = message.getString("command");
 				

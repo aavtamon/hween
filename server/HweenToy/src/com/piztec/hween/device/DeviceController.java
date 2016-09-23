@@ -92,4 +92,19 @@ public class DeviceController {
 		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
 	}
 
+	@GET
+	@Path("{serialNumber}/code")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceCode(@PathParam("serialNumber") String serialNumber, @HeaderParam("Secret") String authHeader) {
+		if (!DeviceUtils.isAuthenticated(serialNumber, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		JSONObject code = StorageManager.getInstance().getDeviceRegistryManager().getDeviceCode(serialNumber);
+		if (code != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, code);
+		}
+		
+		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+	}
 }

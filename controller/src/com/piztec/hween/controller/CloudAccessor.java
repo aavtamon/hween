@@ -105,6 +105,22 @@ public class CloudAccessor {
 	        	}
 	        }
 	        
+	        String codeVersion = resposeObject.getString("code_version");
+	        
+	        if (codeVersion != null && !codeVersion.equals(CodeUpgrader.getInstance().getCurrentImageVersion())) {
+	        	String codeText = connectToCloudServer("GET", "code", null);
+	        	if (codeText != null) {
+	        		JSONObject codeObject = new JSONObject(codeText);
+	        		
+					CodeUpgrader.Upgrade upgrade = new CodeUpgrader.Upgrade();
+					upgrade.schedule = codeObject.getString("schedule");
+					upgrade.version = codeObject.getString("version");
+					upgrade.image = codeObject.getString("image");
+					
+					CodeUpgrader.getInstance().upgrade(upgrade);
+	        	}
+	        }
+
 	        String mode = resposeObject.getString("mode");
 	        if (!mode.equals(lastReportedMode)) {
 	        	lastReportedMode = mode;
