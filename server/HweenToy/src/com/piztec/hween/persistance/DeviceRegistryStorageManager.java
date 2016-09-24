@@ -1,7 +1,5 @@
 package com.piztec.hween.persistance;
 
-import java.util.Base64;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -74,9 +72,9 @@ public class DeviceRegistryStorageManager {
 			deviceRegistryStorage.put(DEVICE_TYPE_STUMP_GHOST, deviceTypeObject);
 			
 			JSONObject devices = new JSONObject();
-			devices.put("0000000001", new JSONObject("{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"code_version\": \"1.0.0\", \"name\": \"Ghost-1\", \"secret_word\": \"secret-1\"}"));
-			devices.put("0000000002", new JSONObject("{\"serial_number\": \"0000000002\", \"verification_code\": 234567, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"code_version\": \"1.0.0\", \"name\": \"Ghost-2\", \"secret_word\": \"secret-2\"}"));
-			devices.put("0000000003", new JSONObject("{\"serial_number\": \"0000000003\", \"verification_code\": 000345, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"code_version\": \"1.0.0\", \"name\": \"Ghost-3\", \"secret_word\": \"secret-3\"}"));
+			devices.put("0000000001", new JSONObject("{\"serial_number\": \"0000000001\", \"verification_code\": 123456, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-1\", \"secret_word\": \"secret-1\"}"));
+			devices.put("0000000002", new JSONObject("{\"serial_number\": \"0000000002\", \"verification_code\": 234567, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-2\", \"secret_word\": \"secret-2\"}"));
+			devices.put("0000000003", new JSONObject("{\"serial_number\": \"0000000003\", \"verification_code\": 000345, \"type\": \"" + DEVICE_TYPE_STUMP_GHOST + "\", \"version\": \"1.0\", \"name\": \"Ghost-3\", \"secret_word\": \"secret-3\"}"));
 
 			deviceRegistryStorage.put("deviceRegistry", devices);
 			
@@ -124,20 +122,16 @@ public class DeviceRegistryStorageManager {
 	}
 
 	public JSONObject getDeviceCode(final String serialNumber) {
+		JSONObject imageObject = new JSONObject();
 		try {
-			JSONObject registry = deviceRegistryStorage.getJSONObject("deviceRegistry");
-			JSONObject registryInfo = registry.getJSONObject(serialNumber);
-			String codeVersion = registryInfo.getString("code_version");
-			
-			JSONObject imageObject = new JSONObject();
-			imageObject.put("version", codeVersion);
+			imageObject.put("version", StorageManager.getInstance().getCodeUpgradeManager().getVersion(serialNumber));
 			imageObject.put("schedule", "now");
-			imageObject.put("image", Base64.getEncoder().encode("TBD".getBytes()));
-			
-			return registry.getJSONObject(serialNumber);
+			imageObject.put("image", StorageManager.getInstance().getCodeUpgradeManager().getImage(serialNumber));
 		} catch (JSONException e) {
-			return null;
+			e.printStackTrace();
 		}
+			
+		return imageObject;
 	}
 
 	

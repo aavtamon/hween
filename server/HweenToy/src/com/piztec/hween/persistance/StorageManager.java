@@ -21,6 +21,7 @@ public class StorageManager {
 	private UserAccountStorageManager userAccountStorageManager;
 	private DeviceRegistryStorageManager deviceRegistryStorageManager;
 	private DevicesStorageManager userDevicesStorageManager;
+	private CodeUpgradeManager codeUpgradeManager;
 	
 	
 	public static StorageManager getInstance() {
@@ -37,6 +38,10 @@ public class StorageManager {
 	
 	public DeviceRegistryStorageManager getDeviceRegistryManager() {
 		return deviceRegistryStorageManager;
+	}
+
+	public CodeUpgradeManager getCodeUpgradeManager() {
+		return codeUpgradeManager;
 	}
 
 	
@@ -65,6 +70,7 @@ public class StorageManager {
 			userAccountStorageManager = new UserAccountStorageManager(storage.getJSONObject("userAccounts"));
 			userDevicesStorageManager = new DevicesStorageManager(storage.getJSONObject("userDevices"));
 			deviceRegistryStorageManager = new DeviceRegistryStorageManager(storage.getJSONObject("deviceSettings"));
+			codeUpgradeManager = new CodeUpgradeManager();
 			
 			commit();
 		} catch (JSONException e) {

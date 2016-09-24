@@ -1,7 +1,5 @@
 package com.piztec.hween.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Base64;
 import java.util.Scanner;
 
