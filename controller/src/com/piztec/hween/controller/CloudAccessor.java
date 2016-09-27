@@ -17,7 +17,7 @@ public class CloudAccessor {
 	private static final int FAST_REPORTING_INTERVAL = 10 * 1000;
 	private static final int NORMAL_REPORTING_INTERVAL = 60 * 1000;
 	
-	private final Thread reportingThread;
+	private Thread reportingThread;
 	private int reportingCount;
 	private int reportingInterval = NORMAL_REPORTING_INTERVAL;
 	
@@ -25,6 +25,15 @@ public class CloudAccessor {
 	private String lastReportedMode = null;
 	
 	public CloudAccessor() {
+	}
+	
+	public synchronized void start() {
+		reportingInterval = NORMAL_REPORTING_INTERVAL;
+		
+		if (reportingThread != null) {
+			return;
+		}
+		
 		reportingThread = new Thread() {
 			public void run() {
 				while (!isInterrupted()) {
@@ -44,16 +53,14 @@ public class CloudAccessor {
 						try {
 							CloudAccessor.this.wait(reportingInterval);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							break;
 						}
 					}
 				}
+				
+				System.out.println("Cloud access thread is interrupted");
 			}
 		};
-	}
-	
-	public synchronized void start() {
-		reportingInterval = NORMAL_REPORTING_INTERVAL;
 		
 		reportingThread.start();
 	}
@@ -117,7 +124,10 @@ public class CloudAccessor {
 					upgrade.version = codeObject.getString("version");
 					upgrade.image = codeObject.getString("image");
 					
-					CodeUpgrader.getInstance().upgrade(upgrade);
+					boolean startedInstallation = CodeUpgrader.getInstance().upgrade(upgrade);
+					if (startedInstallation) {
+						stop();
+					}
 	        	}
 	        }
 
