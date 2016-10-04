@@ -94,7 +94,6 @@ public class CodeUpgrader {
 	// install.sh
 	// controller.tar
 	// run_controller.sh
-	// system/system_install.sh
 	// system/hween.service
 	private void installImage(final byte[] image) throws IOException {
 		// Create image on the disk
@@ -103,14 +102,17 @@ public class CodeUpgrader {
 		fos.close();
 
 		File unpackScriptFile = new File(workingDirectory, "unpack.sh");
+		System.out.println("Creating installable image in " + workingDirectory.getAbsolutePath());
+		
 		PrintWriter writer = new PrintWriter(unpackScriptFile);
 		writer.println("# Auto-generated installer script");
 		writer.println("cd " + workingDirectory.getAbsolutePath());
 		writer.println("tar -xvf image.tar");
-		writer.println("sh ./image/install.sh");
+		writer.println("cd image");
+		writer.println("sudo sh ./install.sh");
 		writer.close();
 		
-		System.out.println("Executing installation script...");
+		System.out.println("Executing installation script " + unpackScriptFile.getAbsolutePath());
 		Runtime.getRuntime().exec("sh " + unpackScriptFile.getAbsolutePath());
 	}
 	

@@ -1,18 +1,26 @@
 #!/bin/sh
 
-ROOT_DIR=/home/pi/hween/controller
+RUN_DIR=/home/pi/hween/
 
-rm -rf ${ROOT_DIR}
-mkdir ${ROOT_DIR}
+cp run_controller.sh ${RUN_DIR}
+chmod -R 777 ${RUN_DIR}/run_controller.sh
 
-cp controller.properties ${ROOT_DIR}
-cp controller.tar ${ROOT_DIR}
-cp run_controller.sh ${ROOT_DIR}
 
-mkdir ${ROOT_DIR}/lib
-cp lib/* ${ROOT_DIR}/lib
 
-sudo cp system/hween.service /lib/systemd/system
-sudo systemctl enable hween.service
+CONTROLLER_DIR=${RUN_DIR}/controller
 
-//sudo reboot
+rm -rf ${CONTROLLER_DIR}
+mkdir ${CONTROLLER_DIR}
+
+cp controller.properties ${CONTROLLER_DIR}
+cp controller.jar ${CONTROLLER_DIR}
+
+mkdir ${CONTROLLER_DIR}/lib
+cp lib/* ${CONTROLLER_DIR}/lib
+
+chmod -R 777 ${CONTROLLER_DIR}
+
+cp system/hween.service /lib/systemd/system
+systemctl enable hween.service
+
+#reboot
