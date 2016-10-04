@@ -90,6 +90,12 @@ public class CodeUpgrader {
 		purgeDirectory(workingDirectory);
 	}
 	
+	// The expected structure of the image archive:
+	// install.sh
+	// controller.tar
+	// run_controller.sh
+	// system/system_install.sh
+	// system/hween.service
 	private void installImage(final byte[] image) throws IOException {
 		// Create image on the disk
 		FileOutputStream fos = new FileOutputStream(new File(workingDirectory, "image.tar"));
@@ -102,7 +108,6 @@ public class CodeUpgrader {
 		writer.println("cd " + workingDirectory.getAbsolutePath());
 		writer.println("tar -xvf image.tar");
 		writer.println("sh ./image/install.sh");
-		writer.println("reboot");
 		writer.close();
 		
 		System.out.println("Executing installation script...");

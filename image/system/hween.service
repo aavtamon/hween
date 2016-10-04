@@ -1,0 +1,11 @@
+[Unit]
+Description=Helloween Controller service
+
+[Service]
+Type=forking
+ExecStart=/home/pi/hween/run_controller.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
