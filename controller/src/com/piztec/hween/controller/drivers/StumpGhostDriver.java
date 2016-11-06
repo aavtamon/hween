@@ -97,7 +97,9 @@ public class StumpGhostDriver extends DeviceDriver {
 						
 						synchronized (triggerSyncer) {
 							upLimitTrigger = event.getState() == PinState.HIGH;
-							triggerSyncer.notify();
+							if (upLimitTrigger) {
+								triggerSyncer.notify();
+							}
 						}
 					}
 				});
@@ -143,7 +145,9 @@ public class StumpGhostDriver extends DeviceDriver {
 						
 						synchronized (triggerSyncer) {
 							downLimitTrigger = event.getState() == PinState.HIGH;
-							triggerSyncer.notify();
+							if (downLimitTrigger) {
+								triggerSyncer.notify();
+							}
 						}
 					}
 				});

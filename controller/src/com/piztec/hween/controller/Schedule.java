@@ -43,7 +43,7 @@ public class Schedule {
 	void execute() {
 		System.out.println("Starting schedule execution");		
 		if (executionThread != null && !executionThread.isInterrupted()) {
-			System.err.println("WARNING: Scheudle execution is in progress. Must interrupt first");
+			System.err.println("WARNING: Schedule execution is in progress. Must interrupt first");
 			return;
 		}
 		
@@ -84,10 +84,6 @@ public class Schedule {
 					try {
 						executeProgram(program);
 					} catch (InterruptedException e) {
-						break;
-					}
-				  	
-					if (isInterrupted()) {
 						break;
 					}
 
@@ -162,6 +158,7 @@ public class Schedule {
 				
 				AudioManager.getInstance().stop();
 				
+				boolean interrupted = false;
 				try {
 					JSONArray cloudCommands = program.getJSONArray("commands");
 					for (int i = 0; i < cloudCommands.length(); i++) {
@@ -169,13 +166,10 @@ public class Schedule {
 						try {
 							executeCommand(cloudCommand);
 						} catch (InterruptedException ie) {
+							interrupted = true;
 							break;
 						} catch (Exception e) {
 							e.printStackTrace();
-						}
-						
-						if (isInterrupted()) {
-							break;
 						}
 					}
 					
@@ -183,6 +177,10 @@ public class Schedule {
 					AudioManager.getInstance().stop();
 				} catch (Exception e) {
 					e.printStackTrace();
+				}
+				
+				if (interrupted) {
+					throw new InterruptedException("Command execution interrupted");
 				}
 			}
 					
@@ -228,6 +226,7 @@ public class Schedule {
 
 			try {
 				executionThread.join();
+				executionThread = null;
 			} catch (InterruptedException e) {
 			}
 		}
