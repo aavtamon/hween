@@ -147,18 +147,26 @@ public class Schedule {
 				} catch (JSONException e1) {
 				}
 				
+				boolean interrupted = false;
+				
 				// We reset the device back to the initial position
 				Command resetCommand = driver.getCommand(COMMAND_RESET);
 				if (resetCommand != null) {
 					try {
 						resetCommand.execute(null);
+					} catch (InterruptedException ie) {
+						interrupted = true;
 					} catch (Exception e) {
 					}
 				}
-				
+
 				AudioManager.getInstance().stop();
 				
-				boolean interrupted = false;
+				if (interrupted || isInterrupted()) {
+					throw new InterruptedException("Reset interrupted");
+				}
+				
+				
 				try {
 					JSONArray cloudCommands = program.getJSONArray("commands");
 					for (int i = 0; i < cloudCommands.length(); i++) {
@@ -179,7 +187,7 @@ public class Schedule {
 					e.printStackTrace();
 				}
 				
-				if (interrupted) {
+				if (interrupted || isInterrupted()) {
 					throw new InterruptedException("Command execution interrupted");
 				}
 			}
@@ -223,10 +231,12 @@ public class Schedule {
 	void interrupt() {
 		if (executionThread != null) {
 			executionThread.interrupt();
+			System.out.println("Interrupt signal issued");
 
 			try {
 				executionThread.join();
 				executionThread = null;
+				System.out.println("Interrupt successful");
 			} catch (InterruptedException e) {
 			}
 		}

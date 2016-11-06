@@ -56,7 +56,7 @@ public class StumpGhostDriver extends DeviceDriver {
 				synchronized (commandSyncer) {
 					synchronized (triggerSyncer) {
 						System.out.println("Stump Ghost: <reset> command");
-						
+
 						if (downLimitTrigger) {
 							System.out.println("Stump Ghost: <reset> command cannot be executed - already low position");
 							return false;
@@ -136,9 +136,10 @@ public class StumpGhostDriver extends DeviceDriver {
 				
 				downMotorOut = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Move Down", PinState.LOW);
 				downMotorOut.setShutdownOptions(true, PinState.LOW);
-				downLimitTrigger = downMotorOut.getState() == PinState.HIGH;
 				
 				downMotorSwitchIn = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_12, "Down Limit", PinPullResistance.PULL_DOWN);
+				downMotorSwitchIn.setShutdownOptions(true, PinState.LOW);
+				downLimitTrigger = downMotorSwitchIn.getState() == PinState.HIGH;				
 				downMotorSwitchIn.addListener(new GpioPinListenerDigital() {
 					public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
 						System.out.println("Down Motor Switch got an event. State = " + event.getState());
