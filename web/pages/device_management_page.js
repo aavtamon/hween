@@ -53,6 +53,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
     }
     schedule.trigger = this._triggerList.getValue();
     Backend.setDeviceSchedule(this._deviceId, schedule);
+    Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
   }.bind(this));
   
   this._scheduleStatusPanel = UIUtils.appendBlock(scheduleControlPanel, "ScheduleStatusPanel");
@@ -73,6 +74,7 @@ DeviceManagementPage.prototype.definePageContent = function(root) {
     var schedule = Backend.getDeviceSchedule(this._deviceId);
     schedule.programs = programs;
     Backend.setDeviceSchedule(this._deviceId, schedule);
+    Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
   }.bind(this));
   
 
