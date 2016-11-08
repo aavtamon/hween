@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ROOT_DIR=/home/pi/hween/controller
-CLOUD_SERVER=192.168.0.116:8080
+CLOUD_SERVER=192.168.0.10:8080
 
 amixer cset numid=3 2
 # change 2 to 1 to reconfigure to headphone jack

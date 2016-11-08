@@ -1,0 +1,11 @@
+[Unit]
+Description=Helloween Controller Upgrade service
+
+[Service]
+Type=forking
+ExecStart=/home/pi/hween/code_upgrade.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

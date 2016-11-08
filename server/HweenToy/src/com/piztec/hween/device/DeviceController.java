@@ -93,7 +93,39 @@ public class DeviceController {
 	}
 
 	@GET
-	@Path("{serialNumber}/code")
+	@Path("{serialNumber}/code_version")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDeviceCodeVersion(@PathParam("serialNumber") String serialNumber, @HeaderParam("Secret") String authHeader) {
+		if (!DeviceUtils.isAuthenticated(serialNumber, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		String codeVersion = StorageManager.getInstance().getCodeUpgradeManager().getVersion(serialNumber);
+		if (codeVersion != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, codeVersion);
+		}
+		
+		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+	}
+	
+	@GET
+	@Path("{serialNumber}/code_image")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getDeviceImage(@PathParam("serialNumber") String serialNumber, @HeaderParam("Secret") String authHeader) {
+		if (!DeviceUtils.isAuthenticated(serialNumber, authHeader)) {
+			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
+		}
+		
+		byte[] image = StorageManager.getInstance().getCodeUpgradeManager().getImage(serialNumber);
+		if (image != null) {
+			return ControllerUtils.buildResponse(Response.Status.OK, image);
+		}
+		
+		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
+	}
+	
+	@GET
+	@Path("{serialNumber}/code_object")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDeviceCode(@PathParam("serialNumber") String serialNumber, @HeaderParam("Secret") String authHeader) {
 		if (!DeviceUtils.isAuthenticated(serialNumber, authHeader)) {
@@ -104,7 +136,7 @@ public class DeviceController {
 		if (code != null) {
 			return ControllerUtils.buildResponse(Response.Status.OK, code);
 		}
-		
+
 		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
 	}
 }

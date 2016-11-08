@@ -22,6 +22,7 @@ public class CodeUpgrader {
 	private static CodeUpgrader instance;
 	
 	private final File workingDirectory;
+	private final File upgradeDirectory;
 	
 	public static CodeUpgrader getInstance() {
 		if (instance == null) {
@@ -32,16 +33,18 @@ public class CodeUpgrader {
 	}
 	
 	private CodeUpgrader() {
-		workingDirectory = new File(System.getProperty("user.dir"), "upgrade_tmp");
-		System.out.println("Code upgrade directory = "+ workingDirectory);
+		workingDirectory = new File(System.getProperty("user.dir"));
 		
-		if (!workingDirectory.isDirectory()) {
-			if (workingDirectory.exists()) {
-				workingDirectory.delete();
+		upgradeDirectory = new File(workingDirectory, "upgrade_tmp");
+		System.out.println("Code upgrade directory = "+ upgradeDirectory);
+		
+		if (!upgradeDirectory.isDirectory()) {
+			if (upgradeDirectory.exists()) {
+				upgradeDirectory.delete();
 			}
-			workingDirectory.mkdir();
+			upgradeDirectory.mkdir();
 		} else {
-			clearWorkingDir();
+			purgeDirectory(upgradeDirectory);
 		}		
 	}
 	
@@ -56,7 +59,7 @@ public class CodeUpgrader {
 			byte[] image = Base64.getDecoder().decode(upgrade.image);
 			System.out.println("New image is received. Image size is " + image.length);
 			
-			clearWorkingDir();
+			purgeDirectory(upgradeDirectory);
 			
 			try {
 				installImage(image);
@@ -86,9 +89,6 @@ public class CodeUpgrader {
 		return null;
 	}
 	
-	private void clearWorkingDir() {
-		purgeDirectory(workingDirectory);
-	}
 	
 	// The expected structure of the image archive:
 	// install.sh
@@ -97,16 +97,16 @@ public class CodeUpgrader {
 	// system/hween.service
 	private void installImage(final byte[] image) throws IOException {
 		// Create image on the disk
-		FileOutputStream fos = new FileOutputStream(new File(workingDirectory, "image.tar"));
+		FileOutputStream fos = new FileOutputStream(new File(upgradeDirectory, "image.tar"));
 		fos.write(image);
 		fos.close();
 
-		File unpackScriptFile = new File(workingDirectory, "unpack.sh");
-		System.out.println("Creating installable image in " + workingDirectory.getAbsolutePath());
+		File unpackScriptFile = new File(upgradeDirectory, "unpack.sh");
+		System.out.println("Creating installable image in " + upgradeDirectory.getAbsolutePath());
 		
 		PrintWriter writer = new PrintWriter(unpackScriptFile);
 		writer.println("# Auto-generated installer script");
-		writer.println("cd " + workingDirectory.getAbsolutePath());
+		writer.println("cd " + upgradeDirectory.getAbsolutePath());
 		writer.println("tar -xvf image.tar");
 		writer.println("cd image");
 		writer.println("sudo sh ./install.sh");

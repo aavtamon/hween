@@ -36,7 +36,7 @@ public class CodeUpgradeManager {
 		}
 	}
 	
-	public String getImage(final String serialNumber) {
+	public byte[] getImage(final String serialNumber) {
 		JSONObject descriptor = getImageDescriptor(serialNumber);
 		if (descriptor == null) {
 			return null;
@@ -58,9 +58,18 @@ public class CodeUpgradeManager {
 			is.close();
 			output.close();
 			
-			return Base64.getEncoder().encodeToString(output.toByteArray());			
+			return output.toByteArray();			
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public String getBase64Image(final String serialNumber) {
+		byte[] image = getImage(serialNumber);
+		if (image != null) {
+			return Base64.getEncoder().encodeToString(image);
+		} else {
 			return null;
 		}
 	}

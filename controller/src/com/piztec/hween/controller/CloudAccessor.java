@@ -112,6 +112,7 @@ public class CloudAccessor {
 	        	}
 	        }
 	        
+	        /*
 	        String codeVersion = resposeObject.getString("code_version");
 	        
 	        if (codeVersion != null && !codeVersion.equals(CodeUpgrader.getInstance().getCurrentImageVersion())) {
@@ -130,6 +131,7 @@ public class CloudAccessor {
 					}
 	        	}
 	        }
+	        */
 
 	        String mode = resposeObject.getString("mode");
 	        if (!mode.equals(lastReportedMode)) {
