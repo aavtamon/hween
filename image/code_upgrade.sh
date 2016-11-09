@@ -42,7 +42,7 @@ do
       if [ -f install.sh ]
       then
         chmod 777 install.sh
-        ./install.sh
+        sudo ./install.sh
       else
         echo "Code download failed - the image file is corrupted. Will retry later."
       fi

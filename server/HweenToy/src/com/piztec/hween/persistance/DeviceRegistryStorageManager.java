@@ -121,19 +121,6 @@ public class DeviceRegistryStorageManager {
 		}
 	}
 
-	public JSONObject getDeviceCode(final String serialNumber) {
-		JSONObject imageObject = new JSONObject();
-		try {
-			imageObject.put("version", StorageManager.getInstance().getCodeUpgradeManager().getVersion(serialNumber));
-			imageObject.put("schedule", "now");
-			imageObject.put("image", StorageManager.getInstance().getCodeUpgradeManager().getImage(serialNumber));
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-			
-		return imageObject;
-	}
-
 	
 	public JSONObject getStockPrograms(final String deviceType) {
 		try {

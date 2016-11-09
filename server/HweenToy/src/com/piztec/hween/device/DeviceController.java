@@ -1,5 +1,7 @@
 package com.piztec.hween.device;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.ws.rs.GET;
@@ -117,8 +119,8 @@ public class DeviceController {
 		}
 		
 		byte[] image = StorageManager.getInstance().getCodeUpgradeManager().getImage(serialNumber);
-		if (image != null) {
-			return ControllerUtils.buildResponse(Response.Status.OK, image);
+		if (image != null) {			
+			return ControllerUtils.buildResponse(Response.Status.OK, new ByteArrayInputStream(image));
 		}
 		
 		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
@@ -132,9 +134,15 @@ public class DeviceController {
 			return ControllerUtils.buildResponse(Response.Status.UNAUTHORIZED);
 		}
 		
-		JSONObject code = StorageManager.getInstance().getDeviceRegistryManager().getDeviceCode(serialNumber);
-		if (code != null) {
-			return ControllerUtils.buildResponse(Response.Status.OK, code);
+		JSONObject codeObject = new JSONObject();
+		try {
+			codeObject.put("version", StorageManager.getInstance().getCodeUpgradeManager().getVersion(serialNumber));
+			codeObject.put("schedule", "now");
+			codeObject.put("image", StorageManager.getInstance().getCodeUpgradeManager().getImage(serialNumber));
+			
+			return ControllerUtils.buildResponse(Response.Status.OK, codeObject);
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 
 		return ControllerUtils.buildResponse(Response.Status.BAD_REQUEST);
