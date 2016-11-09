@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source common_defs.sh
+source $(dirname "$0")/common_defs.sh
 
 echo "Detecting local code version"
 local_version=`grep version ${HWEEN_ROOT_DIR}/version.properties | awk '{ print $2 }'`
@@ -28,7 +28,7 @@ do
   else
     echo "Server provides an update - starting the download"
     
-    cd ${RUN_DIR}
+    cd ${HWEEN_ROOT_DIR}
     rm -rf tmp_upgrade
     mkdir tmp_upgrade
     
@@ -42,6 +42,8 @@ do
       if [ -f install.sh ]
       then
         chmod 777 install.sh
+        
+        echo "Starting installation of the new image..."
         sudo ./install.sh
       else
         echo "Code download failed - the image file is corrupted. Will retry later."
@@ -49,6 +51,10 @@ do
     else
       echo "Code download failed - no file received from the server. Will retry later."
     fi
+    
+    echo "Cleaning up temporary installation folder..."
+    cd ${HWEEN_ROOT_DIR}
+    rm -rf tmp_upgrade
   fi
   
   sleep 60

@@ -10,6 +10,7 @@ mkdir tmp
 cp image/controller.jar tmp
 cp image/system.properties tmp
 cp image/install.sh tmp
+cp image/start_code_upgrade.sh tmp
 cp image/code_upgrade.sh tmp
 cp image/run_controller.sh tmp
 cp image/common_defs.sh tmp
