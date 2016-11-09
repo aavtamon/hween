@@ -1,0 +1,8 @@
+#!/bin/sh
+
+HWEEN_CLOUD_SERVER=192.168.0.10:8080
+
+HWEEN_ROOT_DIR=/home/pi/hween/
+HWEEN_CONTROLLER_DIR=${HWEEN_ROOT_DIR}/controller
+
+SYSTEM_PROPERTIES_FILE=${HWEEN_ROOT_DIR}/system.properties
