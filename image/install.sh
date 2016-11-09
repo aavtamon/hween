@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-. common_defs.sh
+source common_defs.sh
 
 if [ -f version.properties ]
 then

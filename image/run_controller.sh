@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-. common_defs.sh
+source common_defs.sh
 
 amixer cset numid=3 2
 # change 2 to 1 to reconfigure to headphone jack

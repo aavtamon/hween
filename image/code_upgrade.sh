@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-. common_defs.sh
+source common_defs.sh
 
 echo "Detecting local code version"
 local_version=`grep version ${HWEEN_ROOT_DIR}/version.properties | awk '{ print $2 }'`

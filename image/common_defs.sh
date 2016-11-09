@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 HWEEN_CLOUD_SERVER=192.168.0.10:8080
 
