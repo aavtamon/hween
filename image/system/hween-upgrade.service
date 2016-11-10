@@ -2,8 +2,8 @@
 Description=Helloween Controller Upgrade service
 
 [Service]
-Type=forking
-ExecStart=/home/pi/hween/start_code_upgrade.sh
+Type=simple
+ExecStart=/home/pi/hween/code_upgrade.sh
 Restart=always
 
 [Install]

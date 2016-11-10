@@ -95,34 +95,38 @@ public class CodeUpgradeManager {
 	}
 	
 	private JSONObject getDescriptor(final String deviceType, final String serialNumber) {
-		JSONObject descriptor = imageDescriptors.get("descriptor-" + deviceType + "-" + serialNumber + ".json");
-		if (descriptor != null) {
-			return descriptor;
-		}
-			
-		return imageDescriptors.get("descriptor-" + deviceType + ".json");
+	  synchronized (imageDescriptors) {
+  		JSONObject descriptor = imageDescriptors.get("descriptor-" + deviceType + "-" + serialNumber + ".json");
+  		if (descriptor != null) {
+  			return descriptor;
+  		}
+  			
+  		return imageDescriptors.get("descriptor-" + deviceType + ".json");
+	  }
 	}
 	
 	
-	private void rehash() {
-		imageDescriptors.clear();
-		
-		File descriptorDirectory = new File(DESCRIPTOR_DIRECTORY);
-		File[] files = descriptorDirectory.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.getName().endsWith(".json");
-			}
-		});
-		
-		for (File file : files) {
-			String fileContent = PersistanceUtils.readFile(file.getAbsolutePath());
-			if (fileContent != null) {
-				try {
-					imageDescriptors.put(file.getName(), new JSONObject(fileContent));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	public void rehash() {
+	  synchronized (imageDescriptors) {
+  		imageDescriptors.clear();
+  		
+  		File descriptorDirectory = new File(DESCRIPTOR_DIRECTORY);
+  		File[] files = descriptorDirectory.listFiles(new FileFilter() {
+  			public boolean accept(File pathname) {
+  				return pathname.getName().endsWith(".json");
+  			}
+  		});
+  		
+  		for (File file : files) {
+  			String fileContent = PersistanceUtils.readFile(file.getAbsolutePath());
+  			if (fileContent != null) {
+  				try {
+  					imageDescriptors.put(file.getName(), new JSONObject(fileContent));
+  				} catch (JSONException e) {
+  					e.printStackTrace();
+  				}
+  			}
+  		}
+	  }
 	}
 }

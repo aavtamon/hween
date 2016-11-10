@@ -22,22 +22,10 @@ then
   chmod -R 777 ${HWEEN_ROOT_DIR}/common_defs.sh
 fi
 
-if [ -f start_controller.sh ]
-then
-  cp start_controller.sh ${HWEEN_ROOT_DIR}
-  chmod -R 777 ${HWEEN_ROOT_DIR}/start_controller.sh
-fi
-
 if [ -f controller.sh ]
 then
   cp controller.sh ${HWEEN_ROOT_DIR}
   chmod -R 777 ${HWEEN_ROOT_DIR}/controller.sh
-fi
-
-if [ -f start_code_upgrade.sh ]
-then
-  cp start_code_upgrade.sh ${HWEEN_ROOT_DIR}
-  chmod -R 777 ${HWEEN_ROOT_DIR}/start_code_upgrade.sh
 fi
 
 if [ -f code_upgrade.sh ]
