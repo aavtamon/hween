@@ -18,45 +18,51 @@ do
 
   code_version=`curl -X GET http://${HWEEN_CLOUD_SERVER}/HweenToy/device/${serialNumber}/code_version -H "secret: ${secret}"`
 
-  echo "Code version available on the server: ${code_version}"
-  
-  echo "Comparing with the local version"
-  
-  if [ ${code_version} == ${local_version} ]
+  if [ "${code_version}" == "" ]
   then
-    echo "Versions are identical - nothing to do. Will retry later."
+    echo "Server does not report a code version. Corrupt update will be skipped"
   else
-    echo "Server provides an update - starting the download"
+    echo "Code version available on the server: ${code_version}"
     
-    cd ${HWEEN_ROOT_DIR}
-    rm -rf tmp_upgrade
-    mkdir tmp_upgrade
-    
-    cd tmp_upgrade
-    
-    curl -X GET http://${HWEEN_CLOUD_SERVER}/HweenToy/device/${serialNumber}/code_image -H "secret: ${secret}" > image.jar
-    if [ -f image.jar ]
+
+    echo "Comparing with the local version"
+
+    if [ "${code_version}" == "${local_version}" ]
     then
-      tar -xvf image.jar
-      
-      if [ -f install.sh ]
-      then
-        chmod 777 install.sh
-        
-        echo "Starting installation of the new image..."
-        sudo ./install.sh
-      else
-        echo "Code download failed - the image file is corrupted. Will retry later."
-      fi
+      echo "Versions are identical - nothing to do. Will retry later."
     else
-      echo "Code download failed - no file received from the server. Will retry later."
+      echo "Server provides an update - starting the download"
+
+      cd ${HWEEN_ROOT_DIR}
+      rm -rf tmp_upgrade
+      mkdir tmp_upgrade
+
+      cd tmp_upgrade
+
+      curl -X GET http://${HWEEN_CLOUD_SERVER}/HweenToy/device/${serialNumber}/code_image -H "secret: ${secret}" > image.jar
+      if [ -f image.jar ]
+      then
+        tar -xvf image.jar
+
+        if [ -f install.sh ]
+        then
+          chmod 777 install.sh
+
+          echo "Starting installation of the new image..."
+          sudo ./install.sh
+        else
+          echo "Code download failed - the image file is corrupted. Will retry later."
+        fi
+      else
+        echo "Code download failed - no file received from the server. Will retry later."
+      fi
+
+      echo "Cleaning up temporary installation folder..."
+      cd ${HWEEN_ROOT_DIR}
+      rm -rf tmp_upgrade
     fi
-    
-    echo "Cleaning up temporary installation folder..."
-    cd ${HWEEN_ROOT_DIR}
-    rm -rf tmp_upgrade
   fi
-  
+
   sleep 60
 done
 

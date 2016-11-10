@@ -3,7 +3,7 @@ Description=Helloween Controller service
 
 [Service]
 Type=forking
-ExecStart=/home/pi/hween/run_controller.sh
+ExecStart=/home/pi/hween/start_controller.sh
 Restart=always
 
 [Install]

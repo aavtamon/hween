@@ -12,7 +12,8 @@ cp image/system.properties tmp
 cp image/install.sh tmp
 cp image/start_code_upgrade.sh tmp
 cp image/code_upgrade.sh tmp
-cp image/run_controller.sh tmp
+cp image/start_controller.sh tmp
+cp image/controller.sh tmp
 cp image/common_defs.sh tmp
 cp -r image/lib tmp
 cp -r image/system tmp
