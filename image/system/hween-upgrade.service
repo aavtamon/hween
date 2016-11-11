@@ -1,5 +1,6 @@
 [Unit]
 Description=Helloween Controller Upgrade service
+After=dhcpcd.service
 
 [Service]
 Type=simple
