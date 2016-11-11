@@ -48,7 +48,7 @@ public class StumpGhostDriver extends DeviceDriver {
 	
 	
 	private void initCommands() {
-		commands.put("reset", new Command("reset") {
+		commands.put(COMMAND_RESET, new Command(COMMAND_RESET) {
 			protected void register() {
 			}
 			
@@ -62,17 +62,19 @@ public class StumpGhostDriver extends DeviceDriver {
 							return false;
 						}
 						
-						downMotorOut.high();
-						
-						while (true) {
-							triggerSyncer.wait(10000);
-							if (downLimitTrigger) {
-								break;
-							}
+						try {
+  						downMotorOut.high();
+  						
+  						while (true) {
+  							triggerSyncer.wait(10000);
+  							if (downLimitTrigger) {
+  								break;
+  							}
+  						}
+						} finally {
+	            downMotorOut.low();
+	            System.out.println("Stump Ghost: <reset> command - completed");
 						}
-						
-						downMotorOut.low();
-						System.out.println("Stump Ghost: <reset> command - completed");
 					}							
 				}
 
@@ -115,13 +117,14 @@ public class StumpGhostDriver extends DeviceDriver {
 							return false;
 						}
 						
-						upMotorOut.high();
-						
-						triggerSyncer.wait(1000);
-						
-						upMotorOut.low();
-						
-						System.out.println("Stump Ghost: <move up> command - completed");
+						try {
+  						upMotorOut.high();
+  						
+  						triggerSyncer.wait(1000);
+						} finally {
+  						upMotorOut.low();
+  						System.out.println("Stump Ghost: <move up> command - completed");
+						}
 					}
 				}
 				
@@ -164,13 +167,14 @@ public class StumpGhostDriver extends DeviceDriver {
 							return false;
 						}
 						
-						downMotorOut.high();
-						
-						triggerSyncer.wait(1000);
-						
-						downMotorOut.low();
-						
-						System.out.println("Stump Ghost: <move down> command - completed");
+						try {
+  						downMotorOut.high();
+  						
+  						triggerSyncer.wait(1000);
+						} finally {
+  						downMotorOut.low();
+  						System.out.println("Stump Ghost: <move down> command - completed");
+						}
 					}
 				}
 				
@@ -184,9 +188,12 @@ public class StumpGhostDriver extends DeviceDriver {
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <turn left> command");
 				
-				Thread.sleep(2000);
+				try {
+	        Thread.sleep(2000);
+				} finally {
+	        System.out.println("Stump Ghost: <turn left> command - completed");
+				}
 				
-				System.out.println("Stump Ghost: <turn left> command - completed");
 				return false;
 			}
 		});
@@ -197,9 +204,12 @@ public class StumpGhostDriver extends DeviceDriver {
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <turn right> command");
 
-				Thread.sleep(2000);
+        try {
+          Thread.sleep(2000);
+        } finally {
+          System.out.println("Stump Ghost: <turn right> command - completed");
+        }
 				
-				System.out.println("Stump Ghost: <turn right> command - completed");
 				return false;
 			}
 		});
@@ -210,9 +220,12 @@ public class StumpGhostDriver extends DeviceDriver {
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <eyes on> command");
 				
-				Thread.sleep(100);
+        try {
+          Thread.sleep(100);
+        } finally {
+          System.out.println("Stump Ghost: <eyes on> command - completed");
+        }
 				
-				System.out.println("Stump Ghost: <eyes on> command - completed");
 				return false;
 			}
 		});
@@ -223,9 +236,12 @@ public class StumpGhostDriver extends DeviceDriver {
 			public boolean execute(Object param) throws Exception {
 				System.out.println("Stump Ghost: <eyes off> command");
 				
-				Thread.sleep(100);
+        try {
+          Thread.sleep(100);
+        } finally {
+          System.out.println("Stump Ghost: <eyes off> command - completed");
+        }
 				
-				System.out.println("Stump Ghost: <eyes off> command - completed");
 				return false;
 			}
 		});

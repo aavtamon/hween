@@ -57,6 +57,11 @@ public class DeviceManager {
 			driver = new StumpGhostDriver(!deviceFeaturesDisabled);
 		}
 		
+		try {
+		  driver.reset();
+		} catch (InterruptedException ie) {
+		  ie.printStackTrace();
+		}
 		
 		Button wpsButton = driver.getButton(DeviceDriver.BUTTON_WPS);
 		if (wpsButton != null) {

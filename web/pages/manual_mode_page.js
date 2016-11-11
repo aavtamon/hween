@@ -118,6 +118,10 @@ ManualModePage.prototype.onShow = function(root, bundle) {
       this._enableActions();
     }
   }.bind(this));
+  
+  
+  Backend.setDeviceMode(this._deviceId, Backend.DeviceMode.MANUAL);
+  Controller.reportToServer(Backend.getDeviceInfo(this._deviceId));
 }
 
 ManualModePage.prototype.onHide = function() {

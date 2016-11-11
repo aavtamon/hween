@@ -20,7 +20,7 @@ do
 
   if [ "${code_version}" == "" ]
   then
-    echo "Server does not report a code version. Corrupt update will be skipped"
+    echo "Server does not report a code version. The update is corrupt or a server is not accessible. Skipping."
   else
     echo "Code version available on the server: ${code_version}"
     

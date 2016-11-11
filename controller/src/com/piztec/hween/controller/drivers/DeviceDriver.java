@@ -10,8 +10,12 @@ public abstract class DeviceDriver {
 	
 	public static String BUTTON_WPS = "wps";
 	
-
-	public static abstract class Command {
+  public static final String COMMAND_PAUSE = "pause";
+  public static final String COMMAND_TALK = "talk";
+  public static final String COMMAND_RESET = "reset";
+	
+  
+  public static abstract class Command {
 		private final String name;
 		
 		Command(final String name) {
@@ -181,4 +185,17 @@ public abstract class DeviceDriver {
 	
 	
 	public abstract Button getButton(String name);
+	
+	public void reset() throws InterruptedException {
+	  Command resetCommand = getCommand(COMMAND_RESET);
+	  if (resetCommand != null) {
+	    try {
+        resetCommand.execute(null);
+      } catch (InterruptedException ie) {
+        throw new InterruptedException("Reset is interrupted");
+	    } catch (Exception e) {
+        e.printStackTrace();
+      }
+	  }
+	}
 }

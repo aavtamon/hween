@@ -14,10 +14,6 @@ public class Schedule {
 	private static final String TRIGGER_IMMEDIATELY = "immediately";
 	private static final String TRIGGER_DELAY = "delay";
 	
-	private static final String COMMAND_PAUSE = "pause";
-	private static final String COMMAND_TALK = "talk";
-	private static final String COMMAND_RESET = "reset";
-	
 	private final JSONObject cloudSchedule;
 	private final DeviceDriver driver;
 	private final Trigger trigger;
@@ -144,28 +140,10 @@ public class Schedule {
 			private void executeProgram(JSONObject program) throws InterruptedException {
 				try {
 					System.out.println("Executing program: " + program.getString("title"));
-				} catch (JSONException e1) {
+				} catch (JSONException e) {
 				}
 				
 				boolean interrupted = false;
-				
-				// We reset the device back to the initial position
-				Command resetCommand = driver.getCommand(COMMAND_RESET);
-				if (resetCommand != null) {
-					try {
-						resetCommand.execute(null);
-					} catch (InterruptedException ie) {
-						interrupted = true;
-					} catch (Exception e) {
-					}
-				}
-
-				AudioManager.getInstance().stop();
-				
-				if (interrupted || isInterrupted()) {
-					throw new InterruptedException("Reset interrupted");
-				}
-				
 				
 				try {
 					JSONArray cloudCommands = program.getJSONArray("commands");
@@ -190,6 +168,18 @@ public class Schedule {
 				if (interrupted || isInterrupted()) {
 					throw new InterruptedException("Command execution interrupted");
 				}
+				
+        // We reset the device back to the initial position
+        try {
+          driver.reset();
+        } catch (InterruptedException ie) {
+          interrupted = true;
+        }
+        AudioManager.getInstance().stop();
+        
+        if (interrupted || isInterrupted()) {
+          throw new InterruptedException("Reset interrupted");
+        }
 			}
 					
 			private void executeCommand(JSONObject cloudCommand) throws JSONException, Exception {
@@ -203,7 +193,7 @@ public class Schedule {
 				System.out.println("Executing command " + commandName);
 				
 				// Special commands first
-				if (COMMAND_PAUSE.equals(commandName)) {
+				if (DeviceDriver.COMMAND_PAUSE.equals(commandName)) {
 					int delay = 3;
 					if (arg != null) {
 						try {
@@ -212,7 +202,7 @@ public class Schedule {
 						}
 					}
 					Thread.sleep(delay * 1000);
-				} else if (COMMAND_TALK.equals(commandName)) {
+				} else if (DeviceDriver.COMMAND_TALK.equals(commandName)) {
 					int duration = AudioManager.getInstance().play(arg.toString());
 					int delay = duration > 0 ? Math.min(duration, 1000) : 1000;
 					Thread.sleep(delay);
@@ -237,6 +227,10 @@ public class Schedule {
 				executionThread.join();
 				executionThread = null;
 				System.out.println("Interrupt successful");
+				
+				System.out.println("Reseting device to the initial position");
+				driver.reset();
+				AudioManager.getInstance().stop();
 			} catch (InterruptedException e) {
 			}
 		}
