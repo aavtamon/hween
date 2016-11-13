@@ -21,7 +21,7 @@ DeviceManagementPage = ClassUtils.defineClass(AbstractDataPage, function DeviceM
     if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_SCHEDULE) {
       var schedule = Backend.getDeviceSchedule(this._deviceId);
       this._refreshProgramList(schedule.programs);
-      //this._triggerList.selectData(schedule.trigger);
+      this._triggerList.selectData(schedule.trigger);
     } else if (event.type == Backend.CacheChangeEvent.TYPE_DEVICE_MODE) {
       this._updateModeButtons();
     }
@@ -159,6 +159,7 @@ DeviceManagementPage.prototype.onShow = function(root, bundle) {
   Backend.getDeviceSettings(this._deviceType, function(status, deviceSettings) {
     if (status == Backend.OperationResult.SUCCESS) {
       this._triggerList.setChoices(deviceSettings.supportedProgramTriggers);
+      var schedule = Backend.getDeviceSchedule(this._deviceId);
       if (schedule != null) {
         this._triggerList.selectData(schedule.trigger);
       }
