@@ -32,17 +32,31 @@ Toy.prototype.remove = function() {
 }
 
 Toy.prototype.reset = function() {
-  this._state = {};
-  this.initializeState(this._state);
-  
-  this._clear();
-  this.drawState(this._state);
+  if (this._state == null) {
+    this._state = {};
+    this.initializeState(this._state);
+    
+    this._clear();
+    this.drawState(this._state);
+  } else if (!this.performCommand({data: Backend.DeviceCommand.MOVE_DOWN})) {
+    this.initializeState(this._state);
+    
+    this._clear();
+    this.drawState(this._state);
+  } else {
+    setTimeout(function() {
+      this.reset();
+    }.bind(this), 100);
+  }
 }
 
 Toy.prototype.performCommand = function(command) {
   if (this.changeState(this._state, command)) {
     this._clear();
     this.drawState(this._state);
+    return true;
+  } else {
+    return false;
   }
 }
 

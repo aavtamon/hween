@@ -149,6 +149,7 @@ CreateProgramPage.prototype.onShow = function(root, bundle) {
         this._descriptionInput.setValue(program.description);
         
         UIUtils.setEnabled(this._saveButton, true);
+        this._stopProgram();
       } else {
         console.error("Incorrect situation: provided library program id " + this._edittingProgramId + " does not match any library program")
       }
@@ -254,7 +255,6 @@ CreateProgramPage.prototype._playProgram = function() {
   
   if (this._currentCommandIndex == null) {
     this._currentCommandIndex = 0;
-    this._toy.reset();
   } else {
     this._stopCommandExecution(this._currentCommandIndex);
     this._currentCommandIndex++;
@@ -302,6 +302,7 @@ CreateProgramPage.prototype._stopProgram = function() {
   this._currentCommandIndex = null;
   
   this._commandList.scrollToItem(this._commandList.getItems()[0]);
+  this._toy.reset();
 }
 
 

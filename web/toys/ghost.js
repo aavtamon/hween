@@ -13,7 +13,7 @@ Ghost._HEAD_TURN_ANGLE = 45;
 
 Ghost.prototype.changeState = function(state, command) {
   Toy.prototype.changeState.call(this, state, command);
-  
+
   if (command.data == Backend.DeviceCommand.MOVE_UP) {
     if (state[Ghost.HEAD].position + 1 <= Ghost._HEAD_HIGH_POSITION) {
       state[Ghost.HEAD].position++;
@@ -119,8 +119,4 @@ Ghost.prototype.drawState = function(state) {
   this.addLine(48, headPosition + 6, 48, 66);
   this.addLine(52, headPosition + 6, 52, 66);
   this.getCanvasContext().stroke();
-  
-  
-
-  
 }
